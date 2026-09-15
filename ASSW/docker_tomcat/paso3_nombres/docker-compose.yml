@@ -1,0 +1,42 @@
+services:
+  tomcat1:
+    image: tomcat1-app
+    build:
+      context: .
+      dockerfile: Dockerfile.app1
+    container_name: tomcat1
+    networks:
+      mynet:
+        ipv4_address: 172.20.5.10
+    ports:
+      - "8081:8080"
+
+  tomcat2:
+    image: tomcat1-app
+    build:
+      context: .
+      dockerfile: Dockerfile.app1
+    container_name: tomcat2
+    networks:
+      mynet:
+        ipv4_address: 172.20.5.11
+    ports:
+      - "8082:8080"
+  tomcat3:
+    image: tomcat1-app
+    build:
+      context: .
+      dockerfile: Dockerfile.app1
+    container_name: tomcat3
+    networks:
+      mynet:
+        ipv4_address: 172.20.5.12
+    ports:
+      - "8083:8080"
+networks:
+  mynet:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.20.5.0/24

@@ -1,0 +1,21 @@
+# Etapa de build https://dev.to/devaaai/best-docker-base-images-and-performance-optimization-for-java-applications-in-2025-kdd
+FROM eclipse-temurin:25-jdk-resolute AS build
+
+RUN apt-get update && apt-get install -y wget && rm -rf /var/lib/apt/lists/*
+
+# Descargar jakarta.servlet-api
+RUN wget -q https://repo1.maven.org/maven2/jakarta/servlet/jakarta.servlet-api/6.0.0/jakarta.servlet-api-6.0.0.jar -O /jakarta-servlet-api.jar
+
+WORKDIR /src
+COPY app1/ . 
+
+# Compilar y empaquetar WAR
+RUN mkdir -p /build \
+    && javac -cp /jakarta-servlet-api.jar -d /build/WEB-INF/classes src/*.java \
+    && cp -r WEB-INF /build/ \
+    && cd /build \
+    && jar -cvf /build/app.war -C /build .
+
+# Imagen final con Tomcat
+FROM tomcat:10.1.46-jdk25
+COPY --from=build /build/app.war /usr/local/tomcat/webapps/app.war

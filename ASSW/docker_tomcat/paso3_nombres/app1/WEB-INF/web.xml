@@ -1,0 +1,12 @@
+<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+         version="3.1">
+    <servlet>
+        <servlet-name>HolaServlet</servlet-name>
+        <servlet-class>HolaServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>HolaServlet</servlet-name>
+        <url-pattern>/hola</url-pattern>
+    </servlet-mapping>
+    <distributable/>
+</web-app>

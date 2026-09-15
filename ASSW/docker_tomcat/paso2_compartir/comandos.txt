@@ -1,0 +1,20 @@
+docker run --rm tomcat:10.1.46-jdk25 cat /usr/local/tomcat/conf/server.xml > server-base.xml
+
+docker build -f Dockerfile.app1 -t tomcat1-app .
+docker run -d --name tomcat1 -p 8081:8080 tomcat1-app
+docker exec -it tomcat1 ls -l /usr/local/tomcat/webapps/
+docker container rm --force tomcat2-app
+
+docker build -f Dockerfile.app2 -t tomcat2-app .	
+docker run -d --name tomcat2 -p 8082:8080 tomcat2-app
+docker exec -it tomcat2 ls -l /usr/local/tomcat/webapps/
+docker container rm --force tomcat2-app
+
+
+docker build -f Dockerfile.app1 -t tomcat1-app .
+docker build -f Dockerfile.app2 -t tomcat2-app .	
+docker compose up --build
+curl http://localhost:8081/app/hola
+curl http://localhost:8082/app/hola
+
+
