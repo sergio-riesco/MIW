@@ -9,12 +9,12 @@ terraform {
 
 provider "openstack" {
   auth_url  = "http://156.35.95.8:5000/v3"
-  user_name = "Quiroga" # TU USUARIO DE OPENSTACK
-  password  = "1234"
-  #application_credential_id     = ""    # TODO: Ajustar parámetro
-  #application_credential_secret = ""    # TODO: Ajustar parámetro
+  user_name = "UO294343" # TU USUARIO DE OPENSTACK
+  #password  = "1234"
+  application_credential_id     = "f40be78fbfc944f3912f5fc8438c3f53"    
+  application_credential_secret = "JF0Pfx0rj_uFeg8v2e41Iu7SMhiQ5vR3HB2XpHPLtt9Of9SiY8E5Ul52M8BIyCCXRJ_TWpzWWM5C398CSdg5XQ"  
   domain_name = "Default"
-  tenant_name = "Quiroga_project"
+  tenant_name = "UO294343_project"
   region      = "RegionOne"
 }
 
@@ -26,13 +26,13 @@ data "openstack_compute_flavor_v2" "small" {
   name = "ephym_small_2"
 }
 resource "openstack_compute_instance_v2" "quiroga_vm" {
-  name            = "Nombre" # TODO: Ajustar parámetro
+  name            = "mv" # TODO: Ajustar parámetro
   image_id        = data.openstack_images_image_v2.ubuntu.id
   flavor_id       = data.openstack_compute_flavor_v2.small.id
   security_groups = ["default"]
 
   network {
-    name = "Quiroga_network"
+    name = "UO294343_network"
   }
   user_data = <<-EOF
     #cloud-config
