@@ -1,0 +1,9 @@
+curl http://192.168.1.52 <h1>Web nodo 1</h1>
+curl http://192.168.1.208 <h1>Web nodo 3</h1>
+curl http://192.168.1.247 <h1>Web nodo 2</h1>
+curl http://192.168.1.121 <h1>Web nodo 3</h1>
+curl http://192.168.1.121 <h1>Web nodo 2</h1>
+curl http://192.168.1.121 <h1>Web nodo 1</h1>
+curl http://192.168.1.121 <h1>Web nodo 3</h1>
+curl http://192.168.1.121 <h1>Web nodo 2</h1>
+curl http://192.168.1.121 <h1>Web nodo 1</h1>
