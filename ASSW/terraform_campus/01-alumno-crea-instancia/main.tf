@@ -25,8 +25,8 @@ data "openstack_images_image_v2" "ubuntu" {
 data "openstack_compute_flavor_v2" "small" {
   name = "ephym_small_2"
 }
-resource "openstack_compute_instance_v2" "quiroga_vm" {
-  name            = "mv" # TODO: Ajustar parámetro
+resource "openstack_compute_instance_v2" "UO294343_vm" {
+  name            = "mv_ASSW" # TODO: Ajustar parámetro
   image_id        = data.openstack_images_image_v2.ubuntu.id
   flavor_id       = data.openstack_compute_flavor_v2.small.id
   security_groups = ["default"]
