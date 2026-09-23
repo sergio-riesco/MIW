@@ -1,0 +1,12 @@
+#cloud-config
+users:
+  - name: user
+    plain_text_passwd: '1234'
+    lock_passwd: false
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    shell: /bin/bash
+ssh_pwauth: True # En el futuro será 'False'
+package_update: true
+package_upgrade: true
+locale: es_ES.UTF-8
+timezone: Europe/Madrid

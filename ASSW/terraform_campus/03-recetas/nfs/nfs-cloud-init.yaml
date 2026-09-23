@@ -1,0 +1,27 @@
+#cloud-config
+package_update: true
+ssh_pwauth: true
+
+users:
+  - name: '${vm_username}'
+    plain_text_passwd: '${vm_password}'
+    lock_passwd: false
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    shell: /bin/bash
+
+packages:
+  - nfs-kernel-server
+
+write_files:
+  - path: /etc/exports
+    permissions: '0644'
+    owner: root:root
+    content: |
+      ${export_path} ${nfs_allowed_network}(rw,sync,no_subtree_check,no_root_squash)
+
+runcmd:
+  - mkdir -p ${export_path}
+  - chown nobody:nogroup ${export_path}
+  - chmod 777 ${export_path}
+  - exportfs -a
+  - systemctl restart nfs-kernel-server
