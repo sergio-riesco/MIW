@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demo Procesador de Imagen Game Boy WASM</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            margin: 2rem;
+            background-color: #f8fafc;
+            color: #0f172a;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .canvas-container {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+        }
+
+        .card {
+            background: white;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            border: 1px solid #e2e8f0;
+            flex: 1;
+            min-width: 280px;
+        }
+
+        canvas {
+            max-width: 100%;
+            height: auto;
+            border: 1px solid #cbd5e1;
+            background: #000;
+            border-radius: 0.25rem;
+        }
+
+        #contenido {
+            white-space: pre-wrap;
+            background: #1e293b;
+            color: #38bdf8;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-top: 1.5rem;
+            font-family: monospace;
+            font-size: 0.85rem;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        input[type="file"] {
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Procesador Game Boy con WebAssembly</h1>
+
+        <div>
+            <label for="fileInput"><strong>Cargar una imagen:</strong> </label>
+            <input type="file" id="fileInput" accept="image/*">
+        </div>
+
+        <div class="canvas-container">
+            <div class="card">
+                <h3>Imagen Original</h3>
+                <canvas id="canvasSrc"></canvas>
+            </div>
+            <div class="card">
+                <h3>Resultado Game Boy (WASM)</h3>
+                <canvas id="canvasDst"></canvas>
+            </div>
+        </div>
+
+        <h2>Lectura de archivo procesar.wat</h2>
+        <div id="contenido">Cargando archivo procesar.wat...</div>
+    </div>
+
+    <script type="module">
+        import { processImage } from './filtroGB.js';
+
+        const fileInput = document.getElementById('fileInput');
+        const canvasSrc = document.getElementById('canvasSrc');
+        const canvasDst = document.getElementById('canvasDst');
+        const ctxSrc = canvasSrc.getContext('2d');
+        const ctxDst = canvasDst.getContext('2d');
+
+        // Dibujar y procesar imagen en los canvas
+        async function render(img) {
+            // Escalar si la imagen es muy grande
+            const maxDim = 400;
+            let w = img.width;
+            let h = img.height;
+
+            if (w > maxDim || h > maxDim) {
+                if (w > h) {
+                    h = Math.round((h * maxDim) / w);
+                    w = maxDim;
+                } else {
+                    w = Math.round((w * maxDim) / h);
+                    h = maxDim;
+                }
+            }
+
+            canvasSrc.width = canvasDst.width = w;
+            canvasSrc.height = canvasDst.height = h;
+
+            // Dibujar original
+            ctxSrc.drawImage(img, 0, 0, w, h);
+            const srcData = ctxSrc.getImageData(0, 0, w, h);
+
+            try {
+                // Procesar píxeles con la función exportada
+                const resultData = await processImage(srcData);
+                ctxDst.putImageData(resultData, 0, 0);
+            } catch (e) {
+                console.error('Error al procesar la imagen con WASM:', e);
+            }
+        }
+
+        // Listener para subir archivo
+        fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                const img = new Image();
+                img.onload = () => render(img);
+                img.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        });
+
+        // Crear una imagen por defecto de prueba en un canvas canvas
+        function cargarDemo() {
+            const demoCanvas = document.createElement('canvas');
+            demoCanvas.width = 300;
+            demoCanvas.height = 200;
+            const dctx = demoCanvas.getContext('2d');
+
+            // Fondo y figura de ejemplo
+            const grad = dctx.createLinearGradient(0, 0, 300, 200);
+            grad.addColorStop(0, '#f43f5e');
+            grad.addColorStop(1, '#3b82f6');
+            dctx.fillStyle = grad;
+            dctx.fillRect(0, 0, 300, 200);
+
+            dctx.fillStyle = '#fef08a';
+            dctx.beginPath();
+            dctx.arc(150, 100, 50, 0, Math.PI * 2);
+            dctx.fill();
+
+            const img = new Image();
+            img.onload = () => render(img);
+            img.src = demoCanvas.toDataURL();
+        }
+
+        cargarDemo();
+    </script>
+
+    <script type="module">
+        (async () => {
+            try {
+                const respuesta = await fetch('./filtroGB.wat');
+                if (!respuesta.ok) {
+                    throw new Error(`Error al cargar archivo: ${respuesta.status}`);
+                }
+                const texto = await respuesta.text();
+                document.getElementById('contenido').textContent = texto;
+            } catch (e) {
+                console.error('Error leyendo archivo .wat:', e);
+                document.getElementById('contenido').textContent = 
+                    'Error leyendo procesar.wat. Asegúrate de servir el archivo desde un servidor local (HTTP).';
+            }
+        })();
+    </script>
+</body>
+</html>

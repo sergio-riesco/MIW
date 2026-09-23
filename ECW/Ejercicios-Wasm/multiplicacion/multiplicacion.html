@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <title>Demo multiplicación WASM</title>
+    <style>
+        body {
+            font-family: system-ui, sans-serif;
+            margin: 2rem;
+        }
+
+        #contenido {
+            white-space: pre-wrap; /* Mantiene saltos de línea */
+            background: #f6f8fa;
+            padding: 1rem;
+            border: 0.1em solid #ddd;
+            border-radius: 0.5em;
+            margin-top: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+    <h1>Prueba de multiplicación con WebAssembly</h1>
+
+    <script type="module">
+        import { multiplicacion } from './multiplicacion.js';
+
+        (async () => {
+            try {
+                const resultado = await multiplicacion(5, 7);
+                document.body.appendChild(
+                    document.createTextNode(`multiplicacion(5,7) = ${resultado}`)
+                );
+            } catch (e) {
+                console.error('Error ejecutando multiplicacion:', e);
+                document.body.appendChild(
+                    document.createTextNode('Error ejecutando multiplicacion. Revisa la consola.')
+                );
+            }
+        })();
+    </script>
+
+    <h2>Lectura de archivo multiplicacion.wat</h2>
+
+    <script type="module">
+        (async () => {
+            try {
+                // Usamos fetch para leer el archivo de texto del servidor
+                const respuesta = await fetch('./multiplicacion.wat');
+                if (!respuesta.ok) {
+                    throw new Error(`Error al cargar archivo: ${respuesta.status}`);
+                }
+                const texto = await respuesta.text();
+
+                // Creamos un contenedor y mostramos el contenido
+                const div = document.createElement('div');
+                div.id = 'contenido';
+                div.textContent = texto;
+                document.body.appendChild(div);
+            } catch (e) {
+                console.error('Error leyendo archivo:', e);
+                document.body.appendChild(
+                    document.createTextNode('Error leyendo archivo. Revisa la consola.')
+                );
+            }
+        })();
+    </script>
+</body>
+</html>
+
+

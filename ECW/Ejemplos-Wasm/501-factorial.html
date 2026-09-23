@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Ejemplo WASM: Factorial</title>
+</head>
+<body>
+    <h2>Ejemplo WASM: cálculo del factorial</h2>
+
+    <script type="module">
+        async function cargarWasm() {
+            try {
+                // Cargamos el archivo .wasm generado a partir de factorial.wat
+                const respuesta = await fetch('501-factorial.wasm');
+                const bytes = await respuesta.arrayBuffer();
+                const modulo = await WebAssembly.instantiate(bytes);
+
+                // Obtenemos la función exportada
+                const factorial = modulo.instance.exports.factorial;
+
+                // Probamos con algunos valores
+                document.body.innerHTML += `<h3>Ejecución</h3>`;
+                document.body.innerHTML += `<p>Factorial de 5 = ${factorial(5)}</p>`;
+                document.body.innerHTML += `<p>Factorial de 7 = ${factorial(7)}</p>`;
+                document.body.innerHTML += `<p>Factorial de 9 = ${factorial(9)}</p>`;
+                document.body.innerHTML += `<p>Factorial de 10 = ${factorial(10)}</p>`;
+                document.body.innerHTML += `<p>Factorial de 27 = ${factorial(27)}</p>`;
+            } catch (error) {
+                document.body.innerHTML += '<p>Error al cargar el módulo WASM.</p>';
+                console.error(error);
+            }
+        }
+
+        async function mostrarArchivoWat() {
+            try {
+                // Leemos el archivo 501-factorial.wat como texto
+                const respuesta = await fetch('501-factorial.wat');
+                if (!respuesta.ok) {
+                    throw new Error(`Error al cargar archivo: ${respuesta.status}`);
+                }
+                const texto = await respuesta.text();
+
+                // Mostramos el contenido respetando saltos de línea con <pre>
+                const pre = document.createElement('pre');
+                pre.textContent = texto;
+                document.body.appendChild(pre);
+            } catch (error) {
+                document.body.innerHTML += '<p>Error al leer el archivo 501-factorial.wat.</p>';
+                console.error(error);
+            }
+        }
+
+        // Ejecutamos ambas funciones
+        cargarWasm();
+        mostrarArchivoWat();
+    </script>
+</body>
+</html>
+
