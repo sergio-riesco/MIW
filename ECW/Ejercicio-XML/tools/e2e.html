@@ -53,6 +53,19 @@
       const nOpts = $("origen").options.length;
       ok(nOpts >= 71, "selector de corpus poblado por /api/corpus", nOpts + " opciones");
 
+      // La pagina raiz (la que ve el usuario en http://localhost:8080/) debe
+      // cargar app.mjs por ruta ABSOLUTA: la relativa ./app.mjs se resolveria
+      // como /app.mjs (404 text/plain) y el navegador bloquearia el modulo.
+      const rui = await fetch("/");
+      const htmlRaiz = await rui.text();
+      const srces = [...htmlRaiz.matchAll(/<script[^>]*src="([^"]+)"/g)].map((m) => m[1]);
+      const mods = srces.filter((s) => s.endsWith(".mjs"));
+      ok(mods.length === 1 && mods[0] === "/packages/ui/app.mjs",
+        "pagina raiz carga app.mjs por ruta absoluta", mods.join(",") || "(sin modulos)");
+      const rapp = await fetch("/packages/ui/app.mjs");
+      ok(rapp.ok && /javascript/.test(rapp.headers.get("content-type")),
+        "app.mjs tiene MIME de JS", rapp.headers.get("content-type"));
+
       // --- Analizar caso-01 con el motor WASM ---
       const r1 = await fetch("/corpus/caso-01-reserva.vxml");
       ok(r1.ok, "fetch caso-01: HTTP " + r1.status);
