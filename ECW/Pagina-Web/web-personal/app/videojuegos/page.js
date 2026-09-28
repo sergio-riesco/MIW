@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { games } from "../data/games";
+import { videogames } from "../data/videogames";
 
 export const metadata = {
   title: "Videojuegos",
@@ -8,7 +8,7 @@ export const metadata = {
 };
 
 export default function VideojuegosPage() {
-  const currentGame = games.find((game) => game.current);
+  const currentGame = videogames.find((game) => game.current);
 
   return (
     <main className="container page" id="contenido">
@@ -36,7 +36,7 @@ export default function VideojuegosPage() {
         </div>
 
         <ul className="game-scroller" aria-label="Lista de videojuegos">
-          {games.map((game, index) => (
+          {videogames.map((game, index) => (
             <li key={game.id}>
               <article
                 className={`game-card${game.current ? " game-card--current" : ""}`}
@@ -48,6 +48,7 @@ export default function VideojuegosPage() {
                     fill
                     sizes="(max-width: 640px) 44vw, 200px"
                     priority={index < 2}
+                    unoptimized={game.cover?.endsWith(".svg")}
                   />
                   {game.current && (
                     <span className="game-badge game-badge--current">

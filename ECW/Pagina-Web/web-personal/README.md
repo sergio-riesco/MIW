@@ -32,6 +32,19 @@ La lista está generada desde `app/data/games.js`. Para añadir uno:
 
 Si se omite `cover`, se muestra automáticamente `public/covers/placeholder.svg`.
 
+## Añadir un grupo de música
+
+La lista está generada desde `app/data/music.js`. Para añadir uno:
+
+1. Copia un objeto del array `bands`.
+2. Cambia el `id`, el `name`, el `genre` y el `album`.
+3. Añade la carátula en `public/covers/music` y actualiza `cover`.
+4. Usa `favorite: true` para marcar un grupo como favorito.
+
+Ahora mismo hay portadas provisionales SVG. Para usar la carátula real, guarda
+la imagen en `public/covers/music` y cambia la extensión en `cover` (por ejemplo,
+a `/covers/music/pink-floyd.jpg`).
+
 ## Desarrollo
 
 ```bash
