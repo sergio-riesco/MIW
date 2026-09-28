@@ -1,0 +1,17 @@
+[package]
+name = "vxml-doctor"
+version = "1.0.0"
+edition = "2021"
+description = "VXML Doctor: analizador estatico de VoiceXML en Rust para WebAssembly"
+license = "MIT"
+
+[lib]
+crate-type = ["cdylib"]
+
+# El unico destino es wasm32-unknown-unknown: sin libc, sin sistema.
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = "symbols"

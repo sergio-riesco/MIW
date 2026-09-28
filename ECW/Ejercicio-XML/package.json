@@ -1,0 +1,23 @@
+{
+  "name": "vxml-doctor",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "VXML Doctor: analizador estatico de VoiceXML en JavaScript, TypeScript y WebAssembly (Rust)",
+  "scripts": {
+    "corpus": "node corpus/generar-corpus.mjs",
+    "gen:reglas": "node tools/gen-reglas.mjs",
+    "build:ts": "tsc -p packages/impl-ts/tsconfig.json",
+    "build:wasm": "node tools/build-wasm.mjs",
+    "build": "npm run gen:reglas && npm run build:ts && npm run build:wasm",
+    "test": "node tools/test-diferencial.mjs",
+    "bench": "node --expose-gc packages/bench/bench.mjs",
+    "bench:html": "node packages/bench/generar-informe.mjs",
+    "serve": "node tools/serve.mjs",
+    "smoke": "node tools/smoke.mjs",
+    "todo": "npm run corpus && npm run build && npm run test && npm run bench"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3"
+  }
+}

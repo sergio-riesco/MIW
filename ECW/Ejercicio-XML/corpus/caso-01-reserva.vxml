@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  VXML Doctor -- caso 01:Reserve de restaurante.
+  Documento CORRECTO a proposito: sirve de referencia y debe producir
+  muy pocos diagnosticos (solo avisos informativos legitimos).
+-->
+<vxml xmlns="http://www.w3.org/2001/vxml"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.w3.org/2001/vxml
+                          http://www.w3.org/TR/voicexml21/vxml.xsd"
+      version="2.1"
+      xml:lang="es-ES">
+
+  <var name="maxIntentos" expr="3"/>
+  <var name="intentos"/>
+
+  <form id="saludo">
+    <block>
+      <prompt>
+        <prosody rate="slow">
+          Bienvenido al servicio de reservas de Mesa Grande.
+        </prosody>
+        <break time="500ms"/>
+        Digame su nombre completo, por favor.
+      </prompt>
+      <field name="nombre" type="string">
+        <grammar src="nombres.grxml" type="application/srgs+xml"/>
+        <prompt>Diga su nombre.</prompt>
+        <nomatch count="1">
+          No he entendido su nombre. Repita, por favor.
+          <reprompt/>
+        </nomatch>
+        <noinput>
+          No he oido nada.
+          <reprompt/>
+        </noinput>
+        <filled>
+          <assign name="intentos" expr="0"/>
+          <goto next="#reservar"/>
+        </filled>
+      </field>
+    </block>
+  </form>
+
+  <form id="reservar">
+    <var name="fecha"/>
+    <var name="hora"/>
+
+    <field name="dia" type="date">
+      <prompt>
+        Para que dia desea reservar?
+        <enumerate>
+          <option>Hoy</option>
+          <option>Manana</option>
+          <option>El sabado proximo</option>
+        </enumerate>
+      </prompt>
+      <filled>
+        <assign name="fecha" expr="dia"/>
+        <goto next="#hora"/>
+      </filled>
+      <nomatch>
+        Repita la fecha, por favor.
+        <reprompt/>
+      </nomatch>
+    </field>
+  </form>
+
+  <form id="hora">
+    <field name="franja" type="string">
+      <prompt>A que hora prefiere cenar? Mediodia o noche.</prompt>
+      <grammar type="application/srgs+xml" src="franjas.grxml"/>
+      <filled>
+        <assign name="hora" expr="franja"/>
+        <goto next="#confirmar"/>
+      </filled>
+      <nomatch>
+        Diga mediodia o noche.
+        <reprompt/>
+      </nomatch>
+      <noinput>
+        No le he oido.
+        <reprompt/>
+      </noinput>
+    </field>
+  </form>
+
+  <form id="confirmar">
+    <block>
+      <prompt>
+        <value expr="nombre"/>
+        , su reserva es el
+        <value expr="fecha"/>
+        a las
+        <value expr="hora"/>
+        . Esta de acuerdo?
+      </prompt>
+      <field name="confirmado" type="boolean">
+        <grammar type="application/srgs+xml" src="si_no.grxml"/>
+        <prompt>Esta de acuerdo con la reserva?</prompt>
+        <filled>
+          <if cond="confirmado == 'si'">
+            <goto next="#registrar"/>
+          <else/>
+            <goto next="#reservar"/>
+          </if>
+        </filled>
+        <nomatch>
+          Digame si o no.
+          <reprompt/>
+        </nomatch>
+      </field>
+    </block>
+  </form>
+
+  <form id="registrar">
+    <block>
+      <submit method="post" next="reservas.cgi"
+              namelist="nombre fecha hora" enctype="application/x-www-form-urlencoded"/>
+      <audio src="confirmado.wav">
+        Su reserva ha sido registrada. Gracias por llamar.
+      </audio>
+      <exit/>
+    </block>
+  </form>
+
+</vxml>

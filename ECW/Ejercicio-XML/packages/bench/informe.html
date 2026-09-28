@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Informe del banco de pruebas — VXML Doctor</title>
+<style>
+  :root { --tinta:#1c2733; --tenue:#5b6b7b; --linea:#e2e8f0; --accent:#0f766e; }
+  * { box-sizing: border-box; }
+  body { font-family: "Segoe UI", system-ui, sans-serif; color: var(--tinta);
+         max-width: 980px; margin: 2rem auto; padding: 0 1.25rem; line-height: 1.5; }
+  h1 { font-size: 1.5rem; margin-bottom: .25rem; }
+  h2 { font-size: 1.15rem; margin-top: 2.25rem; border-bottom: 1px solid var(--linea); padding-bottom: .35rem; }
+  .meta { color: var(--tenue); font-size: .9rem; margin-bottom: 1.75rem; }
+  table { width: 100%; border-collapse: collapse; font-size: .9rem; margin: 1rem 0 2rem; }
+  th, td { padding: .5rem .6rem; border-bottom: 1px solid var(--linea); text-align: right; white-space: nowrap; }
+  th { background: #f6f8fa; font-weight: 600; }
+  td.nombre, th:first-child { text-align: left; }
+  td.bytes { color: var(--tenue); font-variant-numeric: tabular-nums; }
+  .celda-barra { display: flex; align-items: center; gap: .5rem; min-width: 130px; }
+  .bar { background: var(--accent); height: 12px; border-radius: 3px; opacity: .85; }
+  .fuerte { font-weight: 600; color: var(--accent); }
+  .destacado { background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 8px;
+               padding: .9rem 1rem; margin: 1.25rem 0; font-size: .95rem; }
+  .pie { color: var(--tenue); font-size: .8rem; margin-top: 2.5rem; }
+  @media print { body { margin: 0; } .bar { print-color-adjust: exact; -webkit-print-color-adjust: exact; } }
+</style>
+</head>
+<body>
+  <h1>Informe del banco de pruebas — VXML Doctor</h1>
+  <p class="meta">28 de septiembre de 2026 a las 17:13 · Node v24.21.0 · win32/x64 · Intel(R) Core(TM) i9-14900KF · 32 núcleos · 63.8 GiB RAM<br>
+  Corpus: 66 documentos, 5.58 MiB, 9 pasadas medidas por motor con gc() entre pasadas.</p>
+
+  <div class="destacado">El motor WebAssembly es <strong>2.76× más rápido</strong> que el JavaScript de referencia con el corpus completo analizado (mediana de pasadas).</div>
+
+  <h2>Resumen</h2>
+  <table>
+    <thead><tr>
+      <th>Implementación</th><th>Mediana (ms)</th><th>Mínimo</th><th>Máximo</th>
+      <th>MiB/s</th><th>vs. más rápido</th><th>Arranque (ms)</th><th>Primer análisis (ms)</th>
+    </tr></thead>
+    <tbody>
+<tr>
+    <td class="nombre">JavaScript (referencia)</td>
+    <td><div class="celda-barra"><div class="bar" style="width:240%"></div><span>121.4 ms</span></div></td>
+    <td>94.5</td>
+    <td>124.0</td>
+    <td class="fuerte">46.0</td>
+    <td>2.76×</td>
+    <td>1.98</td>
+    <td>25.90</td>
+  </tr>
+<tr>
+    <td class="nombre">TypeScript</td>
+    <td><div class="celda-barra"><div class="bar" style="width:222%"></div><span>112.3 ms</span></div></td>
+    <td>99.0</td>
+    <td>114.5</td>
+    <td class="fuerte">49.7</td>
+    <td>2.55×</td>
+    <td>1.48</td>
+    <td>24.96</td>
+  </tr>
+<tr>
+    <td class="nombre">WebAssembly (Rust)</td>
+    <td><div class="celda-barra"><div class="bar" style="width:87%"></div><span>44.0 ms</span></div></td>
+    <td>43.4</td>
+    <td>44.1</td>
+    <td class="fuerte">126.8</td>
+    <td>1.00×</td>
+    <td>1.59</td>
+    <td>10.19</td>
+  </tr>
+    </tbody>
+  </table>
+
+  <h2>Mediana por documento (ms)</h2>
+  <p class="meta">Ordenados de mayor a menor tamaño. Barras normalizadas al documento más lento.</p>
+  <table>
+    <thead><tr><th>Documento</th><th>Bytes</th><th>JS</th><th>TS</th><th>WASM</th></tr></thead>
+    <tbody>
+<tr>
+    <td class="nombre">masivo-001.vxml</td>
+    <td class="bytes">1116403</td>
+    <td><div class="celda-barra"><div class="bar" style="width:99%"></div><span>28.0</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:100%"></div><span>28.3</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:30%"></div><span>8.6</span></div></td>
+  </tr>
+<tr>
+    <td class="nombre">masivo-000.vxml</td>
+    <td class="bytes">1080833</td>
+    <td><div class="celda-barra"><div class="bar" style="width:98%"></div><span>27.6</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:97%"></div><span>27.5</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:29%"></div><span>8.3</span></div></td>
+  </tr>
+<tr>
+    <td class="nombre">grande-001.vxml</td>
+    <td class="bytes">494891</td>
+    <td><div class="celda-barra"><div class="bar" style="width:28%"></div><span>8.0</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:28%"></div><span>8.0</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:12%"></div><span>3.5</span></div></td>
+  </tr>
+<tr>
+    <td class="nombre">grande-002.vxml</td>
+    <td class="bytes">492838</td>
+    <td><div class="celda-barra"><div class="bar" style="width:29%"></div><span>8.3</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:26%"></div><span>7.2</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:12%"></div><span>3.5</span></div></td>
+  </tr>
+<tr>
+    <td class="nombre">grande-003.vxml</td>
+    <td class="bytes">487156</td>
+    <td><div class="celda-barra"><div class="bar" style="width:26%"></div><span>7.4</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:26%"></div><span>7.4</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:12%"></div><span>3.4</span></div></td>
+  </tr>
+<tr>
+    <td class="nombre">grande-000.vxml</td>
+    <td class="bytes">481102</td>
+    <td><div class="celda-barra"><div class="bar" style="width:35%"></div><span>9.9</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:44%"></div><span>12.6</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:12%"></div><span>3.5</span></div></td>
+  </tr>
+<tr>
+    <td class="nombre">mediano-003.vxml</td>
+    <td class="bytes">79399</td>
+    <td><div class="celda-barra"><div class="bar" style="width:4%"></div><span>1.1</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:3%"></div><span>1.0</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.6</span></div></td>
+  </tr>
+<tr>
+    <td class="nombre">mediano-010.vxml</td>
+    <td class="bytes">78646</td>
+    <td><div class="celda-barra"><div class="bar" style="width:4%"></div><span>1.1</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:3%"></div><span>0.9</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.6</span></div></td>
+  </tr>
+<tr>
+    <td class="nombre">mediano-017.vxml</td>
+    <td class="bytes">76373</td>
+    <td><div class="celda-barra"><div class="bar" style="width:4%"></div><span>1.0</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:3%"></div><span>0.9</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.6</span></div></td>
+  </tr>
+<tr>
+    <td class="nombre">mediano-007.vxml</td>
+    <td class="bytes">74879</td>
+    <td><div class="celda-barra"><div class="bar" style="width:4%"></div><span>1.0</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:3%"></div><span>0.9</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.5</span></div></td>
+  </tr>
+<tr>
+    <td class="nombre">mediano-006.vxml</td>
+    <td class="bytes">74772</td>
+    <td><div class="celda-barra"><div class="bar" style="width:4%"></div><span>1.1</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:3%"></div><span>0.9</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.5</span></div></td>
+  </tr>
+<tr>
+    <td class="nombre">mediano-018.vxml</td>
+    <td class="bytes">74555</td>
+    <td><div class="celda-barra"><div class="bar" style="width:4%"></div><span>1.0</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:3%"></div><span>0.9</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.5</span></div></td>
+  </tr>
+<tr>
+    <td class="nombre">mediano-012.vxml</td>
+    <td class="bytes">73730</td>
+    <td><div class="celda-barra"><div class="bar" style="width:3%"></div><span>1.0</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:4%"></div><span>1.2</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.5</span></div></td>
+  </tr>
+<tr>
+    <td class="nombre">mediano-014.vxml</td>
+    <td class="bytes">73476</td>
+    <td><div class="celda-barra"><div class="bar" style="width:4%"></div><span>1.0</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:3%"></div><span>0.9</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.5</span></div></td>
+  </tr>
+<tr>
+    <td class="nombre">mediano-016.vxml</td>
+    <td class="bytes">72570</td>
+    <td><div class="celda-barra"><div class="bar" style="width:4%"></div><span>1.0</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:3%"></div><span>0.9</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.5</span></div></td>
+  </tr>
+<tr>
+    <td class="nombre">mediano-005.vxml</td>
+    <td class="bytes">72544</td>
+    <td><div class="celda-barra"><div class="bar" style="width:3%"></div><span>1.0</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:3%"></div><span>0.9</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.5</span></div></td>
+  </tr>
+<tr>
+    <td class="nombre">mediano-008.vxml</td>
+    <td class="bytes">71930</td>
+    <td><div class="celda-barra"><div class="bar" style="width:3%"></div><span>0.9</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:3%"></div><span>0.8</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.5</span></div></td>
+  </tr>
+<tr>
+    <td class="nombre">mediano-011.vxml</td>
+    <td class="bytes">71904</td>
+    <td><div class="celda-barra"><div class="bar" style="width:3%"></div><span>1.0</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:3%"></div><span>0.9</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.5</span></div></td>
+  </tr>
+<tr>
+    <td class="nombre">mediano-001.vxml</td>
+    <td class="bytes">71897</td>
+    <td><div class="celda-barra"><div class="bar" style="width:4%"></div><span>1.0</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:3%"></div><span>0.9</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.5</span></div></td>
+  </tr>
+<tr>
+    <td class="nombre">mediano-002.vxml</td>
+    <td class="bytes">71068</td>
+    <td><div class="celda-barra"><div class="bar" style="width:3%"></div><span>1.0</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:3%"></div><span>0.9</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.5</span></div></td>
+  </tr>
+<tr>
+    <td class="nombre">mediano-009.vxml</td>
+    <td class="bytes">71024</td>
+    <td><div class="celda-barra"><div class="bar" style="width:3%"></div><span>0.9</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:3%"></div><span>0.8</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.5</span></div></td>
+  </tr>
+<tr>
+    <td class="nombre">mediano-004.vxml</td>
+    <td class="bytes">70949</td>
+    <td><div class="celda-barra"><div class="bar" style="width:3%"></div><span>1.0</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:3%"></div><span>0.9</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.5</span></div></td>
+  </tr>
+<tr>
+    <td class="nombre">mediano-013.vxml</td>
+    <td class="bytes">70886</td>
+    <td><div class="celda-barra"><div class="bar" style="width:3%"></div><span>1.0</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:3%"></div><span>0.8</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.5</span></div></td>
+  </tr>
+<tr>
+    <td class="nombre">mediano-019.vxml</td>
+    <td class="bytes">67702</td>
+    <td><div class="celda-barra"><div class="bar" style="width:3%"></div><span>0.9</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:3%"></div><span>0.8</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.5</span></div></td>
+  </tr>
+<tr>
+    <td class="nombre">mediano-000.vxml</td>
+    <td class="bytes">66912</td>
+    <td><div class="celda-barra"><div class="bar" style="width:3%"></div><span>1.0</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:3%"></div><span>0.9</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.5</span></div></td>
+  </tr>
+<tr>
+    <td class="nombre">mediano-015.vxml</td>
+    <td class="bytes">61796</td>
+    <td><div class="celda-barra"><div class="bar" style="width:3%"></div><span>0.8</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:3%"></div><span>0.7</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.5</span></div></td>
+  </tr>
+<tr>
+    <td class="nombre">pequeno-031.vxml</td>
+    <td class="bytes">7869</td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.1</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.1</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.1</span></div></td>
+  </tr>
+<tr>
+    <td class="nombre">pequeno-028.vxml</td>
+    <td class="bytes">7806</td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.1</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.1</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.1</span></div></td>
+  </tr>
+<tr>
+    <td class="nombre">pequeno-003.vxml</td>
+    <td class="bytes">7804</td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.1</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.1</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.1</span></div></td>
+  </tr>
+<tr>
+    <td class="nombre">pequeno-021.vxml</td>
+    <td class="bytes">7496</td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.1</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.1</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.1</span></div></td>
+  </tr>
+<tr>
+    <td class="nombre">pequeno-006.vxml</td>
+    <td class="bytes">7372</td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.1</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.1</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.1</span></div></td>
+  </tr>
+<tr>
+    <td class="nombre">pequeno-038.vxml</td>
+    <td class="bytes">7195</td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.1</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.1</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.1</span></div></td>
+  </tr>
+<tr>
+    <td class="nombre">pequeno-023.vxml</td>
+    <td class="bytes">6965</td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.1</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.1</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.1</span></div></td>
+  </tr>
+<tr>
+    <td class="nombre">pequeno-002.vxml</td>
+    <td class="bytes">6861</td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.1</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.1</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.1</span></div></td>
+  </tr>
+<tr>
+    <td class="nombre">pequeno-011.vxml</td>
+    <td class="bytes">6851</td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.1</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.1</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.1</span></div></td>
+  </tr>
+<tr>
+    <td class="nombre">pequeno-015.vxml</td>
+    <td class="bytes">6743</td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.1</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.1</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.1</span></div></td>
+  </tr>
+<tr>
+    <td class="nombre">pequeno-018.vxml</td>
+    <td class="bytes">6728</td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.1</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.1</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.1</span></div></td>
+  </tr>
+<tr>
+    <td class="nombre">pequeno-026.vxml</td>
+    <td class="bytes">6601</td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.1</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.1</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.1</span></div></td>
+  </tr>
+<tr>
+    <td class="nombre">pequeno-025.vxml</td>
+    <td class="bytes">6492</td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.1</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.1</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.1</span></div></td>
+  </tr>
+<tr>
+    <td class="nombre">pequeno-012.vxml</td>
+    <td class="bytes">6491</td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.1</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.1</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.1</span></div></td>
+  </tr>
+<tr>
+    <td class="nombre">pequeno-013.vxml</td>
+    <td class="bytes">6487</td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.1</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.1</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.1</span></div></td>
+  </tr>
+<tr>
+    <td class="nombre">pequeno-020.vxml</td>
+    <td class="bytes">6486</td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.1</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.1</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.1</span></div></td>
+  </tr>
+<tr>
+    <td class="nombre">pequeno-016.vxml</td>
+    <td class="bytes">6471</td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.1</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.1</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.1</span></div></td>
+  </tr>
+<tr>
+    <td class="nombre">pequeno-034.vxml</td>
+    <td class="bytes">6453</td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.1</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.1</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.1</span></div></td>
+  </tr>
+<tr>
+    <td class="nombre">pequeno-000.vxml</td>
+    <td class="bytes">6301</td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.1</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.1</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.1</span></div></td>
+  </tr>
+<tr>
+    <td class="nombre">pequeno-001.vxml</td>
+    <td class="bytes">6290</td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.1</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.1</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.1</span></div></td>
+  </tr>
+<tr>
+    <td class="nombre">pequeno-030.vxml</td>
+    <td class="bytes">6250</td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.1</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.1</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.1</span></div></td>
+  </tr>
+<tr>
+    <td class="nombre">pequeno-033.vxml</td>
+    <td class="bytes">6244</td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.1</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.1</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.1</span></div></td>
+  </tr>
+<tr>
+    <td class="nombre">pequeno-036.vxml</td>
+    <td class="bytes">6186</td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.1</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.1</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.1</span></div></td>
+  </tr>
+<tr>
+    <td class="nombre">pequeno-005.vxml</td>
+    <td class="bytes">6114</td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.1</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.1</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.1</span></div></td>
+  </tr>
+<tr>
+    <td class="nombre">pequeno-004.vxml</td>
+    <td class="bytes">6075</td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.1</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.1</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.1</span></div></td>
+  </tr>
+<tr>
+    <td class="nombre">pequeno-010.vxml</td>
+    <td class="bytes">6038</td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.1</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.1</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.0</span></div></td>
+  </tr>
+<tr>
+    <td class="nombre">pequeno-035.vxml</td>
+    <td class="bytes">6005</td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.1</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.1</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.1</span></div></td>
+  </tr>
+<tr>
+    <td class="nombre">pequeno-019.vxml</td>
+    <td class="bytes">5927</td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.1</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.1</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.1</span></div></td>
+  </tr>
+<tr>
+    <td class="nombre">pequeno-008.vxml</td>
+    <td class="bytes">5762</td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.1</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.1</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.0</span></div></td>
+  </tr>
+<tr>
+    <td class="nombre">pequeno-027.vxml</td>
+    <td class="bytes">5603</td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.1</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.1</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.0</span></div></td>
+  </tr>
+<tr>
+    <td class="nombre">pequeno-039.vxml</td>
+    <td class="bytes">5595</td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.1</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.1</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.1</span></div></td>
+  </tr>
+<tr>
+    <td class="nombre">pequeno-029.vxml</td>
+    <td class="bytes">5418</td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.1</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.1</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.0</span></div></td>
+  </tr>
+<tr>
+    <td class="nombre">pequeno-024.vxml</td>
+    <td class="bytes">5383</td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.1</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.1</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.0</span></div></td>
+  </tr>
+<tr>
+    <td class="nombre">pequeno-037.vxml</td>
+    <td class="bytes">5370</td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.1</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.1</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.0</span></div></td>
+  </tr>
+<tr>
+    <td class="nombre">pequeno-009.vxml</td>
+    <td class="bytes">5324</td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.1</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.1</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.0</span></div></td>
+  </tr>
+<tr>
+    <td class="nombre">pequeno-017.vxml</td>
+    <td class="bytes">5318</td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.1</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.1</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.0</span></div></td>
+  </tr>
+<tr>
+    <td class="nombre">pequeno-014.vxml</td>
+    <td class="bytes">5125</td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.1</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.1</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.0</span></div></td>
+  </tr>
+<tr>
+    <td class="nombre">pequeno-007.vxml</td>
+    <td class="bytes">5110</td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.1</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.1</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.0</span></div></td>
+  </tr>
+<tr>
+    <td class="nombre">pequeno-032.vxml</td>
+    <td class="bytes">4687</td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.1</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.1</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.0</span></div></td>
+  </tr>
+<tr>
+    <td class="nombre">pequeno-022.vxml</td>
+    <td class="bytes">4664</td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.1</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.1</span></div></td>
+    <td><div class="celda-barra"><div class="bar" style="width:2%"></div><span>0.0</span></div></td>
+  </tr>
+    </tbody>
+  </table>
+
+  <p class="pie">Generado por packages/bench/generar-informe.mjs a partir de packages/bench/resultados.json.
+  Las tres implementaciones emiten informes JSON byte a byte idénticos (comprobado por tools/test-diferencial.mjs).</p>
+</body>
+</html>

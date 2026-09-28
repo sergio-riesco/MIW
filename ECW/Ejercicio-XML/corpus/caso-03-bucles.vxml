@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  VXML Doctor -- caso 03: Bucles de navegacion.
+  Casos que activan:
+    - VXML017  goto al propio form (bucle infinito inmediato)
+    - VXML003  ciclo de dos forms sin ninguna salida
+    - VXML012  dos forms con el mismo id
+  Y un control: `con_salida` SI tiene <exit>, por lo que el ciclo que forma con
+  `principal` no debe marcarse como sin salida.
+-->
+<vxml xmlns="http://www.w3.org/2001/vxml" version="2.1" xml:lang="es-ES">
+
+  <form id="principal">
+    <field name="opcion" type="string">
+      <prompt>Diga uno, dos o tres.</prompt>
+      <filled>
+        <if cond="opcion == 'uno'">
+          <goto next="#uno"/>
+        <elseif cond="opcion == 'dos'"/>
+          <goto next="#dos"/>
+        <elseif cond="opcion == 'tres'">
+          <goto next="#tres"/>
+        </if>
+      </filled>
+    </field>
+  </form>
+
+  <!-- VXML017: se manda a si mismo. -->
+  <form id="uno">
+    <block>
+      <prompt>Ha dicho uno.</prompt>
+      <goto next="#uno"/>
+    </block>
+  </form>
+
+  <!-- Ciclo uno <-> dos sin salida: VXML003. -->
+  <form id="dos">
+    <block>
+      <prompt>Ha dicho dos.</prompt>
+      <goto next="#tres"/>
+    </block>
+  </form>
+
+  <form id="tres">
+    <block>
+      <prompt>Ha dicho tres.</prompt>
+      <goto next="#dos"/>
+    </block>
+  </form>
+
+  <!-- Ciclo con salida: no debe registrarse. -->
+  <form id="con_salida">
+    <block>
+      <prompt>Volviendo al inicio.</prompt>
+      <goto next="#principal"/>
+    </block>
+  </form>
+
+  <!-- VXML012: id duplicado. -->
+  <form id="cierre">
+    <block>
+      <prompt>Adios.</prompt>
+      <exit/>
+    </block>
+  </form>
+
+  <form id="cierre">
+    <block>
+      <prompt>Adios de nuevo.</prompt>
+      <exit/>
+    </block>
+  </form>
+
+</vxml>

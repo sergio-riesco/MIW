@@ -1,0 +1,171 @@
+{
+  "$comment": "Catalogo canonico de reglas de VXML Doctor. FUENTE UNICA DE VERDAD.",
+  "$reglas_de_generacion": "tools/gen-reglas.mjs regenera packages/impl-wasm/src/reglas_gen.rs a partir de este fichero. Ejecutar `npm run gen:reglas` tras editarlo.",
+  "version": "1.0.0",
+  "gravedadOrden": ["error", "warning", "info"],
+  "tiposFieldValidos": ["string", "number", "boolean", "currency", "date", "digits", "phonenumber", "time", "telephone"],
+  "reglas": [
+    {
+      "id": "VXML001",
+      "nombre": "goto-a-form-inexistente",
+      "gravedad": "error",
+      "mensaje": "El fragmento del goto no corresponde a ningun form del documento.",
+      "resumen": "Un <goto> apunta a un fragmento que no corresponde a ningun <form> del documento.",
+      "norma": "VoiceXML 2.0 seccion 2.3.1 (<goto>), 5.3.9",
+      "explicacion": "Al ejecutar el <goto>, el interprete busca el form cuyo id coincida con el fragmento. Si no existe, la ejecucion falla en tiempo de ejecucion. El error se detecta aqui, en tiempo de compilacion, en lugar de durante una llamada real."
+    },
+    {
+      "id": "VXML002",
+      "nombre": "form-inaccesible",
+      "gravedad": "warning",
+      "mensaje": "Este form no es alcanzable: nadie hace goto a el y no es el primero.",
+      "resumen": "Un <form> nunca es alcanzado: ningun <goto> lo referencia y no es el primer form del documento.",
+      "norma": "VoiceXML 2.0 seccion 2.1 (Document Structure and Semantics)",
+      "explicacion": "El primer <form> del documento se ejecuta al entrar. Los demas solo se alcanzan mediante <goto>. Un form sin entradas es codigo muerto que nadie depurara nunca y que anade peso al documento."
+    },
+    {
+      "id": "VXML003",
+      "nombre": "ciclo-goto-sin-salida",
+      "gravedad": "error",
+      "mensaje": "Ciclo de goto sin salida: es posible quedar atrapado en un bucle infinito.",
+      "resumen": "Existe un ciclo de saltos <goto> del que no se puede salir (no hay <exit>, <disconnect> ni <return> alcanzable).",
+      "norma": "VoiceXML 2.0 seccion 2.1 (Form Flow), 5.3.9",
+      "explicacion": "Un ciclo de goto sin ninguna salida puede dejar al usuario atrapado indefinidamente. Es una de las causas mas comunes de llamadas colgadas. Se detecta calculando las componentes fuertemente conexas del grafo de flujo y descartando las que contienen una salida."
+    },
+    {
+      "id": "VXML004",
+      "nombre": "field-sin-prompt",
+      "gravedad": "error",
+      "mensaje": "El field no tiene prompt: el usuario nunca oye la pregunta.",
+      "resumen": "Un <field> no tiene <prompt> ni atributo prompt: el usuario nunca oye la pregunta.",
+      "norma": "VoiceXML 2.0 seccion 2.3.2 (Field)",
+      "explicacion": "Un field sin prompt presenta al usuario una recognicion sin ninguna pregunta previa. En la practica el cliente se queda en silencio esperando una palabra que no puede conocer. Es un fallo de usabilidad grave, no solo de sintaxis."
+    },
+    {
+      "id": "VXML005",
+      "nombre": "field-sin-consumidor",
+      "gravedad": "warning",
+      "mensaje": "El field recoge un valor pero nadie lo consume: no hay filled, next ni salida del form.",
+      "resumen": "Un <field> recoge un valor pero nadie lo consume: no hay <filled>, ni atributo next, ni el form contiene una salida.",
+      "norma": "VoiceXML 2.0 seccion 2.3.2 (Field), 5.3.5 (<filled>)",
+      "explicacion": "El valor se captura pero no se usa ni se devuelve. Suele indicar un <filled> olvidado o un next mal escrito."
+    },
+    {
+      "id": "VXML006",
+      "nombre": "nomatch-sin-reprompt",
+      "gravedad": "warning",
+      "mensaje": "El manejador nomatch no hace reprompt ni sale: el usuario se queda bloqueado.",
+      "resumen": "Un manejador <nomatch> no contiene <reprompt> ni conduce a una salida: el usuario se queda bloqueado.",
+      "norma": "VoiceXML 2.0 seccion 2.3.2 (Field), 5.3.5 (Event Handlers)",
+      "explicacion": "Tras un nomatch, si el manejador no llama a <reprompt> y no deja la ejecucion, el item de entrada no vuelve a solicitarse y el dialogo queda sin salida para el usuario."
+    },
+    {
+      "id": "VXML007",
+      "nombre": "sin-xml-lang",
+      "gravedad": "warning",
+      "mensaje": "Falta xml:lang en el elemento raiz vxml: la sintesis de voz elegira un idioma por defecto.",
+      "resumen": "El elemento raiz <vxml> no declara xml:lang.",
+      "norma": "VoiceXML 2.0 seccion 3.1, SSML seccion 2.1 (Language)",
+      "explicacion": "Sin xml:lang la sintesis de voz elige un idioma por defecto de la plataforma, que puede no ser el esperado. El resultado es una locucion con pronunciacion incorrecta o directamente en otro idioma."
+    },
+    {
+      "id": "VXML008",
+      "nombre": "goto-sin-destino",
+      "gravedad": "error",
+      "mensaje": "El goto no tiene ningun destino valido: href, next y event estan ausentes o vacios.",
+      "resumen": "Un <goto> no tiene ningun destino valido: href, next y event estan ausentes o vacios.",
+      "norma": "VoiceXML 2.0 seccion 2.3.1 (<goto>)",
+      "explicacion": "Un goto sin destino no hace nada. El autor cree que hay un salto y el flujo real continua por otro camino, lo que suele producir bucles en cascada difiles de depurar."
+    },
+    {
+      "id": "VXML009",
+      "nombre": "tipo-field-invalido",
+      "gravedad": "error",
+      "mensaje": "El atributo type del field no es uno de los tipos permitidos por la especificacion.",
+      "resumen": "El atributo type de un <field> no pertenece a los tipos declarados por la especificacion.",
+      "norma": "VoiceXML 2.0 seccion 2.3.2 (Field), atributo type",
+      "explicacion": "La especificacion restringe el valor de type a una lista cerrada. Un valor fuera de ella provoca error.badfetch en tiempo de ejecucion, es decir, durante la llamada."
+    },
+    {
+      "id": "VXML010",
+      "nombre": "break-time-invalido",
+      "gravedad": "warning",
+      "mensaje": "El atributo time del break no es un numero de segundos ni un valor temporal de SSML.",
+      "resumen": "El atributo time de <break> no es un numero de segundos ni un valor temporal de SSML.",
+      "norma": "SSML 1.0 seccion 2.3.3 (<break>), VoiceXML 2.0 seccion 5.2.2 (Time)",
+      "explicacion": "SSML admite un numero de segundos o una expresion temporal con unidades (500ms, 1s). Un valor libre como 'un rato' no es interpretable y el motor aplica un valor por defecto silenciosamente."
+    },
+    {
+      "id": "VXML011",
+      "nombre": "if-sin-cond",
+      "gravedad": "error",
+      "mensaje": "El elemento if o elseif no tiene atributo cond, que es obligatorio.",
+      "resumen": "Un <if> o <elseif> no tiene atributo cond.",
+      "norma": "VoiceXML 2.0 seccion 5.3.2 (<if>, <elseif>, <else>)",
+      "explicacion": "El atributo cond es obligatorio. Sin el, la condicion no puede evaluarse y la rama se descarta, con lo que el dialogo se comporta de forma distinta a la pretendida."
+    },
+    {
+      "id": "VXML012",
+      "nombre": "id-form-duplicado",
+      "gravedad": "error",
+      "mensaje": "El id de este form esta duplicado en el documento.",
+      "resumen": "Dos o mas elementos <form> declaran el mismo id.",
+      "norma": "VoiceXML 2.0 seccion 2.1 (Document Structure)",
+      "explicacion": "Los ids de form deben ser unicos. Si se repiten, un <goto> a ese id tiene un destino ambiguo y la resolucion depende del interprete."
+    },
+    {
+      "id": "VXML013",
+      "nombre": "audio-sin-fuente",
+      "gravedad": "warning",
+      "mensaje": "El elemento audio no indica src ni expr.",
+      "resumen": "Un <audio> no indica src ni expr.",
+      "norma": "VoiceXML 2.0 seccion 3.3.2 (<audio>)",
+      "explicacion": "Un audio sin fuente reproduce el texto que contiene. Si no hay texto util, se produce un silencio en medio del dialogo."
+    },
+    {
+      "id": "VXML014",
+      "nombre": "simbolo-tts-ilegible",
+      "gravedad": "info",
+      "mensaje": "El texto del prompt contiene simbolos que el motor TTS suele leer de forma incorrecta.",
+      "resumen": "El texto de un <prompt> contiene simbolos que el motor TTS suele leer de forma incorrecta.",
+      "norma": "SSML 1.0 seccion 2.1, VoiceXML 2.0 seccion 3.3 (Prompts)",
+      "explicacion": "Los simbolos &, %, #, $, /, @ y las barras se leen de forma distinta segun el motor: & puede leerse como 'ampersand' o como nada, % como 'por ciento' o como una pausa, y la barra puede partir la palabra. En un sistema de telefonia la recomendacion es escribir la palabra completa."
+    },
+    {
+      "id": "VXML015",
+      "nombre": "identificador-no-declarado",
+      "gravedad": "info",
+      "mensaje": "La expresion referencia un identificador que no esta declarado en el documento.",
+      "resumen": "Una expresion ECMAScript referencia un identificador que no se declara en ninguna ambito del documento.",
+      "norma": "VoiceXML 2.0 seccion 5.2.2 (Variable Scoping), 5.2.3 (ECMAScript)",
+      "explicacion": "Las variables se declaran con <var>, con el atributo name de un <field>/<initial>/<menu>/<link>/<record> o con <assign>. Una referencia no declarada produce error.semantic en tiempo de ejecucion. Analisis conservador por identificadores: puede producir falsos positivos ante funciones o parametros externos no declarados en el documento."
+    },
+    {
+      "id": "VXML016",
+      "nombre": "form-sin-manejador-error",
+      "gravedad": "info",
+      "mensaje": "El form tiene fields que reconocen voz pero no define nomatch ni noinput.",
+      "resumen": "Un <form> con <field> que reconocen voz no define <nomatch> ni <noinput> en ningun campo.",
+      "norma": "VoiceXML 2.0 seccion 2.3.2 (Field), seccion 6.2 (Error Handling)",
+      "explicacion": "Sin manejadores de noinput y nomatch, un silencio o un reconocimiento fallido deja al usuario sin saber que hacer. La practica recomendada es siempre un <nomatch> con <reprompt/>."
+    },
+    {
+      "id": "VXML017",
+      "nombre": "goto-a-si-mismo",
+      "gravedad": "error",
+      "mensaje": "El goto apunta al form que lo contiene: bucle infinito inmediato.",
+      "resumen": "Un <goto> apunta al form que lo contiene.",
+      "norma": "VoiceXML 2.0 seccion 2.3.1 (<goto>)",
+      "explicacion": "Salto incondicional al mismo form. El form vuelve a ejecutarse desde el principio indefinidamente: la llamada no progresara nunca. Es el bug de bucle infinito mas frecuente al escribir un dialogo."
+    },
+    {
+      "id": "VXML018",
+      "nombre": "sin-version",
+      "gravedad": "warning",
+      "mensaje": "Falta el atributo version en el elemento raiz vxml.",
+      "resumen": "El elemento raiz <vxml> no declara el atributo version.",
+      "norma": "VoiceXML 2.0 seccion 3.1 (<vxml>), 2.1",
+      "explicacion": "El atributo version indica que revision de la especificacion implementa el documento. Si se omite, el comportamiento de las construcciones menos comunes queda indefinido y depende del motor."
+    }
+  ]
+}

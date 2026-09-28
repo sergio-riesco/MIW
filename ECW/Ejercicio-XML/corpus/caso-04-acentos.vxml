@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  VXML Doctor -- caso 04: Acentos y emoji.
+  Sirve para comprobar que las tres implementaciones coinciden en la columna
+  de los diagnosticos aunque el documento NO sea ASCII puro. En JavaScript el
+  indice es una unidad UTF-16, en Rust un byte UTF-8: el contrato exige que
+  ambos publiquen el desplazamiento en BYTES UTF-8 desde el inicio de la linea.
+-->
+<vxml xmlns="http://www.w3.org/2001/vxml" version="2.1" xml:lang="es-ES">
+
+  <form id="menú">
+    <block>
+      <prompt>
+        ¿Qué desea pedir? Puede decir: café,Croissant o Highland Park 🏴󠁧󠁢󠁳󠁣󠁴󠁿.
+      </prompt>
+      <field name="pedido" type="string">
+        <filled>
+          <goto next="#niño"/>
+        </filled>
+        <nomatch>
+          Repita, por favor.
+          <reprompt/>
+        </nomatch>
+      </field>
+    </block>
+  </form>
+
+  <form id="niño">
+    <block>
+      <prompt>¿Para cuántas personas es?</prompt>
+      <field name="personas" type="digits" maxdigits="2">
+        <filled>
+          <exit/>
+        </filled>
+        <nomatch>
+          Diga un numero.
+          <reprompt/>
+        </nomatch>
+      </field>
+    </block>
+  </form>
+
+</vxml>

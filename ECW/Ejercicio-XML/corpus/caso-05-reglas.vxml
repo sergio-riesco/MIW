@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  VXML Doctor -- caso 05: Reglas restantes.
+  Este fichero existe para que las 18 reglas tengan al menos un caso de prueba
+  verificable. Cubre las que no aparecian en los casos 01 a 04:
+    - VXML005  field que recoge un valor y nadie consume, en un form sin salida
+    - VXML008  goto sin destino
+    - VXML018  falta el atributo version
+  A proposito NO lleva xml:lang para provocar tambien VXML007.
+-->
+<vxml xmlns="http://www.w3.org/2001/vxml">
+
+  <form id="inicio">
+    <block>
+      <prompt>Bienvenido.</prompt>
+
+      <!-- VXML005: ni filled ni next, y el form no tiene salida. -->
+      <field name="sinConsumidor" type="string">
+        <prompt>Diga algo.</prompt>
+        <grammar type="application/srgs+xml" src="cualquiera.grxml"/>
+      </field>
+
+      <!-- VXML008: ningun destino. -->
+      <goto/>
+
+      <!-- VXML008: next vacio y event vacio. -->
+      <goto next="" event=""/>
+
+      <if cond="sinConsumidor != ''">
+        <audio src="ok.wav">Recibido.</audio>
+      </if>
+    </block>
+  </form>
+
+  <form id="final">
+    <block>
+      <prompt>Fin de la llamada.</prompt>
+      <exit/>
+    </block>
+  </form>
+
+</vxml>

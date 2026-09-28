@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  VXML Doctor -- caso 02: Atencion al cliente de una operadora.
+  Documento DELIBERADAMENTE DEFECTUOSO. Cada bloque comentario indica la regla
+  que se espera detectar, para poder comprobar que el analizador acierta:
+    - VXML001  goto a #soporte_tecnico, que no existe
+    - VXML002  form "cancelar" nunca es alcanzado
+    - VXML004  field "dni" sin prompt
+    - VXML006  nomatch que ni reprompta ni sale
+    - VXML009  type="entero" no es un tipo valido
+    - VXML010  break time="un rato"
+    - VXML011  elseif sin cond
+    - VXML013  audio sin src ni expr
+    - VXML014  simbolos raros para TTS en los prompts
+    - VXML015  referencias a variables no declaradas
+    - VXML016  form sin nomatch ni noinput
+-->
+<vxml xmlns="http://www.w3.org/2001/vxml" version="2.1">
+
+  <form id="bienvenida">
+    <block>
+      <!-- VXML014: ampersand, porcentaje y numero. -->
+      <prompt>
+        Bienvenido a Soporte &amp; Atencion. Quedan 3 &lt; 5 intentos.
+        Escriba 1-800-555-0100 para llamar un 20% mas barato.
+        <break time="un rato"/>
+      </prompt>
+      <field name="dni" type="string">
+        <grammar type="application/srgs+xml" src="dni.grxml"/>
+        <filled>
+          <goto next="#facturacion"/>
+        </filled>
+      </field>
+    </block>
+  </form>
+
+  <form id="facturacion">
+    <var name="saldo"/>
+
+    <field name="cantidad" type="entero">
+      <prompt>Cuanto desea cobrar?</prompt>
+      <filled>
+        <!-- VXML015: saldoPendiente y comision no estan declaradas. -->
+        <assign name="saldo" expr="saldoPendiente - comision * 0.21"/>
+        <if cond="saldo &lt; 0">
+          <audio>
+            Debe un saldo pendiente.
+          </audio>
+        <elseif/>
+          <audio src="ok.wav">Todo esta correcto.</audio>
+        </if>
+        <goto next="#cierre"/>
+      </filled>
+      <nomatch>
+        No he entendido la cantidad.
+      </nomatch>
+    </field>
+
+    <!-- VXML001 y VXML011 -->
+    <if cond="true">
+      <goto next="#soporte_tecnico"/>
+    </if>
+  </form>
+
+  <form id="cierre">
+    <block>
+      <prompt>Gracias, hasta pronto.</prompt>
+      <exit/>
+    </block>
+  </form>
+
+  <!-- VXML002: nadie hace goto aqui. -->
+  <form id="cancelar">
+    <block>
+      <prompt>Su cancelacion ha sido procesada.</prompt>
+      <exit/>
+    </block>
+  </form>
+
+</vxml>
