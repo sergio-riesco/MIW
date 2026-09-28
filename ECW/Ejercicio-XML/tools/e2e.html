@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>E2E VXML Doctor</title>
+</head>
+<body>
+  <!-- Mismo contrato DOM que packages/ui/index.html (los ids que usa app.mjs) -->
+  <select id="origen"><option value="">— Elegir del corpus… —</option></select>
+  <input type="file" id="fichero">
+  <textarea id="texto"></textarea>
+  <div class="motor" id="motores">
+    <label><input type="radio" name="motor" value="js" checked> JS</label>
+    <label><input type="radio" name="motor" value="ts"> TS</label>
+    <label><input type="radio" name="motor" value="wasm"> WASM</label>
+  </div>
+  <button id="btn-analizar">Analizar</button>
+  <button id="btn-comparar" class="secundario">Comparar los tres</button>
+  <div class="estado" id="estado"></div>
+  <div id="resultado"></div>
+  <div id="cuerpo"></div>
+  <div id="comparativa" class="oculto"><table id="tabla-comparativa"></table></div>
+
+  <!-- El app real de la interfaz web -->
+  <script type="module" src="../packages/ui/app.mjs"></script>
+
+  <script type="module">
+    const $ = (id) => document.getElementById(id);
+    const espera = (fn, ms = 25000) => new Promise((res, rej) => {
+      const t0 = Date.now();
+      (function tick() {
+        let v; try { v = fn(); } catch { /* reintentar */ }
+        if (v) return res(v);
+        if (Date.now() - t0 > ms) return rej(new Error("timeout esperando: " + fn));
+        setTimeout(tick, 60);
+      })();
+    });
+
+    const logs = [];
+    const ok = (cond, m, extra) => logs.push((cond ? "PASS " : "FAIL ") + m + (extra ? "   [" + extra + "]" : ""));
+    const fin = () => {
+      const texto = "E2E " + (logs.every((l) => l.startsWith("PASS")) ? "OK" : "FALLO") + "\n" + logs.join("\n");
+      $("resultado").textContent = texto;
+      // Entrega el veredicto al servidor; tools/e2e-ui.mjs lo consulta por GET.
+      fetch("/api/e2e-resultado", { method: "POST", body: texto }).catch(() => {});
+      console.log("E2E_RESULTADO_START\n" + texto + "\nE2E_RESULTADO_END");
+    };
+
+    try {
+      await espera(() => $("estado").textContent.includes("Interfaz lista"));
+      ok(true, "app.mjs arranco", $("estado").textContent);
+
+      const nOpts = $("origen").options.length;
+      ok(nOpts >= 71, "selector de corpus poblado por /api/corpus", nOpts + " opciones");
+
+      // --- Analizar caso-01 con el motor WASM ---
+      const r1 = await fetch("/corpus/caso-01-reserva.vxml");
+      ok(r1.ok, "fetch caso-01: HTTP " + r1.status);
+      const buf = new Uint8Array(await r1.arrayBuffer());
+      $("texto").value = new TextDecoder().decode(buf);
+      $("texto").dispatchEvent(new Event("input"));
+      document.querySelector('input[name="motor"][value="wasm"]').checked = true;
+      $("btn-analizar").click();
+      await espera(() => $("cuerpo").querySelector("pre"));
+      const inf1 = JSON.parse($("cuerpo").querySelector("pre").textContent);
+      ok(true, "analizar con WASM completo", $("estado").textContent);
+      ok(inf1.bytes === buf.length, "informe.bytes coincide", inf1.bytes + " vs " + buf.length);
+      ok(inf1.diagnosticos.length === 0, "caso-01 sin diagnosticos (contrato)", inf1.diagnosticos.length);
+
+      // --- Comparar los tres motores ---
+      $("btn-comparar").click();
+      await espera(() => !$("comparativa").classList.contains("oculto") &&
+        $("tabla-comparativa").querySelectorAll("tbody tr").length === 3);
+      const trs = [...$("tabla-comparativa").querySelectorAll("tbody tr")];
+      ok(trs.filter((tr) => tr.textContent.includes("idéntico")).length === 3, "comparativa 3/3 identicos byte a byte");
+      ok(trs.every((tr) => /ms/.test(tr.textContent)), "comparativa con tiempos de cada motor");
+      ok($("cuerpo").querySelector("pre"), "informe compartido visible tras comparar");
+
+      // --- Analizar caso-04 (acentos + emoji) con el motor JS ---
+      const r4 = await fetch("/corpus/caso-04-acentos.vxml");
+      ok(r4.ok, "fetch caso-04: HTTP " + r4.status);
+      const buf4 = new Uint8Array(await r4.arrayBuffer());
+      $("texto").value = new TextDecoder().decode(buf4);
+      $("texto").dispatchEvent(new Event("input"));
+      document.querySelector('input[name="motor"][value="js"]').checked = true;
+      $("btn-analizar").click();
+      await espera(() => $("cuerpo").querySelector("pre"));
+      const inf4 = JSON.parse($("cuerpo").querySelector("pre").textContent);
+      ok(inf4.diagnosticos.length === 2, "caso-04: 2 diagnosticos (JS)", inf4.diagnosticos.length);
+      const d0 = inf4.diagnosticos[0];
+      ok(d0.linea === 16 && d0.columna === 7, "caso-04 columna byte 16:7 (contrato)", d0.linea + ":" + d0.columna);
+
+      fin();
+    } catch (e) {
+      logs.push("FAIL excepcion: " + (e && e.stack ? e.stack : e));
+      fin();
+    }
+  </script>
+</body>
+</html>

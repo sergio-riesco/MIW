@@ -11,6 +11,7 @@
     "build:wasm": "node tools/build-wasm.mjs",
     "build": "npm run gen:reglas && npm run build:ts && npm run build:wasm",
     "test": "node tools/test-diferencial.mjs",
+    "test:ui": "node tools/e2e-ui.mjs",
     "bench": "node --expose-gc packages/bench/bench.mjs",
     "bench:html": "node packages/bench/generar-informe.mjs",
     "serve": "node tools/serve.mjs",
