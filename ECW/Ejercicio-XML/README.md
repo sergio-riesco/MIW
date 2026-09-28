@@ -17,7 +17,7 @@ npm test               # equivalencia byte a byte (JS vs TS vs WASM) sobre todo 
 npm run test:ui        # prueba de extremo a extremo: la UI funciona en Chrome/Edge real
 npm run bench          # banco de pruebas (mediana de pasadas, MiB/s)
 npm run bench:html     # informe HTML + docs/benchmark.md
-npm run serve          # interfaz web -> http://localhost:8080
+npm run serve          # interfaz web -> http://localhost:5173
 ```
 
 La primera ejecución de `npm test` necesita el corpus grande (gitignored): regenerarlo con
@@ -67,7 +67,8 @@ ningún número se publica sin conformidad previa.
 
 ## Interfaz web
 
-`npm run serve` levanta la UI en `http://localhost:8080`: elige un documento del corpus (o
+`npm run serve` levanta la UI en `http://localhost:5173` (o en el siguiente puerto libre si
+ese estuviera ocupado): elige un documento del corpus (o
 súbelo/pégalo), selecciona motor **JS / TS / WASM** y analiza; o pulsa *«Comparar los tres»*
 para ver tiempos y la verificación de identidad en vivo. El WASM se compila y ejecuta
 íntegramente en el navegador. Con Chrome o Edge instalado puedes verificarlo de forma

@@ -53,7 +53,7 @@
       const nOpts = $("origen").options.length;
       ok(nOpts >= 71, "selector de corpus poblado por /api/corpus", nOpts + " opciones");
 
-      // La pagina raiz (la que ve el usuario en http://localhost:8080/) debe
+      // La pagina raiz (la que ve el usuario en http://localhost:5173/) debe
       // cargar app.mjs por ruta ABSOLUTA: la relativa ./app.mjs se resolveria
       // como /app.mjs (404 text/plain) y el navegador bloquearia el modulo.
       const rui = await fetch("/");

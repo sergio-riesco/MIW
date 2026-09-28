@@ -7,8 +7,9 @@
  *   GET /            -> packages/ui/index.html
  *   GET /api/corpus  -> JSON con los ficheros *.vxml del corpus
  *
- * Uso:  node tools/serve.mjs [puerto]   (por defecto 8080)
- * Abrir http://localhost:8080/
+ * Uso:  node tools/serve.mjs [puerto]   (por defecto PUERTO_POR_DEFECTO)
+ * Si el puerto esta ocupado --o reservado por Windows/Hyper-V, que devuelve
+ * EACCES en vez de EADDRINUSE-- se prueba el siguiente automaticamente.
  * -----------------------------------------------------------------------------
  */
 import { createServer } from "node:http";
@@ -17,6 +18,12 @@ import { join, dirname, extname, normalize, sep } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
 const aqui = dirname(fileURLToPath(import.meta.url));
+
+/** Puerto por defecto. 5173 esta fuera de los rangos que Hyper-V/WinNAT reservan. */
+const PUERTO_POR_DEFECTO = 5173;
+
+/** Cuantos puertos seguidos se prueban antes de rendirse. */
+const INTENTOS_PUERTO = 20;
 
 const MIME = {
   ".html": "text/html; charset=utf-8",
@@ -112,10 +119,34 @@ export function crearServidor(raizProyecto) {
 }
 
 /** Arranca el servidor y devuelve {servidor, puerto} una vez escuchando. */
-export function arrancar(raizProyecto, puerto = 8080) {
+export function arrancar(raizProyecto, puerto = PUERTO_POR_DEFECTO) {
   const servidor = crearServidor(raizProyecto);
-  return new Promise((resolve) => {
-    servidor.listen(puerto, () => resolve({ servidor, puerto: servidor.address().port }));
+  const primero = puerto;
+  return new Promise((resolve, reject) => {
+    servidor.on("error", reintentar);
+    servidor.listen(puerto, () => {
+      servidor.removeListener("error", reintentar);
+      resolve({ servidor, puerto: servidor.address().port });
+    });
+
+    // puerto 0 = "elige tu el que sea libre": no hay nada que reintentar.
+    function reintentar(err) {
+      const recuperable = err.code === "EACCES" || err.code === "EADDRINUSE";
+      if (!recuperable || puerto === 0 || puerto - primero >= INTENTOS_PUERTO) {
+        return reject(
+          new Error(
+            `No se pudo escuchar en el puerto ${puerto} (${err.code}). ` +
+              (recuperable
+                ? `Prueba con otro: node tools/serve.mjs <puerto>  (en Windows, ` +
+                  `netsh interface ipv4 show excludedportrange protocol=tcp lista los reservados).`
+                : err.message)
+          )
+        );
+      }
+      puerto += 1;
+      console.warn(`Puerto ${puerto - 1} no disponible (${err.code}); probando ${puerto}...`);
+      servidor.listen(puerto);
+    }
   });
 }
 
@@ -123,7 +154,12 @@ export function arrancar(raizProyecto, puerto = 8080) {
 const directo = import.meta.url === pathToFileURL(process.argv[1] || "").href;
 if (directo) {
   const raiz = join(aqui, "..");
-  const puerto = Number(process.argv[2] || process.env.PORT || 8080);
-  const { servidor } = await arrancar(raiz, puerto);
-  console.log(`VXML Doctor UI en http://localhost:${servidor.address().port}/  (raiz: ${raiz})`);
+  const puerto = Number(process.argv[2] || process.env.PORT || PUERTO_POR_DEFECTO);
+  try {
+    const { servidor } = await arrancar(raiz, puerto);
+    console.log(`VXML Doctor UI en http://localhost:${servidor.address().port}/  (raiz: ${raiz})`);
+  } catch (e) {
+    console.error(e.message);
+    process.exit(1);
+  }
 }
