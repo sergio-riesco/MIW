@@ -5,7 +5,7 @@ Sitio web personal creado con Next.js, HTML semántico y CSS puro.
 ## Páginas
 
 - `/`: sobre mí.
-- `/musica`: rock de los años 70.
+- `/musica`: grupos y artistas por género.
 - `/videojuegos`: juegos favoritos.
 - `/series`: series favoritas.
 - `/hobbies`: aficiones.

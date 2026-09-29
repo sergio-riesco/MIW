@@ -1,4 +1,6 @@
 import Link from "next/link";
+import Breadcrumb from "./components/Breadcrumb";
+import styles from "./page.module.css";
 
 export const metadata = {
   title: "Sobre mí",
@@ -6,11 +8,41 @@ export const metadata = {
     "Presentación de Sergio Riesco Collar, estudiante de Ingeniería Informática de Software y del Máster en Ingeniería Web.",
 };
 
+const facts = [
+  { label: "Vivo en", value: "Gijón, Asturias" },
+  { label: "Grado", value: "Ingeniería Informática de Software" },
+  { label: "Máster", value: "Ingeniería Web" },
+  { label: "Universidad", value: "Universidad de Oviedo" },
+];
+
+const sections = [
+  {
+    href: "/musica",
+    title: "Música",
+    text: "Mis grupos y artistas favoritos, organizados por género.",
+  },
+  {
+    href: "/videojuegos",
+    title: "Videojuegos",
+    text: "DOOM, Zelda, Outer Wilds y el que estoy jugando ahora mismo.",
+  },
+  {
+    href: "/series",
+    title: "Series",
+    text: "The Boys, Invincible, Breaking Bad y la que estoy viendo.",
+  },
+  {
+    href: "/hobbies",
+    title: "Hobbies",
+    text: "Skate, pizzas y videojuegos.",
+  },
+];
+
 export default function Home() {
   return (
     <main className="container page" id="contenido">
       <header className="page-header">
-        <p className="eyebrow">Sobre mí</p>
+        <Breadcrumb items={[{ label: "Sobre mí" }]} />
         <h1>Sergio Riesco Collar</h1>
         <p className="lead">
           Vivo en Gijón y estudio Ingeniería Informática de Software y el
@@ -21,22 +53,38 @@ export default function Home() {
       <section aria-labelledby="presentacion">
         <h2 id="presentacion">Presentación</h2>
         <p>
-          Me interesa aprender, construir cosas y entender la tecnología que
-          hay detrás de las que usamos cada día.
+          Me interesa aprender, construir cosas y entender la tecnología que hay
+          detrás de las que usamos cada día.
         </p>
         <p>
-          Este sitio reúne las cinco partes que mejor me definen: la música,
+          Este sitio reúne las cuatro partes que mejor me definen: la música,
           los videojuegos, las series y mis aficiones.
         </p>
       </section>
 
+      <section aria-labelledby="datos">
+        <h2 id="datos">En resumen</h2>
+        <dl className={styles.factList}>
+          {facts.map((fact) => (
+            <div className={styles.fact} key={fact.label}>
+              <dt>{fact.label}</dt>
+              <dd>{fact.value}</dd>
+            </div>
+          ))}
+        </dl>
+      </section>
+
       <section aria-labelledby="secciones">
         <h2 id="secciones">Mis secciones</h2>
-        <ul className="link-list">
-          <li><Link href="/musica">Música</Link>: rock de los años 70.</li>
-          <li><Link href="/videojuegos">Videojuegos</Link>: DOOM, Zelda y Outer Wilds.</li>
-          <li><Link href="/series">Series</Link>: The Boys, Invincible, Breaking Bad y más.</li>
-          <li><Link href="/hobbies">Hobbies</Link>: skate, pizzas y videojuegos.</li>
+        <ul className={styles.sectionList}>
+          {sections.map((section) => (
+            <li key={section.href}>
+              <Link className={styles.sectionLink} href={section.href}>
+                <span className={styles.sectionLinkTitle}>{section.title}</span>
+                <span className={styles.sectionLinkText}>{section.text}</span>
+              </Link>
+            </li>
+          ))}
         </ul>
       </section>
     </main>

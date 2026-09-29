@@ -1,5 +1,7 @@
 import Image from "next/image";
+import Breadcrumb from "../components/Breadcrumb";
 import { videogames } from "../data/videogames";
+import styles from "./videojuegos.module.css";
 
 export const metadata = {
   title: "Videojuegos",
@@ -13,7 +15,9 @@ export default function VideojuegosPage() {
   return (
     <main className="container page" id="contenido">
       <header className="page-header">
-        <p className="eyebrow">Videojuegos</p>
+        <Breadcrumb
+          items={[{ label: "Sobre mí", href: "/" }, { label: "Videojuegos" }]}
+        />
         <h1>Videojuegos</h1>
         <p className="lead">
           Ahora mismo estoy jugando a <strong>{currentGame?.title}</strong> con
@@ -22,26 +26,30 @@ export default function VideojuegosPage() {
       </header>
 
       <section aria-labelledby="lista">
-        <div className="game-section-header">
+        <div className={styles.sectionHeader}>
           <div>
             <h2 id="lista">Mis juegos</h2>
-            <p className="game-section-hint">Desliza la lista para ver más.</p>
+            <p className={styles.sectionHint}>Desliza la lista para ver más.</p>
           </div>
           {currentGame && (
-            <p className="current-game">
+            <p className={styles.currentGame}>
               <span aria-hidden="true" />
               Jugando ahora: {currentGame.title}
             </p>
           )}
         </div>
 
-        <ul className="game-scroller" aria-label="Lista de videojuegos">
+        <ul className={styles.scroller} aria-label="Lista de videojuegos">
           {videogames.map((game, index) => (
             <li key={game.id}>
               <article
-                className={`game-card${game.current ? " game-card--current" : ""}`}
+                className={
+                  game.current
+                    ? `${styles.card} ${styles.currentCard}`
+                    : styles.card
+                }
               >
-                <div className="game-card__cover">
+                <div className={styles.cover}>
                   <Image
                     src={game.cover || "/covers/placeholder.svg"}
                     alt=""
@@ -51,20 +59,20 @@ export default function VideojuegosPage() {
                     unoptimized={game.cover?.endsWith(".svg")}
                   />
                   {game.current && (
-                    <span className="game-badge game-badge--current">
+                    <span className={`${styles.badge} ${styles.badgeCurrent}`}>
                       Jugando ahora
                     </span>
                   )}
                   {game.favorite && (
-                    <span className="game-badge game-badge--favorite">
+                    <span className={`${styles.badge} ${styles.badgeFavorite}`}>
                       ★ Favorito
                     </span>
                   )}
                 </div>
 
-                <p className="game-card__genre">{game.genre}</p>
+                <p className={styles.genre}>{game.genre}</p>
                 <h3>{game.title}</h3>
-                <p className="game-card__description">{game.description}</p>
+                <p className={styles.description}>{game.description}</p>
               </article>
             </li>
           ))}

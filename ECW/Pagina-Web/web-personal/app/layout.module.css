@@ -1,0 +1,93 @@
+/* Cabecera, navegación principal y pie. Solo los usa app/layout.js. */
+
+.siteHeader {
+  border-bottom: 1px solid var(--border);
+}
+
+.headerContent {
+  display: flex;
+  min-height: 4.5rem;
+  padding-block: 0.8rem;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem 2rem;
+}
+
+.siteTitle {
+  color: var(--text);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.siteTitle:hover {
+  color: var(--accent);
+}
+
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.navList {
+  display: flex;
+  margin: 0;
+  padding: 0;
+  flex-wrap: wrap;
+  gap: 0.25rem 1.1rem;
+  list-style: none;
+}
+
+.navLink {
+  color: var(--muted);
+  text-decoration: none;
+}
+
+.navLink:hover {
+  color: var(--accent);
+  text-decoration: underline;
+}
+
+.siteFooter {
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.footerContent {
+  display: flex;
+  padding-block: 1.5rem;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.4rem 2rem;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.footerContent p {
+  margin: 0;
+}
+
+@media (max-width: 40rem) {
+  .headerContent {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .headerActions {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .footerContent {
+    flex-direction: column;
+  }
+}
+
+@media print {
+  .siteHeader,
+  .siteFooter {
+    display: none;
+  }
+}

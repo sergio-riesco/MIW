@@ -1,4 +1,6 @@
 import Link from "next/link";
+import Breadcrumb from "../components/Breadcrumb";
+import styles from "./hobbies.module.css";
 
 export const metadata = {
   title: "Hobbies",
@@ -9,12 +11,14 @@ export default function HobbiesPage() {
   return (
     <main className="container page" id="contenido">
       <header className="page-header">
-        <p className="eyebrow">Hobbies</p>
+        <Breadcrumb
+          items={[{ label: "Sobre mí", href: "/" }, { label: "Hobbies" }]}
+        />
         <h1>Mis aficiones</h1>
         <p className="lead">Tres cosas a las que dedico parte de mi tiempo libre.</p>
       </header>
 
-      <ul className="hobby-list">
+      <ul className={styles.list}>
         <li>
           <h2>Videojuegos</h2>
           <p>

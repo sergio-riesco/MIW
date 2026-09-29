@@ -1,5 +1,6 @@
 import Link from "next/link";
 import ThemeToggle from "./components/ThemeToggle";
+import styles from "./layout.module.css";
 import "./globals.css";
 
 const navigation = [
@@ -27,18 +28,20 @@ export default function RootLayout({ children }) {
           Saltar al contenido principal
         </a>
 
-        <header className="site-header">
-          <div className="container header-content">
-            <Link className="site-title" href="/">
+        <header className={styles.siteHeader}>
+          <div className={`container ${styles.headerContent}`}>
+            <Link className={styles.siteTitle} href="/">
               Sergio Riesco Collar
             </Link>
 
-            <div className="header-actions">
+            <div className={styles.headerActions}>
               <nav aria-label="Navegación principal">
-                <ul>
+                <ul className={styles.navList}>
                   {navigation.map((item) => (
                     <li key={item.href}>
-                      <Link href={item.href}>{item.label}</Link>
+                      <Link className={styles.navLink} href={item.href}>
+                        {item.label}
+                      </Link>
                     </li>
                   ))}
                 </ul>
@@ -50,8 +53,8 @@ export default function RootLayout({ children }) {
 
         {children}
 
-        <footer className="site-footer">
-          <div className="container footer-content">
+        <footer className={styles.siteFooter}>
+          <div className={`container ${styles.footerContent}`}>
             <p>© 2026 Sergio Riesco Collar</p>
             <p>Gijón, Asturias · HTML, CSS y Next.js</p>
           </div>

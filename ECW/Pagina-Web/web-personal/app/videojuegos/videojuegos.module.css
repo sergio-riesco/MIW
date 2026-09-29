@@ -1,0 +1,160 @@
+/* Carrusel horizontal de videojuegos con sus tarjetas. */
+
+.sectionHeader {
+  display: flex;
+  margin-bottom: 1.25rem;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.5rem;
+}
+
+.sectionHeader h2 {
+  margin-bottom: 0.15rem;
+}
+
+.sectionHint,
+.currentGame {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.88rem;
+}
+
+.currentGame {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  color: var(--current);
+  font-weight: 700;
+}
+
+.currentGame > span {
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 50%;
+  background: var(--current);
+  box-shadow: 0 0 0 0.25rem var(--current-glow);
+}
+
+.scroller {
+  display: grid;
+  margin: 0;
+  padding: 0.25rem 0.25rem 1.5rem;
+  grid-auto-columns: 12.5rem;
+  grid-auto-flow: column;
+  gap: 1rem;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-padding-left: 0.25rem;
+  scroll-snap-type: x mandatory;
+  scrollbar-color: var(--border) transparent;
+  scrollbar-width: thin;
+  list-style: none;
+}
+
+.scroller::-webkit-scrollbar {
+  height: 0.5rem;
+}
+
+.scroller::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scroller::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: var(--border);
+}
+
+.scroller > li {
+  min-width: 0;
+  scroll-snap-align: start;
+}
+
+.cover {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 2 / 3;
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  background: var(--surface);
+  box-shadow: 0 0.25rem 0.8rem var(--shadow-color);
+}
+
+.currentCard .cover {
+  box-shadow: 0 0 0 3px var(--current), 0 0.4rem 1rem var(--shadow-color);
+}
+
+.cover img {
+  object-fit: cover;
+  transition: transform 180ms ease;
+}
+
+.card:hover .cover img {
+  transform: scale(1.025);
+}
+
+.badge {
+  position: absolute;
+  top: 0.55rem;
+  left: 0.55rem;
+  padding: 0.28rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.63rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.badgeCurrent {
+  background: var(--current-badge);
+  color: var(--white);
+}
+
+.badgeFavorite {
+  background: var(--favorite);
+  color: var(--on-favorite);
+}
+
+.genre {
+  margin: 0.8rem 0 0.1rem;
+  color: var(--accent);
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.card h3 {
+  margin: 0 0 0.25rem;
+  font-size: 1rem;
+  line-height: 1.35;
+}
+
+.description {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+@media (max-width: 40rem) {
+  .scroller {
+    grid-auto-columns: min(11rem, 44vw);
+    gap: 0.75rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cover img {
+    transition: none;
+  }
+}
+
+@media print {
+  .scroller {
+    padding-inline: 0;
+    grid-auto-flow: row;
+    grid-template-columns: repeat(2, 1fr);
+    overflow: visible;
+  }
+}

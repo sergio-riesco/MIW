@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" role="img" aria-labelledby="title">
+  <title id="title">King Crimson</title>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="1" x2="1" y2="0">
+      <stop offset="0" stop-color="#0b0c10"/>
+      <stop offset="0.6" stop-color="#3d1220"/>
+      <stop offset="1" stop-color="#a8322f"/>
+    </linearGradient>
+  </defs>
+  <rect width="400" height="400" fill="url(#bg)"/>
+  <g fill="none" stroke="#f3e6d8" stroke-width="6" opacity="0.92">
+    <path d="M200 96 120 268h160Z"/>
+    <path d="M200 154 162 244h76Z"/>
+  </g>
+  <circle cx="200" cy="222" r="9" fill="#f3e6d8"/>
+  <text x="30" y="326" fill="#f3e6d8" font-family="Arial, sans-serif" font-size="38" font-weight="700">KING</text>
+  <text x="30" y="366" fill="#f3e6d8" font-family="Arial, sans-serif" font-size="38" font-weight="700">CRIMSON</text>
+</svg>

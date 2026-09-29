@@ -1,0 +1,10 @@
+/* Listas con viñeta, que es como se muestran las series. */
+
+.list {
+  margin-top: 0;
+  padding-left: 1.3rem;
+}
+
+.list li {
+  margin-bottom: 0.4rem;
+}

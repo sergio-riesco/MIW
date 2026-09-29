@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useSyncExternalStore } from "react";
+import styles from "./ThemeToggle.module.css";
 
 const STORAGE_KEY = "theme";
 const themeListeners = new Set();
@@ -66,7 +67,7 @@ export default function ThemeToggle() {
 
   return (
     <button
-      className="theme-toggle"
+      className={styles.themeToggle}
       type="button"
       onClick={changeTheme}
       aria-pressed={isDark}

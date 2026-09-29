@@ -1,68 +1,54 @@
 import Image from "next/image";
-import { bands } from "../data/music";
+import Link from "next/link";
+import Breadcrumb from "../components/Breadcrumb";
+import { categories } from "../data/music";
+import styles from "./musica.module.css";
 
 export const metadata = {
   title: "Música",
   description:
-    "Mis grupos favoritos de rock de los años 70: Pink Floyd, Electric Light Orchestra, Blue Öyster Cult y The Alan Parsons Project.",
+    "Mis grupos y artistas favoritos, organizados por género musical.",
 };
 
 export default function MusicPage() {
   return (
     <main className="container page" id="contenido">
       <header className="page-header">
-        <p className="eyebrow">Música</p>
+        <Breadcrumb items={[{ label: "Sobre mí", href: "/" }, { label: "Música" }]} />
         <h1>Música</h1>
         <p className="lead">
-          Me gusta especialmente el rock de los años setenta. Estos son los
-          grupos que más escucho.
+          Escucho todo tipo de música pero en especial me gusta el rock. Aquí
+          están mis grupos y artistas, agrupados por género junto a sus álbumes más famosos.
         </p>
       </header>
 
-      <section aria-labelledby="genero">
-        <div className="genre-panel">
-          <h2 id="genero">Rock de los años 70</h2>
-          <p className="genre-panel__text">
-            Canciones largas, sintetizadores y mucho espacio para experimentar.
-            El rock de esa época es el que más me gusta.
-          </p>
-          <p className="genre-panel__count">
-            {bands.length} grupos en la lista
-          </p>
-        </div>
-      </section>
-
-      <section aria-labelledby="grupos">
-        <h2 id="grupos">Mis grupos</h2>
-        <ul className="band-list">
-          {bands.map((band) => (
-            <li key={band.id}>
-              <article className="band">
-                <div className="band__cover">
+      <ul className={styles.grid}>
+        {categories.map((category) => (
+          <li key={category.id}>
+            <Link className={styles.card} href={`/musica/${category.id}`}>
+              <span className={styles.covers}>
+                {category.bands.slice(0, 4).map((band) => (
                   <Image
+                    key={band.id}
                     src={band.cover || "/covers/placeholder.svg"}
                     alt=""
-                    width={88}
-                    height={88}
-                    sizes="88px"
+                    width={40}
+                    height={40}
+                    sizes="40px"
                     unoptimized={band.cover?.endsWith(".svg")}
                   />
-                </div>
+                ))}
+              </span>
 
-                <div className="band__info">
-                  <h3>{band.name}</h3>
-                  <p className="band__genre">{band.genre}</p>
-                  {band.album && <p className="band__album">{band.album}</p>}
-                </div>
-
-                {band.favorite && (
-                  <span className="band-badge">★ Favorito</span>
-                )}
-              </article>
-            </li>
-          ))}
-        </ul>
-      </section>
+              <span className={styles.name}>{category.name}</span>
+              <span className={styles.count}>
+                {category.bands.length}{" "}
+                {category.bands.length === 1 ? "grupo" : "grupos"}
+              </span>
+            </Link>
+          </li>
+        ))}
+      </ul>
     </main>
   );
 }
