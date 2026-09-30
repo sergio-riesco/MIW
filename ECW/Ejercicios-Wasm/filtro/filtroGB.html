@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="utf-8" />
+    <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Demo Procesador de Imagen Game Boy WASM</title>
     <style>
@@ -13,7 +13,10 @@
         }
 
         .container {
-            max-width: 900px;
+            /* Ancho suficiente para que las tres tarjetas quepan sin
+               reducir el canvas del resultado. Si el navegador lo
+               encoge, la cuadrícula de píxeles sale irregular. */
+            max-width: 1120px;
             margin: 0 auto;
         }
 
@@ -30,7 +33,7 @@
             border-radius: 0.5rem;
             border: 1px solid #e2e8f0;
             flex: 1;
-            min-width: 280px;
+            min-width: 300px;
         }
 
         canvas {
@@ -39,6 +42,86 @@
             border: 1px solid #cbd5e1;
             background: #000;
             border-radius: 0.25rem;
+        }
+
+        /* La matriz de píxeles tiene que verse nítida, sin que el
+           navegador suavice los bordes de los bloques. */
+        #canvasDst,
+        #canvasJs {
+            image-rendering: pixelated;
+            /* Color del sustrato del LCD, se ve en las zonas
+               transparentes de la imagen original. */
+            background: #1b2a18;
+        }
+
+        h3 {
+            margin-top: 0;
+        }
+
+        .tag {
+            display: inline-block;
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 0.03em;
+            padding: 0.1rem 0.45rem;
+            border-radius: 999px;
+            vertical-align: middle;
+            margin-left: 0.4rem;
+        }
+
+        .tag-wasm { background: #ede9fe; color: #5b21b6; }
+        .tag-js { background: #fef9c3; color: #854d0e; }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 0.75rem;
+            font-size: 0.9rem;
+        }
+
+        th, td {
+            text-align: right;
+            padding: 0.4rem 0.6rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        th:first-child, td:first-child {
+            text-align: left;
+        }
+
+        thead th {
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: #64748b;
+        }
+
+        tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        td.win {
+            font-weight: 700;
+            color: #15803d;
+        }
+
+        .controls {
+            display: flex;
+            gap: 1.5rem;
+            align-items: flex-end;
+            flex-wrap: wrap;
+            margin-bottom: 0.5rem;
+        }
+
+        .controls label {
+            display: block;
+            margin-bottom: 0.35rem;
+        }
+
+        .hint {
+            color: #64748b;
+            font-size: 0.85rem;
+            margin-top: 0.75rem;
         }
 
         #contenido {
@@ -63,10 +146,27 @@
     <div class="container">
         <h1>Procesador Game Boy con WebAssembly</h1>
 
-        <div>
-            <label for="fileInput"><strong>Cargar una imagen:</strong> </label>
-            <input type="file" id="fileInput" accept="image/*">
+        <div class="controls">
+            <div>
+                <label for="fileInput"><strong>Cargar una imagen:</strong></label>
+                <input type="file" id="fileInput" accept="image/*">
+            </div>
+
+            <div>
+                <label for="chkMatriz">
+                    <input type="checkbox" id="chkMatriz" checked>
+                    <strong>Matriz de píxeles (LCD)</strong>
+                </label>
+            </div>
         </div>
+
+        <p class="hint">
+            Con la matriz activada la imagen se reduce a la resolución de la pantalla
+            original (160 &times; 144) y cada uno de sus píxeles se pinta como un bloque
+            de 2 &times; 2 con la separación oscura que tiene el LCD real entre ellos.
+            El zoom es fijo en x2 porque es el único que cabe sin que el navegador
+            reduzca el canvas, que es lo que mantiene la cuadrícula nítida.
+        </p>
 
         <div class="canvas-container">
             <div class="card">
@@ -74,54 +174,295 @@
                 <canvas id="canvasSrc"></canvas>
             </div>
             <div class="card">
-                <h3>Resultado Game Boy (WASM)</h3>
+                <h3>Game Boy <span class="tag tag-wasm">WASM</span></h3>
                 <canvas id="canvasDst"></canvas>
             </div>
+            <div class="card">
+                <h3>Game Boy <span class="tag tag-js">JavaScript</span></h3>
+                <canvas id="canvasJs"></canvas>
+            </div>
         </div>
+
+        <p class="hint" id="equalNote"></p>
+
+        <h2>WASM contra JavaScript</h2>
+        <p class="hint">
+            Los dos resultados salen de ejecutar el mismo algoritmo: uno compilado a
+            WebAssembly y el otro en JavaScript puro. <code>filtroGB-js.js</code> es una
+            traducción literal del <code>.wat</code>, con la misma paleta, la misma
+            búsqueda del color más cercano y el mismo bucle de píxeles. Los tres canvas
+            se dibujan a la vez y con el mismo tamaño, así que lo único que cambia es
+            dónde se ejecuta el código.
+        </p>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Implementación</th>
+                    <th>Pasadas</th>
+                    <th>Por pasada</th>
+                    <th>Megapíxeles/s</th>
+                    <th>JavaScript tarda más</th>
+                </tr>
+            </thead>
+            <tbody id="benchmarkBody">
+                <tr><td colspan="5">Midiendo...</td></tr>
+            </tbody>
+        </table>
+        <p class="hint">
+            Cada implementación se mide durante unos 60 ms, pero como el
+            WASM es mucho más rápido cada una repite el filtro un número
+            distinto de veces. La columna <em>Por pasada</em> es la que se
+            puede comparar, porque es el tiempo que tarda el filtro en
+            procesar una imagen. Los números cambian según el navegador y
+            la máquina.
+        </p>
+
+        <h3>Por qué la diferencia es pequeña</h3>
+        <p class="hint">
+            Es normal que los dos tiempos estén parejos, y no es que el WASM
+            esté explicando mal. Este filtro es justo el caso donde el
+            motor de JavaScript ya lo hace casi tan bien como WebAssembly:
+            V8 compila este tipo de bucles sobre <code>TypedArray</code> a
+            código máquina muy eficientemente, así que las dos versiones acaban
+            ejecutando instrucciones parecidas.
+            <br><br>
+            Además WASM carga con un coste que JavaScript no tiene: la
+            imagen tiene que entrar y salir de la memoria lineal, y solo
+            copiarla ya son cientos de kilobytes. En una imagen de 320 &times; 214
+            son unos 340 KB de memoria que se mueven solo para poder filtrar.
+            <br><br>
+            WebAssembly destaca de verdad cuando el JavaScript no se puede
+            optimizar: funciones enormes, puntos de llamada que cambian de
+            tipo, o un runtime sin JIT. También cuando el trabajo por píxel
+            es mucho más pesado o cuando se pueden usar las instrucciones
+            SIMD de WebAssembly, que en JavaScript no existen. Y cuando hay
+            muchísimas llamadas pequeñas a cruzar la frontera entre los dos
+            mundos.
+        </p>
 
         <h2>Lectura de archivo procesar.wat</h2>
         <div id="contenido">Cargando archivo procesar.wat...</div>
     </div>
 
     <script type="module">
-        import { processImage } from './filtroGB.js';
+        import {
+            processImage,
+            processImageLCD,
+            processImageSync,
+            processImageLCDSync,
+            GB_SCREEN_WIDTH,
+            GB_SCREEN_HEIGHT,
+            GB_DEFAULT_SCALE,
+            GB_DEFAULT_GRID
+        } from './filtroGB.js';
+
+        import { processImageJS, processImageLCDJS } from './filtroGB-js.js';
+        import { compare, formatMs, formatRatio } from './benchmark.js';
 
         const fileInput = document.getElementById('fileInput');
         const canvasSrc = document.getElementById('canvasSrc');
         const canvasDst = document.getElementById('canvasDst');
-        const ctxSrc = canvasSrc.getContext('2d');
+        const canvasJs = document.getElementById('canvasJs');
+        const chkMatriz = document.getElementById('chkMatriz');
+        const equalNote = document.getElementById('equalNote');
+
+        const ctxSrc = canvasSrc.getContext('2d', { willReadFrequently: true });
         const ctxDst = canvasDst.getContext('2d');
+        const ctxJs = canvasJs.getContext('2d');
+
+        // Tope de la imagen cuando no hay matriz de píxeles.
+        const MAX_DIM = 400;
+
+        // Canvas auxiliar donde se reduce la imagen antes de filtrarla.
+        const canvasTmp = document.createElement('canvas');
+        const ctxTmp = canvasTmp.getContext('2d', { willReadFrequently: true });
+
+        // Última imagen cargada, para poder re-procesarla al
+        // cambiar las opciones sin volver a pedir el archivo.
+        let imagenActual = null;
+
+        /**
+         * Reduce una imagen para que quepa en maxW x maxH, manteniendo
+         * la proporción, y devuelve sus píxeles.
+         *
+         * Con el suavizado activado al reducir, la muestra es bastante
+         * mejor que sin él.
+         */
+        function reduceTo(img, maxW, maxH) {
+            const ratio = Math.min(maxW / img.width, maxH / img.height);
+
+            const w = Math.max(1, Math.round(img.width * ratio));
+            const h = Math.max(1, Math.round(img.height * ratio));
+
+            canvasTmp.width = w;
+            canvasTmp.height = h;
+
+            ctxTmp.imageSmoothingEnabled = true;
+            ctxTmp.imageSmoothingQuality = 'high';
+            ctxTmp.drawImage(img, 0, 0, w, h);
+
+            return ctxTmp.getImageData(0, 0, w, h);
+        }
+
+        // Reduce la imagen a la resolución de la pantalla de Game Boy.
+        const toGameBoyScreen = (img) =>
+            reduceTo(img, GB_SCREEN_WIDTH, GB_SCREEN_HEIGHT);
+
+        // Mantiene la imagen tal cual, con un tope de MAX_DIM.
+        const toNormalSize = (img) => reduceTo(img, MAX_DIM, MAX_DIM);
+
+        // Comprueba si dos ImageData son idénticos píxel a píxel.
+        function sonIguales(a, b) {
+            if (a.width !== b.width || a.height !== b.height) return false;
+
+            const x = a.data;
+            const y = b.data;
+
+            for (let i = 0; i < x.length; i++) {
+                if (x[i] !== y[i]) return false;
+            }
+            return true;
+        }
+
+        // Pinta la tabla de tiempos.
+        function pintarTabla(rows) {
+            const body = document.getElementById('benchmarkBody');
+            body.innerHTML = '';
+
+            for (const row of rows) {
+                const tr = document.createElement('tr');
+
+                // La primera fila es la referencia (WASM), así que no
+                // tiene contra qué compararse.
+                const baseline = row.slowerThan === 1;
+
+                tr.innerHTML =
+                    `<td>${row.label}</td>` +
+                    `<td>${row.iterations}</td>` +
+                    `<td>${formatMs(row.avg)} ms</td>` +
+                    `<td>${row.throughput.toFixed(1)}</td>` +
+                    `<td class="${baseline ? '' : 'win'}">` +
+                    `${baseline ? '&mdash;' : formatRatio(row.slowerThan)}</td>`;
+
+                body.appendChild(tr);
+            }
+        }
+
+        // Mide las dos implementaciones sobre la misma imagen de entrada.
+        //
+        // Se usan las versiones síncronas de WASM. Las de la API pública
+        // son async, y medir un async midiendo lo que tarda en devolver
+        // la promesa, que no es nada, daría un tiempo inventado.
+        //
+        function medir(srcData, lcd, scale, outW, outH) {
+            const nodes = outW * outH;
+
+            const { rows } = compare([
+                {
+                    label: 'WebAssembly',
+                    run: () => (lcd
+                        ? processImageLCDSync(srcData, scale, GB_DEFAULT_GRID)
+                        : processImageSync(srcData)),
+                    nodes
+                },
+                {
+                    label: 'JavaScript',
+                    run: () => (lcd
+                        ? processImageLCDJS(srcData, scale, GB_DEFAULT_GRID)
+                        : processImageJS(srcData)),
+                    nodes
+                }
+            ]);
+
+            pintarTabla(rows);
+        }
 
         // Dibujar y procesar imagen en los canvas
         async function render(img) {
-            // Escalar si la imagen es muy grande
-            const maxDim = 400;
-            let w = img.width;
-            let h = img.height;
+            imagenActual = img;
 
-            if (w > maxDim || h > maxDim) {
-                if (w > h) {
-                    h = Math.round((h * maxDim) / w);
-                    w = maxDim;
-                } else {
-                    w = Math.round((w * maxDim) / h);
-                    h = maxDim;
-                }
-            }
-
-            canvasSrc.width = canvasDst.width = w;
-            canvasSrc.height = canvasDst.height = h;
-
-            // Dibujar original
-            ctxSrc.drawImage(img, 0, 0, w, h);
-            const srcData = ctxSrc.getImageData(0, 0, w, h);
+            const lcd = chkMatriz.checked;
 
             try {
-                // Procesar píxeles con la función exportada
-                const resultData = await processImage(srcData);
-                ctxDst.putImageData(resultData, 0, 0);
+                // ---------------------------------------------------------
+                // 1. Imagen de entrada del filtro
+                // ---------------------------------------------------------
+                //
+                // Con la matriz activada se reduce a 160 x 144, que es la
+                // resolución real de la pantalla de Game Boy. Sin ella se
+                // usa la imagen entera con un tope de 400 px.
+                //
+
+                const scale = lcd ? GB_DEFAULT_SCALE : 1;
+                const srcData = lcd ? toGameBoyScreen(img) : toNormalSize(img);
+
+                // ---------------------------------------------------------
+                // 2. Los dos resultados miden lo mismo
+                // ---------------------------------------------------------
+
+                const outW = srcData.width * scale;
+                const outH = srcData.height * scale;
+
+                // La original se pinta a ese mismo tamaño, así las tres
+                // imágenes se comparan píxel a píxel y a igual escala.
+                //
+                // Hay que dimensionar el canvas antes de dibujar. Si no, se
+                // dibuja sobre el tamaño por defecto del HTML (300x150) y la
+                // imagen original sale recortada.
+                canvasSrc.width = outW;
+                canvasSrc.height = outH;
+                ctxSrc.drawImage(img, 0, 0, outW, outH);
+
+                // ---------------------------------------------------------
+                // 3. Los dos filtros
+                // ---------------------------------------------------------
+
+                const wasmResult = lcd
+                    ? await processImageLCD(srcData, scale, GB_DEFAULT_GRID)
+                    : await processImage(srcData);
+
+                canvasDst.width = outW;
+                canvasDst.height = outH;
+                ctxDst.putImageData(wasmResult, 0, 0);
+
+                const jsResult = lcd
+                    ? processImageLCDJS(srcData, scale, GB_DEFAULT_GRID)
+                    : processImageJS(srcData);
+
+                canvasJs.width = outW;
+                canvasJs.height = outH;
+                ctxJs.putImageData(jsResult, 0, 0);
+
+                // ---------------------------------------------------------
+                // 4. Comprobar que el filtro es el mismo
+                // ---------------------------------------------------------
+
+                const iguales = sonIguales(wasmResult, jsResult);
+
+                equalNote.textContent = iguales
+                    ? 'Comprobado: los dos resultados son identicos pixel a pixel. '
+                      + 'Lo unico que cambia es donde se ejecuta el codigo.'
+                    : 'Aviso: los dos resultados NO coinciden pixel a pixel.';
+
+                equalNote.style.color = iguales ? '#15803d' : '#b91c1c';
+
+                // ---------------------------------------------------------
+                // 5. Medir
+                // ---------------------------------------------------------
+                //
+                // Se mide en otra tarea para que el navegador llegue a
+                // pintar los canvas antes de que la medición lo bloquee.
+                // No se usa requestAnimationFrame porque sus callbacks no
+                // se disparan con la pestaña en segundo plano.
+                //
+
+                setTimeout(() => medir(srcData, lcd, scale, outW, outH), 0);
+
             } catch (e) {
-                console.error('Error al procesar la imagen con WASM:', e);
+                console.error('Error al procesar la imagen:', e);
+                equalNote.textContent = 'Error al procesar la imagen: ' + e.message;
+                equalNote.style.color = '#b91c1c';
             }
         }
 
@@ -137,6 +478,11 @@
                 img.src = event.target.result;
             };
             reader.readAsDataURL(file);
+        });
+
+        // Re-procesar la imagen actual al cambiar las opciones.
+        chkMatriz.addEventListener('change', () => {
+            if (imagenActual) render(imagenActual);
         });
 
         // Crear una imagen por defecto de prueba en un canvas canvas
@@ -177,7 +523,7 @@
                 document.getElementById('contenido').textContent = texto;
             } catch (e) {
                 console.error('Error leyendo archivo .wat:', e);
-                document.getElementById('contenido').textContent = 
+                document.getElementById('contenido').textContent =
                     'Error leyendo procesar.wat. Asegúrate de servir el archivo desde un servidor local (HTTP).';
             }
         })();
