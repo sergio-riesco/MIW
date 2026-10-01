@@ -21,7 +21,7 @@ export default function HobbiesPage() {
       </header>
 
       <ul className={styles.list}>
-        {hobbies.map((hobby) => (
+        {hobbies.map((hobby, index) => (
           <li key={hobby.id}>
             <article className={styles.card}>
               <div className={styles.cover}>
@@ -30,6 +30,8 @@ export default function HobbiesPage() {
                   alt=""
                   fill
                   sizes="(max-width: 640px) 100vw, 22rem"
+                  // La primera afición es la que aparece sin hacer scroll.
+                  priority={index === 0}
                   unoptimized={hobby.cover?.endsWith(".svg")}
                 />
               </div>

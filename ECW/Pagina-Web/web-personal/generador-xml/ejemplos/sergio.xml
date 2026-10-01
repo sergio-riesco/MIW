@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sitio idioma="es" autor="Sergio Riesco Collar">
+  <perfil foto="/sergio.jpg">
+    <resumen>Vivo en Gijón. Estudio el Grado en Ingeniería Informática de Software y el Máster en Ingeniería Web, ambos en la Universidad de Oviedo.</resumen>
+    <parrafo>Me interesa aprender, construir cosas y entender la tecnología que hay detrás de las que usamos cada día.</parrafo>
+    <parrafo>Este sitio reúne las cuatro partes que mejor me definen: la música, los videojuegos, las series y mis aficiones.</parrafo>
+    <dato etiqueta="Vivo en">Gijón, Asturias</dato>
+    <dato etiqueta="Estudios">Grado en Ingeniería Informática de Software (Universidad de Oviedo, en curso)</dato>
+    <dato etiqueta="Actualmente">Estudiando el Máster en Ingeniería Web (Universidad de Oviedo)</dato>
+    <contacto etiqueta="Correo" enlace="mailto:sergioriescocollar@gmail.com">sergioriescocollar@gmail.com</contacto>
+    <contacto etiqueta="GitHub" enlace="https://github.com/sergio-riesco">github.com/sergio-riesco</contacto>
+  </perfil>
+  <musica introduccion="Escucho todo tipo de música pero en especial me gusta el rock. Aquí están mis grupos y artistas, agrupados por género junto a sus álbumes más famosos." descripcion="Mis grupos y artistas favoritos, organizados por género.">
+    <categoria nombre="Rock progresivo">
+      <grupo nombre="Pink Floyd" album="The Dark Side of the Moon (1973)" imagen="/covers/music/pink-floyd.png"/>
+      <grupo nombre="King Crimson" album="In the Court of the Crimson King (1969)" imagen="/covers/music/king-crimson.png"/>
+      <grupo nombre="The Alan Parsons Project" album="Tales of Mystery and Imagination (1976)" imagen="/covers/music/alan-parsons-project.png"/>
+    </categoria>
+    <categoria nombre="Pop Rock">
+      <grupo nombre="Electric Light Orchestra" album="Out of the Blue (1977)" imagen="/covers/music/electric-light-orchestra.png"/>
+    </categoria>
+    <categoria nombre="Yacht Rock">
+      <grupo nombre="Blue Öyster Cult" album="Agents of Fortune (1976)" imagen="/covers/music/blue-oyster-cult.png"/>
+    </categoria>
+  </musica>
+  <videojuegos introduccion="Ahora mismo estoy jugando a Big Walk con amigos. En esta lista puedes ver algunos de mis videojuegos favoritos." descripcion="DOOM, Zelda, Outer Wilds y el que estoy jugando ahora mismo.">
+    <juego titulo="Big Walk" genero="Cooperativo | Puzles" imagen="/covers/videogames/big-walk.png" actual="true">Está siendo mi videojuego favorito del año.</juego>
+    <juego titulo="The Legend of Zelda: Breath of the Wild" genero="Aventura" imagen="/covers/videogames/botw.png" favorito="true">Mi videojuego favorito, tiene la mejor exploración de cualquier mundo abierto.</juego>
+    <juego titulo="Outer Wilds" genero="Exploración" imagen="/covers/videogames/outer-wilds.png">Me gustan sus secretos y su universo.</juego>
+    <juego titulo="DOOM Eternal" genero="FPS" imagen="/covers/videogames/doom-eternal.png">Me flipa.</juego>
+    <juego titulo="Dark Souls" genero="RPG" imagen="/covers/videogames/dark-souls.png">La primera vez que lo jugué lo odie, pero después me enamoré.</juego>
+    <juego titulo="Helldivers II" genero="TPS" imagen="/covers/videogames/helldivers-ii.jpg">Te hace sentir como que estás en una película de acción.</juego>
+  </videojuegos>
+  <series introduccion="Estas son las series que más me gustan y la que estoy viendo ahora mismo." descripcion="The Boys, Invincible, Breaking Bad y la que estoy viendo.">
+    <serie titulo="Breaking Bad" genero="Thriller" anio="2008" imagen="/covers/series/breaking-bad.png" favorita="true">Es probablemente la serie más perfecta que han hecho jamás.</serie>
+    <serie titulo="The Boys" genero="Súperhéroes" anio="2019" imagen="/covers/series/the-boys.png">Vigilantes con poderes que no respetan la moral. Lo que empieza como una crítica de superheroes acaba siendo una crítica de la sociedad.</serie>
+    <serie titulo="Invincible" genero="Súperhéroes" anio="2021" imagen="/covers/series/invincible.png">Brutal, merece la pena verla sin saber nada antes.</serie>
+    <serie titulo="Better Call Saul" genero="Thriller" anio="2015" imagen="/covers/series/better-call-saul.png">Precuela de Breaking Bad. Llega más lejos de lo que esperabas y funciona muy bien.</serie>
+    <serie titulo="Lanterns" genero="Misterio - Super Héroes" anio="2026" imagen="/covers/series/lanterns.png" actual="true">La que estoy viendo ahora mismo.</serie>
+  </series>
+  <aficiones introduccion="Tres cosas a las que dedico parte de mi tiempo libre." descripcion="Skate, pizzas y videojuegos.">
+    <aficion titulo="Videojuegos" imagen="/covers/hobbies/videojuegos.png">Es una de mis aficiones. Si quieres, puedes ver mi lista completa en la página de videojuegos.</aficion>
+    <aficion titulo="Skate" imagen="/covers/hobbies/skate.png">Me gusta hacer skate sobre todo para dar paseos, no para hacer trucos.</aficion>
+    <aficion titulo="Pizzas" imagen="/covers/hobbies/pizzas.png">Hacer pizzas es otra de las cosas que más me gustan.</aficion>
+  </aficiones>
+</sitio>

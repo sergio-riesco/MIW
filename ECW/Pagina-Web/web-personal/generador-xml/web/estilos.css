@@ -1,0 +1,21 @@
+:root{color-scheme:light dark;--bd:#8885;--ac:#1f5f5b}
+@media(prefers-color-scheme:dark){:root{--ac:#7fc9bd}}
+body{margin:0;font:1rem/1.5 system-ui,sans-serif;padding:1rem 1.5rem 3rem}
+h1{margin:.2rem 0}h2{font-size:1.2rem;margin:1.2rem 0 .5rem}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:2rem}
+@media(max-width:60rem){.layout{grid-template-columns:1fr}}
+fieldset{border:1px solid var(--bd);border-radius:.5rem;margin:0 0 1rem}
+legend{font-weight:700;padding:0 .4rem}
+.item{display:grid;gap:.5rem;padding:.75rem;margin-bottom:.75rem;border:1px dashed var(--bd);border-radius:.4rem}
+label{display:grid;gap:.15rem;font-size:.9rem}
+label.check{display:flex;gap:.5rem;align-items:center}
+input[type=text],textarea{font:inherit;padding:.4rem;width:100%}
+button,.boton{font:inherit;padding:.45rem .9rem;border:1px solid var(--bd);border-radius:.4rem;background:transparent;color:inherit;cursor:pointer}
+button:hover,.boton:hover{border-color:var(--ac);color:var(--ac)}
+.primario{background:var(--ac);color:#fff;border-color:var(--ac)}.primario:hover{color:#fff;opacity:.9}
+.acciones{display:flex;flex-wrap:wrap;gap:.5rem}
+#xml{font:.8rem/1.4 ui-monospace,monospace}
+#pestanas{display:flex;flex-wrap:wrap;gap:.3rem;margin:.5rem 0}
+#pestanas .activa{border-color:var(--ac);color:var(--ac);font-weight:700}
+#vista{width:100%;height:32rem;border:1px solid var(--bd);border-radius:.5rem;background:#fff}
+.ok{color:#1d7a3a}.error{color:#c0392b;font-weight:700}

@@ -23,18 +23,20 @@ export default function MusicPage() {
       </header>
 
       <ul className={styles.grid}>
-        {categories.map((category) => (
+        {categories.map((category, categoryIndex) => (
           <li key={category.id}>
             <Link className={styles.card} href={`/musica/${category.id}`}>
               <span className={styles.covers}>
-                {category.bands.slice(0, 4).map((band) => (
+                {category.bands.slice(0, 4).map((band, index) => (
                   <Image
                     key={band.id}
-                    src={band.cover || "/covers/placeholder.svg"}
+                    src={band.cover || "/covers/videogames/placeholder.svg"}
                     alt=""
                     width={40}
                     height={40}
                     sizes="40px"
+                    // La primera tarjeta es la que se ve sin hacer scroll.
+                    priority={categoryIndex === 0 && index === 0}
                     unoptimized={band.cover?.endsWith(".svg")}
                   />
                 ))}

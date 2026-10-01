@@ -93,6 +93,7 @@ export default function Home() {
             width={1200}
             height={960}
             sizes="(max-width: 640px) 100vw, 22rem"
+            priority
           />
         </div>
       </section>

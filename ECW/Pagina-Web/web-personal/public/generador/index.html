@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Generador de sitios web personales desde XML</title>
+  <link rel="stylesheet" href="estilos.css">
+</head>
+<body>
+  <header>
+    <h1>Generador de sitios web personales</h1>
+    <p>Rellena el formulario → se genera un documento XML → WebAssembly (Rust) lo convierte en un sitio completo.</p>
+    <p class="acciones">
+      <label class="boton">Abrir XML… <input id="archivo-xml" type="file" accept=".xml,text/xml" hidden></label>
+    </p>
+  </header>
+  <div class="layout">
+    <section aria-labelledby="t-form">
+      <h2 id="t-form">1. Contenido</h2>
+      <div id="formulario"></div>
+    </section>
+    <section aria-labelledby="t-xml">
+      <h2 id="t-xml">2. XML</h2>
+      <p class="acciones">
+        <button id="btn-xml" type="button">Formulario → XML</button>
+        <button id="btn-xml-a-form" type="button">XML → formulario</button>
+      </p>
+      <textarea id="xml" rows="16" spellcheck="false" aria-label="Documento XML"></textarea>
+      <h2>3. Sitio</h2>
+      <p class="acciones">
+        <button id="btn-generar" type="button" class="primario">Generar sitio</button>
+        <button id="btn-zip" type="button">Descargar ZIP</button>
+      </p>
+      <p id="estado" role="status"></p>
+      <div id="pestanas"></div>
+      <iframe id="vista" title="Vista previa del sitio generado"></iframe>
+    </section>
+  </div>
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

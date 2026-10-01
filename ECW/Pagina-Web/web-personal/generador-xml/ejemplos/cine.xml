@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sitio idioma="en" autor="Ana &amp; Co.">
+  <perfil>
+    <resumen>Film student &amp; amateur photographer. Test site with only some sections.</resumen>
+    <parrafo>Caracteres especiales: &lt;b&gt;no se interpretan&lt;/b&gt; y "las comillas" tampoco rompen nada.</parrafo>
+    <dato etiqueta="City">Valencia</dato>
+    <contacto etiqueta="Web" enlace="https://example.org">example.org</contacto>
+  </perfil>
+  <series>
+    <serie titulo="Twin Peaks" genero="Mystery" anio="1990" favorita="true">Sin imagen: se muestra un hueco.</serie>
+    <serie titulo="Severance" genero="Sci-Fi" anio="2022" actual="true">Otra descripción.</serie>
+  </series>
+  <aficiones>
+    <aficion titulo="Fotografía analógica">Revelar carretes en casa.</aficion>
+  </aficiones>
+</sitio>
