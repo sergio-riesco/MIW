@@ -1,5 +1,7 @@
+import Image from "next/image";
 import Link from "next/link";
 import Breadcrumb from "../components/Breadcrumb";
+import { hobbies } from "../data/hobbies";
 import styles from "./hobbies.module.css";
 
 export const metadata = {
@@ -19,21 +21,32 @@ export default function HobbiesPage() {
       </header>
 
       <ul className={styles.list}>
-        <li>
-          <h2>Videojuegos</h2>
-          <p>
-            Es una de mis aficiones. Si quieres, puedes ver mi lista en la
-            página de <Link href="/videojuegos">videojuegos</Link>.
-          </p>
-        </li>
-        <li>
-          <h2>Skate</h2>
-          <p>Me gusta hacer skate sobre todo para dar paseos, no para hacer trucos.</p>
-        </li>
-        <li>
-          <h2>Pizzas</h2>
-          <p>Hacer pizzas es otra de las cosas que más me gustan.</p>
-        </li>
+        {hobbies.map((hobby) => (
+          <li key={hobby.id}>
+            <article className={styles.card}>
+              <div className={styles.cover}>
+                <Image
+                  src={hobby.cover || "/covers/videogames/placeholder.svg"}
+                  alt=""
+                  fill
+                  sizes="(max-width: 640px) 100vw, 22rem"
+                  unoptimized={hobby.cover?.endsWith(".svg")}
+                />
+              </div>
+
+              <div className={styles.info}>
+                <h2>{hobby.title}</h2>
+                <p>{hobby.text}</p>
+
+                {hobby.link && (
+                  <Link className={styles.link} href={hobby.link.href}>
+                    {hobby.link.label}
+                  </Link>
+                )}
+              </div>
+            </article>
+          </li>
+        ))}
       </ul>
     </main>
   );

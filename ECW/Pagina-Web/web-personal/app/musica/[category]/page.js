@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import Breadcrumb from "../../components/Breadcrumb";
 import { categories } from "../../data/music";
@@ -47,6 +48,15 @@ export default async function MusicCategoryPage({ params }) {
           {category.bands.length === 1 ? "grupo" : "grupos"}
         </p>
       </header>
+
+      <nav className={styles.back} aria-label="Volver a la lista de géneros">
+        <Link className={styles.backLink} href="/musica">
+          <span className={styles.backArrow} aria-hidden="true">
+            ←
+          </span>
+          Volver a todos los géneros
+        </Link>
+      </nav>
 
       <ul className={styles.list}>
         {category.bands.map((band) => (

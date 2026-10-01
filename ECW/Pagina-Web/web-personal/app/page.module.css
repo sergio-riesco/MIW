@@ -25,6 +25,37 @@
   margin: 0;
 }
 
+/* Segunda línea de cada dato: la universidad del estudio. */
+.factDetail {
+  display: block;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+/* Presentación: el texto y la foto uno al lado del otro. */
+.profile {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 1.5rem 2.5rem;
+  align-items: start;
+}
+
+.profileText > :last-child {
+  margin-bottom: 0;
+}
+
+.photo {
+  width: 22rem;
+  height: auto;
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+}
+
+/* Contacto: el <address> solo envuelve la lista de datos. */
+.contact {
+  font-style: normal;
+}
+
 .sectionList {
   margin: 0;
   padding: 0;
@@ -61,6 +92,18 @@
 .sectionLinkText {
   color: var(--muted);
   line-height: 1.55;
+}
+
+@media (max-width: 40rem) {
+  .profile {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .photo {
+    width: 100%;
+    max-width: 22rem;
+  }
 }
 
 @media (max-width: 34rem) {

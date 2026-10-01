@@ -1,17 +1,102 @@
-/* Lista de aficiones, separada por líneas finas. */
+/* Aficiones: cada una en una fila con su imagen a la izquierda. */
 
 .list {
+  display: grid;
   margin: 0;
   padding: 0;
+  gap: 1.5rem;
   list-style: none;
 }
 
+/* Separadores finos entre filas, como en la lista anterior. */
 .list li + li {
-  margin-top: 2rem;
-  padding-top: 2rem;
+  margin-top: 0.25rem;
+  padding-top: 1.5rem;
   border-top: 1px solid var(--border);
 }
 
-.list p:last-child {
-  margin-bottom: 0;
+.card {
+  display: grid;
+  grid-template-columns: 22rem 1fr;
+  gap: 1.5rem 2rem;
+  align-items: center;
+}
+
+.cover {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 4 / 3;
+  border: 1px solid var(--border);
+  border-radius: 0.6rem;
+  background: var(--surface);
+  box-shadow: 0 0.25rem 0.8rem var(--shadow-color);
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+
+.cover img {
+  object-fit: cover;
+}
+
+.card:hover .cover {
+  border-color: var(--accent);
+  box-shadow: 0 0.4rem 1.2rem var(--shadow-color);
+}
+
+.info {
+  min-width: 0;
+}
+
+.info h2 {
+  margin: 0 0 0.35rem;
+  font-size: 1.3rem;
+}
+
+.info p {
+  margin: 0;
+  max-width: 40rem;
+  color: var(--muted);
+}
+
+.link {
+  display: inline-block;
+  margin-top: 0.85rem;
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.link::after {
+  content: " →";
+}
+
+.link:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 46rem) {
+  .card {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  /* En móvil la imagen no debe comerse media pantalla. */
+  .cover {
+    max-width: 20rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cover {
+    transition: none;
+  }
+}
+
+@media print {
+  .cover {
+    box-shadow: none;
+  }
+
+  .link {
+    display: none;
+  }
 }

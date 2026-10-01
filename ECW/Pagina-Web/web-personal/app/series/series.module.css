@@ -1,10 +1,207 @@
-/* Listas con viñeta, que es como se muestran las series. */
+/* Series: serie destacada en formato 16:9 y rejilla de tarjetas.
+   A diferencia de Videojuegos (carrusel 2:3) y Música (índices de categorías),
+   aquí las portadas son panorámicas porque las series se ven en horizontal. */
 
-.list {
-  margin-top: 0;
-  padding-left: 1.3rem;
+.sectionHeader {
+  display: flex;
+  margin-bottom: 1.25rem;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.5rem;
 }
 
-.list li {
-  margin-bottom: 0.4rem;
+.sectionHeader h2 {
+  margin-bottom: 0.15rem;
+}
+
+.currentHint {
+  display: inline-flex;
+  margin: 0;
+  align-items: center;
+  gap: 0.45rem;
+  color: var(--current);
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.currentHint > span {
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 50%;
+  background: var(--current);
+  box-shadow: 0 0 0 0.25rem var(--current-glow);
+}
+
+/* Serie en curso: portada ancha a la izquierda y datos a la derecha. */
+.featured {
+  display: grid;
+  margin-bottom: 3rem;
+  padding: 1.25rem;
+  border: 1px solid var(--current);
+  border-radius: 0.75rem;
+  grid-template-columns: minmax(0, 30rem) 1fr;
+  gap: 1.5rem 2rem;
+  align-items: center;
+  background: var(--surface);
+  box-shadow: 0 0.5rem 1.4rem var(--shadow-color);
+}
+
+.featuredCover {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 16 / 9;
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  background: var(--background);
+}
+
+.featuredCover img {
+  object-fit: cover;
+}
+
+.featuredInfo {
+  min-width: 0;
+}
+
+.featuredTitle {
+  margin: 0.3rem 0 0.2rem;
+  font-size: clamp(1.5rem, 3.5vw, 2.1rem);
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+}
+
+.grid {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+  gap: 1.5rem 1.25rem;
+  list-style: none;
+}
+
+.card {
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+}
+
+.cover {
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 0.8rem;
+  aspect-ratio: 16 / 9;
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  background: var(--surface);
+  box-shadow: 0 0.25rem 0.8rem var(--shadow-color);
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+
+.cover img {
+  object-fit: cover;
+  transition: transform 180ms ease;
+}
+
+.card:hover .cover {
+  border-color: var(--accent);
+  box-shadow: 0 0.4rem 1.2rem var(--shadow-color);
+}
+
+.card:hover .cover img {
+  transform: scale(1.03);
+}
+
+.badge {
+  position: absolute;
+  top: 0.55rem;
+  left: 0.55rem;
+  padding: 0.28rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.63rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.badgeFavorite {
+  background: var(--favorite);
+  color: var(--on-favorite);
+}
+
+.genre {
+  margin: 0;
+  color: var(--accent);
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.cardTitle {
+  margin: 0.3rem 0 0.15rem;
+  font-size: 1.05rem;
+  line-height: 1.3;
+}
+
+.season {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
+.description {
+  margin: 0.5rem 0 0;
+  color: var(--muted);
+  font-size: 0.88rem;
+  line-height: 1.55;
+}
+
+.favoriteNote {
+  max-width: 44rem;
+  margin: 0;
+  color: var(--muted);
+}
+
+.favoriteNote strong {
+  color: var(--text);
+}
+
+@media (max-width: 46rem) {
+  .featured {
+    grid-template-columns: 1fr;
+    gap: 1.1rem;
+  }
+}
+
+@media (max-width: 40rem) {
+  .featured {
+    padding: 1rem;
+  }
+
+  .grid {
+    gap: 1.25rem 1rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cover img,
+  .cover {
+    transition: none;
+  }
+
+  .card:hover .cover img {
+    transform: none;
+  }
+}
+
+@media print {
+  .featured {
+    grid-template-columns: 1fr;
+    break-inside: avoid;
+  }
+
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }

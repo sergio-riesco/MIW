@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" role="img" aria-labelledby="t">
+  <title id="t">LANTERNS</title>
+  <rect width="800" height="450" fill="#e9ebe8"/>
+  <rect x="0" y="0" width="800" height="6" fill="#2f7d5f"/>
+  <circle cx="400" cy="211" r="128" fill="#2f7d5f" opacity="0.14"/>
+  <text x="400" y="253" fill="#2f7d5f" font-family="Arial, Helvetica, sans-serif" font-size="190" font-weight="800" text-anchor="middle">L</text>
+  <text x="400" y="408" fill="#5b615f" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="700" letter-spacing="4" text-anchor="middle">LANTERNS</text>
+</svg>

@@ -20,6 +20,9 @@ if (!respCatalogo.ok) {
   throw new Error("Sin catalogo no hay motores.");
 }
 globalThis.__VXML_CATALOGO = await respCatalogo.json();
+// Indice id -> regla: los motores solo emiten el id (VXML004), asi que el catalogo
+// aporta el nombre tecnico, el resumen y la norma para mostrarlo en la interfaz.
+const REGLAS_POR_ID = new Map(globalThis.__VXML_CATALOGO.reglas.map((r) => [r.id, r]));
 
 // --- 1. Motores (carga perezosa) ---------------------------------------------
 let motores = null;
@@ -147,34 +150,68 @@ function pintarInforme(inf, ms, motor) {
       <div class="chip"><b>${ms.toFixed(2)} ms</b>${motor}</div>
     </div>`;
 
+  const conteo = { error: 0, warning: 0, info: 0 };
+  for (const d of inf.diagnosticos) conteo[d.gravedad] = (conteo[d.gravedad] || 0) + 1;
+
   const filas = inf.diagnosticos.map((d) => {
-    const sev = "sev-" + d.gravedad;
-    return `<tr>
-      <td class="${sev}">${d.regla}</td>
-      <td class="${sev}">${d.gravedad}</td>
-      <td>${d.linea}:${d.columna}</td>
-      <td>&lt;${escHTML(d.elemento)}&gt;</td>
-      <td>${d.detalle ? escHTML(d.detalle) : ""}</td>
+    const r = REGLAS_POR_ID.get(d.regla);
+    const ayuda = r ? `${r.resumen} — ${r.norma}` : "";
+    return `<tr class="diag" data-gravedad="${d.gravedad}"${r ? ` title="${escHTML(ayuda)}"` : ""}>
+      <td class="mono nowrap">${escHTML(d.regla)}${r ? `<span class="sub">${escHTML(r.nombre)}</span>` : ""}</td>
+      <td><span class="marca sev-${d.gravedad}">${d.gravedad}</span></td>
+      <td class="num mono">${d.linea}:${d.columna}</td>
+      <td class="mono nowrap">&lt;${escHTML(d.elemento)}&gt;</td>
+      <td class="mono">${d.detalle ? escHTML(d.detalle) : '<span class="vacio">—</span>'}</td>
       <td>${escHTML(d.mensaje)}</td>
     </tr>`;
   }).join("");
 
-  const forms = inf.formularios.map((f) =>
-    `#${escHTML(f.id || "(sin id)")} · línea ${f.linea} · ${f.campos} campos · ` +
-    (f.accesible ? "accesible" : "inaccesible")).join(" · ");
+  const filasForms = inf.formularios.map((f, i) => `
+    <tr>
+      <td class="num">${i + 1}</td>
+      <td class="mono">${f.id ? escHTML(f.id) : '<span class="vacio">sin id</span>'}</td>
+      <td class="num">${f.linea}</td>
+      <td class="num">${f.campos}</td>
+      <td><span class="marca ${f.accesible ? "marca-si" : "marca-no"}">${f.accesible ? "accesible" : "inaccesible"}</span></td>
+    </tr>`).join("");
 
   const pre = document.createElement("pre");
   pre.textContent = JSON.stringify(inf, null, 2);
 
   cuerpo.innerHTML = "";
   cuerpo.insertAdjacentHTML("beforeend", chips);
-  if (inf.formularios.length) cuerpo.insertAdjacentHTML("beforeend",
-    `<h3>Formularios</h3><p class="form-list">${forms}</p>`);
-  if (inf.diagnosticos.length) {
+  if (inf.formularios.length) {
+    const muertos = inf.formularios.filter((f) => !f.accesible).length;
     cuerpo.insertAdjacentHTML("beforeend",
-      `<h3>Diagnósticos</h3>
-       <table><thead><tr><th>Regla</th><th>Gravedad</th><th>Posición</th><th>Elemento</th><th>Detalle</th><th>Mensaje</th></tr></thead>
-       <tbody>${filas}</tbody></table>`);
+      `<h3>Formularios <span class="contador">${inf.formularios.length}</span></h3>
+       <div class="tabla-scroll">
+         <table>
+           <thead><tr><th>#</th><th>id</th><th>Línea</th><th>Campos</th><th>Flujo</th></tr></thead>
+           <tbody>${filasForms}</tbody>
+         </table>
+       </div>
+       <p class="nota">«Accesible» = el primer &lt;form&gt; del documento o el destino de algún
+       <code>&lt;goto next="#id"&gt;</code>. Inaccesibles: <b>${muertos}</b> (VXML002).</p>`);
+  }
+  if (inf.diagnosticos.length) {
+    const severidades = ["error", "warning", "info"];
+    const botones = [`<button type="button" class="filtro sel" data-filtro="todas">Todos <b>${inf.diagnosticos.length}</b></button>`]
+      .concat(severidades.map((g) => `<button type="button" class="filtro sev-${g}" data-filtro="${g}"${conteo[g] ? "" : " disabled"}>${g} <b>${conteo[g] || 0}</b></button>`))
+      .join("");
+    cuerpo.insertAdjacentHTML("beforeend",
+      `<h3>Diagnósticos <span class="contador">${inf.diagnosticos.length}</span></h3>
+       <div class="filtros" role="group" aria-label="Filtrar diagnósticos por gravedad">${botones}</div>
+       <div class="tabla-scroll">
+         <table class="tabla-diag">
+           <colgroup><col style="width:8rem"><col style="width:5rem"><col style="width:4.5rem"><col style="width:7rem"><col style="width:7rem"><col></colgroup>
+           <thead><tr><th>Regla</th><th>Gravedad</th><th>Posición</th><th>Elemento</th><th>Detalle</th><th>Mensaje</th></tr></thead>
+           <tbody>${filas}</tbody>
+         </table>
+       </div>
+       <p class="vacio oculto" id="diag-vacio">Ningún diagnóstico con ese filtro.</p>
+       <p class="nota">Cada fila indica el identificador de regla y su nombre técnico; pasa el ratón
+       por la regla para leer el resumen y la norma de VoiceXML que la motiva.</p>`);
+    conectarFiltrosDiagnosticos();
   } else {
     cuerpo.insertAdjacentHTML("beforeend", `<p class="vacio">Sin diagnósticos: el documento cumple las 18 reglas.</p>`);
   }
@@ -182,11 +219,37 @@ function pintarInforme(inf, ms, motor) {
   cuerpo.appendChild(pre);
 }
 
-/** Escapa texto del documento antes de insertarlo en HTML. */
+/**
+ * Escapa texto del documento antes de insertarlo en HTML.
+ * Escapa tambien las comillas para poder reutilizarse dentro de atributos
+ * (por ejemplo el title con la ayuda de una regla).
+ */
 function escHTML(s) {
   const d = document.createElement("div");
   d.textContent = s;
-  return d.innerHTML;
+  return d.innerHTML.replace(/"/g, "&quot;");
+}
+
+/**
+ * Filtra la tabla de diagnosticos por gravedad sin volver a construirla: solo se
+ * ocultan las filas que no encajan, de modo el informe se repinta al instante.
+ */
+function conectarFiltrosDiagnosticos() {
+  const filasDiag = cuerpo.querySelectorAll("tr.diag");
+  const aviso = $("diag-vacio");
+  for (const boton of cuerpo.querySelectorAll(".filtro")) {
+    boton.addEventListener("click", () => {
+      const filtro = boton.dataset.filtro;
+      let visibles = 0;
+      for (const f of filasDiag) {
+        const ver = filtro === "todas" || f.dataset.gravedad === filtro;
+        f.classList.toggle("oculto", !ver);
+        if (ver) visibles++;
+      }
+      for (const b of cuerpo.querySelectorAll(".filtro")) b.classList.toggle("sel", b === boton);
+      if (aviso) aviso.classList.toggle("oculto", visibles > 0);
+    });
+  }
 }
 
 // --- 6. Comparativa de los tres motores --------------------------------------

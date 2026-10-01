@@ -8,7 +8,9 @@
   border: 1px solid var(--border);
   border-radius: 50%;
   place-items: center;
-  background: var(--background);
+  /* --surface, no --background: en modo oscuro el header comparte fondo con el
+     body y el botón se perdería si usara el mismo color. */
+  background: var(--surface);
   color: var(--text);
   cursor: pointer;
   font-size: 1.15rem;

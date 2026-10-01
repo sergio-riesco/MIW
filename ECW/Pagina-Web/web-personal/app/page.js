@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import Breadcrumb from "./components/Breadcrumb";
 import styles from "./page.module.css";
@@ -5,14 +6,34 @@ import styles from "./page.module.css";
 export const metadata = {
   title: "Sobre mí",
   description:
-    "Presentación de Sergio Riesco Collar, estudiante de Ingeniería Informática de Software y del Máster en Ingeniería Web.",
+    "Presentación de Sergio Riesco Collar, estudiante de Ingeniería Informática de Software y del Máster en Ingeniería Web de la Universidad de Oviedo.",
 };
 
 const facts = [
   { label: "Vivo en", value: "Gijón, Asturias" },
-  { label: "Grado", value: "Ingeniería Informática de Software" },
-  { label: "Máster", value: "Ingeniería Web" },
-  { label: "Universidad", value: "Universidad de Oviedo" },
+  {
+    label: "Estudios",
+    value: "Grado en Ingeniería Informática de Software",
+    detail: "Universidad de Oviedo (en curso)",
+  },
+  {
+    label: "Actualmente",
+    value: "Estudiando el Máster en Ingeniería Web",
+    detail: "Universidad de Oviedo",
+  },
+];
+
+const contact = [
+  {
+    label: "Correo",
+    text: "sergioriescocollar@gmail.com",
+    href: "mailto:sergioriescocollar@gmail.com",
+  },
+  {
+    label: "GitHub",
+    text: "github.com/sergio-riesco",
+    href: "https://github.com/sergio-riesco",
+  },
 ];
 
 const sections = [
@@ -45,21 +66,35 @@ export default function Home() {
         <Breadcrumb items={[{ label: "Sobre mí" }]} />
         <h1>Sergio Riesco Collar</h1>
         <p className="lead">
-          Vivo en Gijón y estudio Ingeniería Informática de Software y el
-          Máster en Ingeniería Web en la Universidad de Oviedo.
+          Vivo en Gijón. Estudio el Grado en Ingeniería Informática de Software y
+          el Máster en Ingeniería Web, ambos en la Universidad de Oviedo.
         </p>
       </header>
 
       <section aria-labelledby="presentacion">
         <h2 id="presentacion">Presentación</h2>
-        <p>
-          Me interesa aprender, construir cosas y entender la tecnología que hay
-          detrás de las que usamos cada día.
-        </p>
-        <p>
-          Este sitio reúne las cuatro partes que mejor me definen: la música,
-          los videojuegos, las series y mis aficiones.
-        </p>
+
+        <div className={styles.profile}>
+          <div className={styles.profileText}>
+            <p>
+              Me interesa aprender, construir cosas y entender la tecnología que
+              hay detrás de las que usamos cada día.
+            </p>
+            <p>
+              Este sitio reúne las cuatro partes que mejor me definen: la
+              música, los videojuegos, las series y mis aficiones.
+            </p>
+          </div>
+
+          <Image
+            className={styles.photo}
+            src="/sergio.jpg"
+            alt="Sergio Riesco Collar"
+            width={1200}
+            height={960}
+            sizes="(max-width: 640px) 100vw, 22rem"
+          />
+        </div>
       </section>
 
       <section aria-labelledby="datos">
@@ -68,10 +103,31 @@ export default function Home() {
           {facts.map((fact) => (
             <div className={styles.fact} key={fact.label}>
               <dt>{fact.label}</dt>
-              <dd>{fact.value}</dd>
+              <dd>
+                {fact.value}
+                {fact.detail && (
+                  <span className={styles.factDetail}>{fact.detail}</span>
+                )}
+              </dd>
             </div>
           ))}
         </dl>
+      </section>
+
+      <section aria-labelledby="contacto">
+        <h2 id="contacto">Contacto</h2>
+        <address className={styles.contact}>
+          <dl className={styles.factList}>
+            {contact.map((item) => (
+              <div className={styles.fact} key={item.label}>
+                <dt>{item.label}</dt>
+                <dd>
+                  <a href={item.href}>{item.text}</a>
+                </dd>
+              </div>
+            ))}
+          </dl>
+        </address>
       </section>
 
       <section aria-labelledby="secciones">

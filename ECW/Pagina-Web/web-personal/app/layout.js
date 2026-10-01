@@ -1,4 +1,5 @@
 import Link from "next/link";
+import InlineScript from "./components/InlineScript";
 import ThemeToggle from "./components/ThemeToggle";
 import styles from "./layout.module.css";
 import "./globals.css";
@@ -11,6 +12,14 @@ const navigation = [
   { href: "/hobbies", label: "Hobbies" },
 ];
 
+/**
+ * Se ejecuta de forma síncrona al analizar el HTML, antes del primer pintado,
+ * para que `data-theme` ya tenga el valor correcto y recargar la página no
+ * produzca ningún destello. Debe coincidir con la lógica de
+ * app/components/ThemeToggle.js.
+ */
+const themeScript = `(function(){try{var p=localStorage.getItem("theme");var t=(p==="light"||p==="dark")?p:(window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light");document.documentElement.setAttribute("data-theme",t)}catch(e){document.documentElement.setAttribute("data-theme","light")}})()`;
+
 export const metadata = {
   title: {
     default: "Sergio Riesco Collar",
@@ -22,7 +31,10 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="es">
+    <html lang="es" data-theme="light" suppressHydrationWarning>
+      <head>
+        <InlineScript html={themeScript} />
+      </head>
       <body>
         <a className="skip-link" href="#contenido">
           Saltar al contenido principal

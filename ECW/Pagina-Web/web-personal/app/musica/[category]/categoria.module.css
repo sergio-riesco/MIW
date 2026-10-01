@@ -1,5 +1,35 @@
 /* Página de una categoría: lista vertical de grupos con su carátula. */
 
+/* Enlace de vuelta a /musica. La miga de pan ya enlaza, pero en texto
+   pequeño pasa desapercibida, así que se repite aquí como botón visible. */
+.back {
+  margin-bottom: 1.5rem;
+}
+
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: var(--text);
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.backLink:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.backArrow {
+  color: var(--accent);
+  font-size: 1.05rem;
+  line-height: 1;
+}
+
 .list {
   margin: 0;
   padding: 0;

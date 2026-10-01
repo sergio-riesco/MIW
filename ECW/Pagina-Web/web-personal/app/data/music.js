@@ -18,7 +18,7 @@ export const categories = [
       {
         id: "king-crimson",
         name: "King Crimson",
-        cover: "/covers/music/king-crimson.svg",
+        cover: "/covers/music/king-crimson.png",
         album: "In the Court of the Crimson King (1969)",
       },
       {

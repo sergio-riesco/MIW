@@ -4,7 +4,20 @@
    cada página o componente van en su archivo .module.css.
    ------------------------------------------------------------------ */
 
-:root {
+/* ------------------------------------------------------------------
+   Temas.
+
+   El atributo `data-theme` de <html> es la única fuente de verdad y vale
+   "light" o "dark". Lo fija el script en línea de app/layout.js mientras el
+   navegador analiza el HTML, antes del primer pintado, de modo que recargar
+   nunca produce un destello ni un cambio brusco de color.
+
+   La consulta de medios solo entra en juego si el atributo no existe (por
+   ejemplo, si el JavaScript está bloqueado); en ese caso manda el sistema.
+   ------------------------------------------------------------------ */
+
+:root,
+:root[data-theme="light"] {
   --background: #fdfdfb;
   --surface: #f4f4f1;
   --text: #1b1d1c;
@@ -36,9 +49,9 @@
   --border: #33403c;
 }
 
-/* Solo se aplica si el usuario no ha elegido tema a mano. */
+/* Solo se aplica si no hay tema explícito: entonces manda el sistema. */
 @media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
+  :root:not([data-theme]) {
     --background: #141817;
     --surface: #1e2725;
     --text: #edf1ec;
@@ -59,16 +72,16 @@
   box-sizing: border-box;
 }
 
-html {
+:root {
   color-scheme: light;
 }
 
-html[data-theme="dark"] {
+:root[data-theme="dark"] {
   color-scheme: dark;
 }
 
 @media (prefers-color-scheme: dark) {
-  html:not([data-theme="light"]) {
+  :root:not([data-theme]) {
     color-scheme: dark;
   }
 }
