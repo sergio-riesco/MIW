@@ -13,10 +13,7 @@
         }
 
         .container {
-            /* Ancho suficiente para que las tres tarjetas quepan sin
-               reducir el canvas del resultado. Si el navegador lo
-               encoge, la cuadrícula de píxeles sale irregular. */
-            max-width: 1120px;
+            max-width: 1400px;
             margin: 0 auto;
         }
 
@@ -32,26 +29,20 @@
             padding: 1rem;
             border-radius: 0.5rem;
             border: 1px solid #e2e8f0;
-            flex: 1;
-            min-width: 300px;
+
+            /* En pantallas estrechas las tarjetas bajan de una en una, así
+               que el canvas no tiene que encogerse. */
+            flex: 1 1 320px;
+            min-width: 240px;
         }
 
         canvas {
+            display: block;
             max-width: 100%;
             height: auto;
             border: 1px solid #cbd5e1;
             background: #000;
             border-radius: 0.25rem;
-        }
-
-        /* La matriz de píxeles tiene que verse nítida, sin que el
-           navegador suavice los bordes de los bloques. */
-        #canvasDst,
-        #canvasJs {
-            image-rendering: pixelated;
-            /* Color del sustrato del LCD, se ve en las zonas
-               transparentes de la imagen original. */
-            background: #1b2a18;
         }
 
         h3 {
@@ -118,6 +109,10 @@
             margin-bottom: 0.35rem;
         }
 
+        .controls select {
+            font: inherit;
+        }
+
         .hint {
             color: #64748b;
             font-size: 0.85rem;
@@ -153,19 +148,21 @@
             </div>
 
             <div>
-                <label for="chkMatriz">
-                    <input type="checkbox" id="chkMatriz" checked>
-                    <strong>Matriz de píxeles (LCD)</strong>
-                </label>
+                <label for="selResolucion"><strong>Resolución de trabajo:</strong></label>
+                <select id="selResolucion">
+                    <option value="160x144" selected>160 × 144 — la de la Game Boy</option>
+                    <option value="320x288">320 × 288 — el doble</option>
+                    <option value="640x576">640 × 576 — el cuádruple</option>
+                    <option value="auto">Original, con tope de 400 px</option>
+                </select>
             </div>
         </div>
 
         <p class="hint">
-            Con la matriz activada la imagen se reduce a la resolución de la pantalla
-            original (160 &times; 144) y cada uno de sus píxeles se pinta como un bloque
-            de 2 &times; 2 con la separación oscura que tiene el LCD real entre ellos.
-            El zoom es fijo en x2 porque es el único que cabe sin que el navegador
-            reduzca el canvas, que es lo que mantiene la cuadrícula nítida.
+            El filtro busca, para cada píxel, el color más cercano de los cuatro de la
+            paleta de la Game Boy y lo sustituye. Da igual la resolución con la que se
+            trabaje: la salida mide exactamente lo mismo que la imagen de entrada, y el
+            navegador se encarga de mostrarla al tamaño que le toque.
         </p>
 
         <div class="canvas-container">
@@ -248,30 +245,24 @@
     <script type="module">
         import {
             processImage,
-            processImageLCD,
-            processImageSync,
-            processImageLCDSync,
-            GB_SCREEN_WIDTH,
-            GB_SCREEN_HEIGHT,
-            GB_DEFAULT_SCALE,
-            GB_DEFAULT_GRID
+            processImageSync
         } from './filtroGB.js';
 
-        import { processImageJS, processImageLCDJS } from './filtroGB-js.js';
+        import { processImageJS } from './filtroGB-js.js';
         import { compare, formatMs, formatRatio } from './benchmark.js';
 
         const fileInput = document.getElementById('fileInput');
         const canvasSrc = document.getElementById('canvasSrc');
         const canvasDst = document.getElementById('canvasDst');
         const canvasJs = document.getElementById('canvasJs');
-        const chkMatriz = document.getElementById('chkMatriz');
+        const selResolucion = document.getElementById('selResolucion');
         const equalNote = document.getElementById('equalNote');
 
         const ctxSrc = canvasSrc.getContext('2d', { willReadFrequently: true });
         const ctxDst = canvasDst.getContext('2d');
         const ctxJs = canvasJs.getContext('2d');
 
-        // Tope de la imagen cuando no hay matriz de píxeles.
+        // Tope de la imagen cuando se elige trabajar con la original.
         const MAX_DIM = 400;
 
         // Canvas auxiliar donde se reduce la imagen antes de filtrarla.
@@ -305,12 +296,21 @@
             return ctxTmp.getImageData(0, 0, w, h);
         }
 
-        // Reduce la imagen a la resolución de la pantalla de Game Boy.
-        const toGameBoyScreen = (img) =>
-            reduceTo(img, GB_SCREEN_WIDTH, GB_SCREEN_HEIGHT);
+        // Reduce la imagen a la resolución elegida en el desplegable. El
+        // filtro no tiene ninguna resolución fija: el .wat recibe width y
+        // height en cada llamada y devuelve un píxel de salida por cada
+        // píxel de entrada, así que da igual cuál sea.
+        function aResolucion(img) {
+            const opcion = selResolucion.value;
 
-        // Mantiene la imagen tal cual, con un tope de MAX_DIM.
-        const toNormalSize = (img) => reduceTo(img, MAX_DIM, MAX_DIM);
+            if (opcion === 'auto') {
+                return reduceTo(img, MAX_DIM, MAX_DIM);
+            }
+
+            const [w, h] = opcion.split('x').map(Number);
+
+            return reduceTo(img, w, h);
+        }
 
         // Comprueba si dos ImageData son idénticos píxel a píxel.
         function sonIguales(a, b) {
@@ -355,22 +355,18 @@
         // son async, y medir un async midiendo lo que tarda en devolver
         // la promesa, que no es nada, daría un tiempo inventado.
         //
-        function medir(srcData, lcd, scale, outW, outH) {
-            const nodes = outW * outH;
+        function medir(srcData) {
+            const nodes = srcData.width * srcData.height;
 
             const { rows } = compare([
                 {
                     label: 'WebAssembly',
-                    run: () => (lcd
-                        ? processImageLCDSync(srcData, scale, GB_DEFAULT_GRID)
-                        : processImageSync(srcData)),
+                    run: () => processImageSync(srcData),
                     nodes
                 },
                 {
                     label: 'JavaScript',
-                    run: () => (lcd
-                        ? processImageLCDJS(srcData, scale, GB_DEFAULT_GRID)
-                        : processImageJS(srcData)),
+                    run: () => processImageJS(srcData),
                     nodes
                 }
             ]);
@@ -378,31 +374,39 @@
             pintarTabla(rows);
         }
 
+        // La medición tarda unos 120 ms por implementación y bloquea el
+        // hilo, así que no se hace en cada cambio de resolución, sino
+        // cuando ya no cambia nada.
+        let timerMedida = null;
+        function programarMedida(srcData) {
+            clearTimeout(timerMedida);
+            timerMedida = setTimeout(() => medir(srcData), 200);
+        }
+
         // Dibujar y procesar imagen en los canvas
         async function render(img) {
             imagenActual = img;
-
-            const lcd = chkMatriz.checked;
 
             try {
                 // ---------------------------------------------------------
                 // 1. Imagen de entrada del filtro
                 // ---------------------------------------------------------
                 //
-                // Con la matriz activada se reduce a 160 x 144, que es la
-                // resolución real de la pantalla de Game Boy. Sin ella se
-                // usa la imagen entera con un tope de 400 px.
+                // Aquí es donde se decide la resolución de trabajo. Como el
+                // filtro devuelve un píxel por píxel de entrada, los tres
+                // canvas miden lo mismo y se comparan a igual escala.
                 //
+                const srcData = aResolucion(img);
 
-                const scale = lcd ? GB_DEFAULT_SCALE : 1;
-                const srcData = lcd ? toGameBoyScreen(img) : toNormalSize(img);
+                const outW = srcData.width;
+                const outH = srcData.height;
 
                 // ---------------------------------------------------------
-                // 2. Los dos resultados miden lo mismo
+                // 2. Los dos filtros
                 // ---------------------------------------------------------
 
-                const outW = srcData.width * scale;
-                const outH = srcData.height * scale;
+                const wasmResult = await processImage(srcData);
+                const jsResult = processImageJS(srcData);
 
                 // La original se pinta a ese mismo tamaño, así las tres
                 // imágenes se comparan píxel a píxel y a igual escala.
@@ -414,28 +418,16 @@
                 canvasSrc.height = outH;
                 ctxSrc.drawImage(img, 0, 0, outW, outH);
 
-                // ---------------------------------------------------------
-                // 3. Los dos filtros
-                // ---------------------------------------------------------
-
-                const wasmResult = lcd
-                    ? await processImageLCD(srcData, scale, GB_DEFAULT_GRID)
-                    : await processImage(srcData);
-
                 canvasDst.width = outW;
                 canvasDst.height = outH;
                 ctxDst.putImageData(wasmResult, 0, 0);
-
-                const jsResult = lcd
-                    ? processImageLCDJS(srcData, scale, GB_DEFAULT_GRID)
-                    : processImageJS(srcData);
 
                 canvasJs.width = outW;
                 canvasJs.height = outH;
                 ctxJs.putImageData(jsResult, 0, 0);
 
                 // ---------------------------------------------------------
-                // 4. Comprobar que el filtro es el mismo
+                // 3. Comprobar que el filtro es el mismo
                 // ---------------------------------------------------------
 
                 const iguales = sonIguales(wasmResult, jsResult);
@@ -448,7 +440,7 @@
                 equalNote.style.color = iguales ? '#15803d' : '#b91c1c';
 
                 // ---------------------------------------------------------
-                // 5. Medir
+                // 4. Medir
                 // ---------------------------------------------------------
                 //
                 // Se mide en otra tarea para que el navegador llegue a
@@ -457,7 +449,7 @@
                 // se disparan con la pestaña en segundo plano.
                 //
 
-                setTimeout(() => medir(srcData, lcd, scale, outW, outH), 0);
+                programarMedida(srcData);
 
             } catch (e) {
                 console.error('Error al procesar la imagen:', e);
@@ -480,8 +472,8 @@
             reader.readAsDataURL(file);
         });
 
-        // Re-procesar la imagen actual al cambiar las opciones.
-        chkMatriz.addEventListener('change', () => {
+        // Re-procesar la imagen actual al cambiar la resolución.
+        selResolucion.addEventListener('change', () => {
             if (imagenActual) render(imagenActual);
         });
 
