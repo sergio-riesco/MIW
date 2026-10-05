@@ -3,7 +3,7 @@
  Sitio web personal de Sergio Riesco Collar
 ==================================================================
 
-URL de despliegue: <completar con la URL donde esté publicado>
+URL de despliegue: https://miw-five.vercel.app/
 
 
 1. CONTENIDO DEL SITIO

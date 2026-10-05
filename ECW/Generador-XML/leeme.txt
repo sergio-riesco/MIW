@@ -3,7 +3,7 @@
  XML como modelo para construir sitios web
 ==================================================================
 
-URL de despliegue: <completar con la URL donde esté publicado>
+URL de despliegue: https://sergio-riesco.github.io/MIW/ECW/Generador-XML/app/
 
 
 1. QUÉ ES

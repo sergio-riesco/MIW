@@ -4,7 +4,7 @@
 ==================================================================
 
 Autor: Sergio Riesco
-URL de despliegue: <completar con la URL donde esté publicada>
+URL de despliegue: https://sergio-riesco.github.io/MIW/ECW/Ejercicios-Wasm/filtro/filtroGB.html
 
 
 1. QUÉ HACE LA APLICACIÓN
