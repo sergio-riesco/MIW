@@ -1,4 +1,4 @@
-// Interfaz del generador: formulario -> XML -> sitio (WebAssembly) -> ZIP.
+// Interfaz: formulario -> XML -> sitio (wasm) -> ZIP.
 import { sitioVacio } from './model.js';
 import { aXml, deXml } from './xml.js';
 import { iniciarWasm, crearZip, descargar } from './glue.js';
@@ -9,13 +9,13 @@ const crear = (tag, props = {}, ...hijos) => {
     e.append(...hijos);
     return e;
 };
-/** Archivos subidos desde el formulario: ruta dentro del sitio -> archivo. */
+// archivos subidos: ruta en el sitio -> File
 const subidos = new Map();
-/** Salida del WebAssembly: ruta -> contenido. */
+// lo que devuelve el wasm: ruta -> contenido
 const archivos = new Map();
-/** URLs blob: de los archivos subidos, para la vista previa. */
+// blob: de los subidos, para la vista previa
 const urls = new Map();
-/** Carpeta de donde se leen las imágenes y vídeos de un ejemplo cargado. */
+// carpeta de los recursos del ejemplo cargado
 let baseRecursos = '';
 let sitio = sitioVacio();
 const ARCHIVOS = {
@@ -79,7 +79,7 @@ function lista(titulo, carpeta, arr, campos, nuevo) {
 }
 const NOMBRES = { musica: 'Música', videojuegos: 'Videojuegos', series: 'Series', aficiones: 'Hobbies' };
 const C = (k, et, tipo) => ({ k, et, tipo });
-/** Campo obligatorio. */
+// campo obligatorio
 const O = (k, et) => ({ k, et, oblig: true });
 function pintarFormulario() {
     const perfil = [
@@ -107,27 +107,26 @@ function pintarFormulario() {
         C('enlace', 'Enlace (opcional)'), C('textoEnlace', 'Texto del enlace'),
     ], () => ({ titulo: '', texto: '', imagen: '', enlace: '', textoEnlace: '' })));
 }
-// ---------- XML -> sitio (WebAssembly) ----------
+// --- XML -> sitio (WebAssembly) ---
 const xmlArea = () => $('xml');
 function estado(msg, ok) {
     const e = $('estado');
     e.textContent = msg;
     e.className = ok ? 'ok' : 'error';
 }
-/** Muestra los errores de validación como lista. */
 function mostrarErrores(titulo, errores) {
     const e = $('estado');
     e.className = 'error';
     e.replaceChildren(titulo, crear('ul', {}, ...errores.map(t => crear('li', { textContent: t }))));
 }
-/** Comprueba el formulario; si hay errores los muestra y devuelve false. */
+// si hay errores los enseña y devuelve false
 function formularioValido(s, titulo) {
     const errores = validarSitio(s);
     if (errores.length)
         mostrarErrores(titulo, errores);
     return errores.length === 0;
 }
-/** Crea el XML desde el formulario solo si es válido. */
+// XML desde el formulario, solo si es válido
 function xmlDesdeFormulario() {
     if (!formularioValido(sitio, 'No se ha creado el XML: corrige estos campos.'))
         return false;
@@ -136,7 +135,7 @@ function xmlDesdeFormulario() {
 }
 async function generar() {
     try {
-        // El XML se puede haber editado a mano: se comprueba igual que el formulario.
+        // el XML puede estar editado a mano, así que se comprueba también
         if (!formularioValido(deXml(xmlArea().value), 'No se ha generado el sitio: el XML no es válido.'))
             return false;
         const gen = await iniciarWasm();
@@ -160,9 +159,9 @@ async function generar() {
         return false;
     }
 }
-/** Atributos que apuntan a imágenes, vídeos o audios. */
+// atributos con rutas de imágenes, vídeos o audios
 const ATRIBUTO_RECURSO = /\b(src|poster|data-trailer)="([^"]+)"/g;
-/** Muestra una página generada en el iframe de la vista previa. */
+// pinta una página en el iframe
 function mostrar(nombre) {
     let html = archivos.get(nombre);
     if (!html)
@@ -170,11 +169,11 @@ function mostrar(nombre) {
     const svg = archivos.get('imagen-por-defecto.svg') ?? '';
     const svgUrl = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
     html = html
-        // CSS y JS en línea: en un iframe srcdoc no hay carpeta del sitio.
+        // en un srcdoc no hay carpeta, así que CSS y JS van en línea
         .replace('<link rel="stylesheet" href="estilos.css">', () => `<style>${archivos.get('estilos.css') ?? ''}</style>`)
         .replace('<script src="sitio.js"></script>', () => `<script>${archivos.get('sitio.js') ?? ''}<\/script>`)
         .replaceAll('"imagen-por-defecto.svg"', `"${svgUrl}"`)
-        // Archivos subidos en el formulario: URL blob.
+        // los subidos, con su blob:
         .replace(ATRIBUTO_RECURSO, (m, k, ruta) => {
         const real = ruta.replace(/&amp;/g, '&');
         const f = subidos.get(real);
@@ -184,7 +183,7 @@ function mostrar(nombre) {
             urls.set(real, URL.createObjectURL(f));
         return `${k}="${urls.get(real)}"`;
     });
-    // Los recursos de un ejemplo están en su carpeta de sitios/.
+    // los recursos de los ejemplos están en sitios/<nombre>/
     if (baseRecursos) {
         html = html.replace('<head>', `<head><base href="${new URL(baseRecursos, location.href).href}">`);
     }
@@ -197,8 +196,8 @@ function mostrar(nombre) {
     fr.srcdoc = html;
     document.querySelectorAll('#pestanas button').forEach(b => b.classList.toggle('activa', b.dataset.p === nombre));
 }
-// ---------- ZIP ----------
-/** Lee un recurso: subido en el formulario o de la carpeta del ejemplo. */
+// --- ZIP ---
+// lee un recurso subido o de la carpeta del ejemplo
 async function leerRecurso(ruta) {
     const f = subidos.get(ruta);
     if (f)
@@ -224,14 +223,13 @@ async function zip() {
     const enc = new TextEncoder();
     const externa = (r) => /^(https?:|data:|blob:|mailto:|\/\/)/i.test(r);
     const xml = aXmlDesdeTexto(xmlArea().value);
-    // 1) Recursos que usa el sitio (rutas relativas del XML)
+    // rutas de recursos del XML
     const rutas = new Set();
     for (const m of xml.matchAll(/\b(foto|imagen|trailer|fragmento)="([^"]+)"/g)) {
         const r = m[2].replace(/&amp;/g, '&');
         if (!externa(r))
             rutas.add(r.replace(/^\/+/, ''));
     }
-    // 2) Leerlos
     const datos = new Map();
     const faltan = [];
     for (const r of rutas) {
@@ -241,7 +239,7 @@ async function zip() {
         else
             faltan.push(r);
     }
-    // 3) El sitio, el XML y su DTD y XSD, para que el XML se pueda validar.
+    // el sitio + el XML con su DTD y XSD (para poder validarlo)
     const entradas = new Map();
     for (const [n, t] of archivos)
         entradas.set(n, enc.encode(t));
@@ -255,13 +253,13 @@ async function zip() {
         ? `ZIP descargado, pero faltan ${faltan.length} archivo(s): ${faltan.join(', ')}`
         : `ZIP descargado con ${datos.size} imagen(es), vídeo(s) y audio(s).`, faltan.length === 0);
 }
-/** El XML del ZIP apunta al DTD y al XSD que van junto a él. */
+// en el ZIP el XML apunta al DTD y XSD que van al lado
 function aXmlDesdeTexto(xml) {
     return xml
         .replace(/<!DOCTYPE sitio SYSTEM "[^"]*">/, '<!DOCTYPE sitio SYSTEM "sitio.dtd">')
         .replace(/xsi:noNamespaceSchemaLocation="[^"]*"/, 'xsi:noNamespaceSchemaLocation="sitio.xsd"');
 }
-// ---------- Cargar XML ----------
+// --- Cargar XML ---
 function cargarXml(texto, base) {
     try {
         sitio = deXml(texto);
@@ -274,7 +272,7 @@ function cargarXml(texto, base) {
         estado(e instanceof Error ? e.message : String(e), false);
     }
 }
-// ---------- Eventos ----------
+// --- Eventos ---
 $('btn-xml').onclick = () => { if (xmlDesdeFormulario())
     estado('XML generado desde el formulario.', true); };
 $('btn-generar').onclick = () => { if (xmlArea().value.trim() || xmlDesdeFormulario())

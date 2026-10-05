@@ -136,24 +136,18 @@
         const ctxDst = canvasDst.getContext('2d');
         const ctxJs = canvasJs.getContext('2d');
 
-        // Tope de la imagen cuando se elige trabajar con la original.
+        // Tamaño máximo con la opción "Original".
         const MAX_DIM = 400;
 
-        // Canvas auxiliar donde se reduce la imagen antes de filtrarla.
+        // Canvas fuera de la página para reducir la imagen.
         const canvasTmp = document.createElement('canvas');
         const ctxTmp = canvasTmp.getContext('2d', { willReadFrequently: true });
 
-        // Última imagen cargada, para poder volver a procesarla al
-        // cambiar la resolución sin pedir otra vez el archivo.
+        // Para volver a filtrarla al cambiar la resolución.
         let imagenActual = null;
 
-        /**
-         * Reduce una imagen para que quepa en maxW x maxH, manteniendo
-         * la proporción, y devuelve sus píxeles.
-         *
-         * Con el suavizado activado la reducción conserva mejor los
-         * detalles que tomando un píxel de cada tantos.
-         */
+        // Reduce la imagen para que quepa en maxW x maxH sin deformarla y
+        // devuelve sus píxeles. Con suavizado queda bastante mejor.
         function reduceTo(img, maxW, maxH) {
             const ratio = Math.min(maxW / img.width, maxH / img.height);
 
@@ -170,10 +164,8 @@
             return ctxTmp.getImageData(0, 0, w, h);
         }
 
-        // Reduce la imagen a la resolución elegida en el desplegable. El
-        // filtro no tiene ninguna resolución fija: recibe el número de
-        // píxeles en cada llamada y devuelve uno de salida por cada uno
-        // de entrada.
+        // Reduce la imagen a la resolución del desplegable. Al filtro le da
+        // igual el tamaño: saca un píxel por cada píxel de entrada.
         function aResolucion(img) {
             const opcion = selResolucion.value;
 
@@ -186,7 +178,7 @@
             return reduceTo(img, w, h);
         }
 
-        // Comprueba si dos ImageData son idénticos píxel a píxel.
+        // ¿Mismos píxeles?
         function sonIguales(a, b) {
             if (a.width !== b.width || a.height !== b.height) return false;
 
@@ -199,13 +191,12 @@
             return true;
         }
 
-        // Muestra un mensaje de estado debajo de las imágenes.
+        // Mensaje debajo de las imágenes.
         function avisar(texto, ok) {
             equalNote.textContent = texto;
             equalNote.className = 'hint ' + (ok ? 'ok' : 'error');
         }
 
-        // Crea una celda de la tabla con su texto.
         function celda(texto, clase) {
             const td = document.createElement('td');
             td.textContent = texto;
@@ -213,14 +204,14 @@
             return td;
         }
 
-        // Describe una fila frente a la referencia (WASM).
+        // "2.5x más lento" / "1.2x más rápido" respecto a WASM.
         function frenteAWasm(x) {
             if (!isFinite(x)) return '-';
             if (x >= 1) return formatRatio(x) + ' más lento';
             return formatRatio(1 / x) + ' más rápido';
         }
 
-        // Pinta la tabla de tiempos. La primera fila es la referencia.
+        // Tabla de tiempos; la primera fila es WASM.
         function pintarTabla(rows) {
             const body = document.getElementById('benchmarkBody');
             const masRapida = Math.min(...rows.map((r) => r.avg));
@@ -242,10 +233,7 @@
             body.replaceChildren(...filas);
         }
 
-        // Mide las dos implementaciones sobre la misma imagen de entrada.
-        //
-        // Se usa la versión síncrona de WASM: medir una función async
-        // solo mediría lo que tarda en devolver la promesa.
+        // Se usa processImageSync: con la async solo mediría la promesa.
         function medir(srcData) {
             const nodes = srcData.width * srcData.height;
 
@@ -265,34 +253,26 @@
             pintarTabla(rows);
         }
 
-        // La medición bloquea el hilo unos 120 ms por implementación
-        // (calibrar y medir), así que no se lanza en cada cambio, sino
-        // cuando el usuario deja de cambiar opciones.
+        // Medir bloquea la página un rato, así que espero a que se dejen
+        // de cambiar opciones.
         let timerMedida = null;
         function programarMedida(srcData) {
             clearTimeout(timerMedida);
             timerMedida = setTimeout(() => medir(srcData), 200);
         }
 
-        // Filtra la imagen con las dos implementaciones y la pinta.
         async function render(img) {
             imagenActual = img;
 
             try {
-                // 1. Imagen de entrada, a la resolución elegida.
-                //
-                // Como el filtro devuelve un píxel por cada píxel de
-                // entrada, los tres canvas miden lo mismo.
                 const srcData = aResolucion(img);
                 const { width, height } = srcData;
 
-                // 2. Los dos filtros.
                 const wasmResult = await processImage(srcData);
                 const jsResult = processImageJS(srcData);
 
-                // 3. Pintar. Hay que dimensionar cada canvas antes de
-                // dibujar; si no, se dibuja sobre el tamaño por defecto
-                // (300 x 150) y la imagen sale recortada.
+                // Hay que poner el tamaño del canvas antes de dibujar; si no,
+                // se queda en 300x150 y la imagen sale recortada.
                 canvasSrc.width = width;
                 canvasSrc.height = height;
                 ctxSrc.drawImage(img, 0, 0, width, height);
@@ -305,12 +285,11 @@
                 canvasJs.height = height;
                 ctxJs.putImageData(jsResult, 0, 0);
 
-                // Entrada y salida, 4 bytes por píxel cada una.
+                // entrada + salida, 4 bytes por píxel
                 const kb = (width * height * 4 * 2) / 1024;
                 bytesCopiados.textContent =
                     `${kb.toLocaleString('es-ES', { maximumFractionDigits: 0 })} KB`;
 
-                // 4. Comprobar que los dos filtros dan lo mismo.
                 if (sonIguales(wasmResult, jsResult)) {
                     avisar('Comprobado: los dos resultados son idénticos píxel a píxel. '
                         + 'Lo único que cambia es dónde se ejecuta el código.', true);
@@ -318,10 +297,8 @@
                     avisar('Aviso: los dos resultados no coinciden píxel a píxel.', false);
                 }
 
-                // 5. Medir, en otra tarea para que el navegador llegue a
-                // pintar los canvas antes de que la medición lo bloquee.
-                // No se usa requestAnimationFrame porque no se ejecuta
-                // con la pestaña en segundo plano.
+                // Con setTimeout (no requestAnimationFrame, que se para con la
+                // pestaña en segundo plano) para que se pinten los canvas antes.
                 programarMedida(srcData);
 
             } catch (e) {
@@ -330,7 +307,6 @@
             }
         }
 
-        // Carga la imagen que elige el usuario.
         fileInput.addEventListener('change', () => {
             const file = fileInput.files[0];
             if (!file) return;
@@ -350,13 +326,11 @@
             img.src = url;
         });
 
-        // Vuelve a procesar la imagen actual al cambiar la resolución.
         selResolucion.addEventListener('change', () => {
             if (imagenActual) render(imagenActual);
         });
 
-        // Imagen de ejemplo para que la página muestre algo al abrirse:
-        // un degradado con un círculo, dibujado en un canvas.
+        // Imagen de ejemplo al abrir la página (degradado con un círculo).
         function cargarDemo() {
             const demoCanvas = document.createElement('canvas');
             demoCanvas.width = 300;
@@ -381,7 +355,6 @@
 
         cargarDemo();
 
-        // Muestra el código fuente del .wat en la página.
         async function mostrarWat() {
             const contenido = document.getElementById('contenido');
 

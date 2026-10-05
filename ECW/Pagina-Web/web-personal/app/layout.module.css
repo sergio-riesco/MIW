@@ -1,4 +1,4 @@
-/* Cabecera, navegación principal y pie. Solo los usa app/layout.js. */
+/* Cabecera, menú y pie */
 
 .siteHeader {
   border-bottom: 1px solid var(--border);

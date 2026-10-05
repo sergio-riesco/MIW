@@ -1,9 +1,9 @@
-/** xs:language: "es", "en", "es-ES"... */
+// xs:language: es, en, es-ES...
 const IDIOMA = /^[a-zA-Z]{1,8}(-[a-zA-Z0-9]{1,8})*$/;
-/** xs:gYear: año de al menos cuatro cifras, con zona horaria opcional. */
+// xs:gYear: 4 cifras o más (puede llevar zona horaria)
 const ANIO = /^-?\d{4,}(Z|[+-]\d{2}:\d{2})?$/;
 const vacio = (s) => s.trim() === '';
-/** Devuelve los errores encontrados; si no hay ninguno, la lista está vacía. */
+/** Lista de errores (vacía si está todo bien). */
 export function validarSitio(s) {
     const errores = [];
     const falta = (que) => errores.push(`Falta ${que}.`);

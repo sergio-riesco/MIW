@@ -1,29 +1,13 @@
-/**
- * vxml-lint.ts -- Motor de analisis de VXML Doctor (implementacion TypeScript).
- * ---------------------------------------------------------------------------
- * ESTRATEGIA (TypeScript):
- *   - El scanner construye un ARBOL de nodos tipados (NodoElemento | NodoTexto)
- *     con los atributos materializados en un Map (scanner.ts).
- *   - El analisis camina el arbol en preorden con una pila de marcos y hace
- *     MATCHING EXHAUSTIVO con `switch` sobre los nombres conocidos: el
- *     compilador obliga a tratar cada tipo de elemento que interesa y el
- *     `default` es explicito para los desconocidos.
- *   - Los contadores de subarbol se calculan de forma incremental (snapshot en
- *     la apertura, diferencia en el cierre), igual que en JavaScript, pero
- *     sobre la estructura de arbol: aqui no hay offsets ni hashes que
- *     consultar.
- *   - Tarjan es RECURSIVO (a diferencia del iterativo de JS y del plan SoA de
- *     Rust): el tipado hace el codigo mas legible, y la profundidad del grafo
- *     de un documento VXML real queda muy por debajo del limite de pila.
- *
- * Toda la edicion de estado vive en UNA instancia de `AnalizadorVxml` por
- * documento: nada de mutable global compartido.
- *
- * La serializacion del informe se importa del contrato compartido
- * (packages/core/contrato.mjs): es la garantia de salida identica byte a byte
- * en las tres implementaciones.
- * ---------------------------------------------------------------------------
- */
+// vxml-lint.ts -- el analizador en TypeScript.
+//
+// A diferencia de la version JS, aqui se trabaja sobre un arbol de nodos con
+// tipos (scanner.ts) y las reglas se eligen con un switch sobre el nombre del
+// elemento. Los contadores de subarbol funcionan igual que en JS. Tarjan es
+// recursivo: queda mas claro y un documento VoiceXML no tiene tantos forms
+// como para llenar la pila.
+//
+// Todo el estado va en una instancia de AnalizadorVxml por documento. La
+// serializacion del informe es la del contrato, la misma para las tres.
 
 import { escanearArbol, NodoDocumento, NodoElemento, NodoTexto } from "./scanner.js";
 import {
@@ -33,11 +17,9 @@ import {
   Informe, Diagnostico,
 } from "./contrato.js";
 
-// ---------------------------------------------------------------------------
-// Tipos internos
-// ---------------------------------------------------------------------------
+// --- Tipos internos ---
 
-/** "Evento" minimo para empujar un diagnostico: posicion + nombre. */
+// lo minimo para crear un diagnostico: posicion y nombre
 interface Ev {
   linea: number;
   colU16: number;
@@ -97,7 +79,7 @@ const NUEVOS_CONTADORES = (): Contadores => ({
   noinput: 0, filled: 0, goto: 0, prompt: 0,
 });
 
-/** Nombres de reglas usadas por este motor (id canonico en el catalogo). */
+// nombres de las reglas (como en el catalogo)
 const REGLA = {
   gotoInexistente: "goto-a-form-inexistente",
   formInaccesible: "form-inaccesible",
@@ -119,9 +101,7 @@ const REGLA = {
   sinVersion: "sin-version",
 } as const;
 
-// ===========================================================================
-// Analizador por documento
-// ===========================================================================
+// --- Analizador (uno por documento) ---
 
 class AnalizadorVxml {
   readonly texto: string;
@@ -153,7 +133,7 @@ class AnalizadorVxml {
     this.columnas = crearColumnas(this.bytes, texto);
   }
 
-  /** Empuja un diagnostico resolviendo el catalogo. */
+  // anade un diagnostico con los datos del catalogo
   empuja(nombreRegla: string, ev: Ev, detalle: string): void {
     const idx = INDICE_NOMBRE.get(nombreRegla);
     if (idx === undefined) throw new Error("Regla desconocida en el catalogo: " + nombreRegla);
@@ -166,16 +146,13 @@ class AnalizadorVxml {
     });
   }
 
-  /** Analiza el documento desde cero. */
   analizar(): Informe {
     const notas: { msg: string; linea: number; col: number }[] = [];
     const { doc } = escanearArbol(this.texto, (msg, linea, colu) => {
       notas.push({ msg, linea, col: this.columnas.columnaByte(colu, linea) });
     });
 
-    // ---------------------------------------------------------------------
-    // PASADA 2: caminar el arbol en preorden con marcos.
-    // ---------------------------------------------------------------------
+    // pasada 2: recorrer el arbol en preorden
     const pilaWalk: ItemDePila[] = [];
     for (let k = doc.hijos.length - 1; k >= 0; k--) pilaWalk.push({ nodo: doc.hijos[k], cerrado: false });
 
@@ -191,20 +168,15 @@ class AnalizadorVxml {
       }
       const nodo = item.nodo as NodoElemento;
       this.abrirNodo(nodo);
-      // Un elemento autocerrado (<x/>) no abre marco; tampoco emite evento de
-      // cierre, igual que en el scanner flat de JavaScript.
+      // <x/> no abre marco ni tiene cierre (igual que en JS)
       if (!nodo.autocerrado) pilaWalk.push({ nodo, cerrado: true });
       for (let k = nodo.hijos.length - 1; k >= 0; k--) pilaWalk.push({ nodo: nodo.hijos[k], cerrado: false });
     }
 
-    // ---------------------------------------------------------------------
-    // PASADA 3: grafo de flujo entre forms
-    // ---------------------------------------------------------------------
+    // pasada 3: grafo entre forms
     const grafo = this.resolverGrafo();
 
-    // ---------------------------------------------------------------------
-    // Cierre del informe
-    // ---------------------------------------------------------------------
+    // informe
     const diagnosticos: Diagnostico[] = this.ds.map((d) => ({
       regla: d.regla, gravedad: d.gravedad, linea: d.linea,
       columna: this.columnas.columnaByte(d.colU16, d.linea),
@@ -240,9 +212,7 @@ class AnalizadorVxml {
     };
   }
 
-  // -------------------------------------------------------------------------
-  // Apertura / cierre / texto
-  // -------------------------------------------------------------------------
+  // --- Apertura, cierre y texto ---
 
   subarbol(marco: Marco): Contadores {
     const s = NUEVOS_CONTADORES();
@@ -251,8 +221,7 @@ class AnalizadorVxml {
   }
 
   abrirNodo(nodo: NodoElemento): void {
-    // Contadores de subarbol: cuentan para TODO elemento abierto, tambien
-    // autocerrado.
+    // los contadores cuentan todos los elementos, tambien los <x/>
     if (ELEMENTOS_SALIDA.has(nodo.nombre)) this.C.salida++;
     switch (nodo.nombre) {
       case "reprompt": this.C.reprompt++; break;
@@ -268,7 +237,7 @@ class AnalizadorVxml {
     this.nElementos++;
     this.nAtributos += nodo.nAtributos;
 
-    // VXML015 -- expresiones ECMAScript, ANTES de declarar el name.
+    // VXML015 antes de declarar el name
     for (const [nombre, valor] of nodo.atributos) {
       if (nombre === "cond" || nombre === "expr" || nombre === "srcexpr") {
         this.revisarExpresion(valor, nodo);
@@ -329,7 +298,7 @@ class AnalizadorVxml {
       default: break;
     }
 
-    // --- abrir marco (solo elementos no autocerrados) ---
+    // abrir marco (si no es <x/>)
     if (nodo.autocerrado) return;
     const marco: Marco = {
       nodo,
@@ -414,7 +383,7 @@ class AnalizadorVxml {
     }
   }
 
-  /** `cond` presente y con algun caracter que no sea espacio/tab/CR/LF. */
+  // ¿tiene cond con algo que no sean espacios?
   atributoCondNoVacio(nodo: NodoElemento): boolean {
     const v = nodo.atributos.get("cond");
     if (v === undefined) return false;
@@ -443,11 +412,9 @@ class AnalizadorVxml {
     }
   }
 
-  // -------------------------------------------------------------------------
-  // Grafo de flujo entre forms
-  // -------------------------------------------------------------------------
+  // --- Grafo entre forms ---
 
-  /** Aplica VXML001, VXML002, VXML003, VXML012 y VXML017. */
+  // VXML001, VXML002, VXML003, VXML012 y VXML017
   resolverGrafo(): Grafo {
     const formularios = this.formularios;
     const n = formularios.length;
@@ -461,7 +428,7 @@ class AnalizadorVxml {
       else porId.set(id, [i]);
     }
 
-    // VXML012 -- ids de form duplicados.
+    // VXML012: ids repetidos
     for (const [id, lista] of porId) {
       if (lista.length < 2) continue;
       for (let k = 1; k < lista.length; k++) {
@@ -490,7 +457,7 @@ class AnalizadorVxml {
       }
     }
 
-    // VXML002 -- forms no alcanzables. El primer form se ejecuta al entrar.
+    // VXML002: forms a los que no se llega (el primero siempre se ejecuta)
     const alcanzable = new Uint8Array(n);
     for (let i = 0; i < n; i++) for (const d of adyac[i]) alcanzable[d] = 1;
     const inalcanzables: string[] = [];
@@ -503,9 +470,8 @@ class AnalizadorVxml {
       this.empuja(REGLA.formInaccesible, { linea: f.linea, colU16: f.colU16, nombre: "form" }, f.id);
     }
 
-    // --- VXML003 -- ciclos sin salida ---
-    // Punto fijo: un form es "seguro" si su subarbol contiene una salida o
-    // salta a otro form seguro.
+    // VXML003: ciclos sin salida. Un form es "seguro" si tiene una salida o
+    // salta a otro seguro; se repite hasta que no cambia nada.
     const seguro = new Uint8Array(n);
     const trabajo: number[] = [];
     for (let i = 0; i < n; i++) if (formularios[i].tieneSalida) { seguro[i] = 1; trabajo.push(i); }
@@ -519,7 +485,7 @@ class AnalizadorVxml {
       }
     }
 
-    // Componentes fuertemente conexas del subgrafo de forms inseguros.
+    // componentes fuertemente conexas entre los no seguros
     const componentes = tarjan(adyac, n, (i) => seguro[i] === 0);
     const ciclos = componentes.filter((c) => c.length > 1 || tieneAutoBucle(adyac, c));
     for (const comp of ciclos) comp.sort((a, b) => formularios[a].orden - formularios[b].orden);
@@ -533,9 +499,7 @@ class AnalizadorVxml {
     return { nodos: n, aristas: nAristas, ciclos: ciclos.length, inalcanzables, alcanzable };
   }
 
-  // -------------------------------------------------------------------------
-  // VXML015 -- identificadores no declarados
-  // -------------------------------------------------------------------------
+  // --- VXML015: identificadores no declarados ---
 
   revisarExpresion(expr: string, ev: Ev): void {
     const n = expr.length;
@@ -544,7 +508,7 @@ class AnalizadorVxml {
     while (i < n) {
       const c = expr.charCodeAt(i);
 
-      // Cadena: se salta entera.
+      // cadena: se salta
       if (c === 34 || c === 39) {
         const q = c;
         i++;
@@ -558,7 +522,7 @@ class AnalizadorVxml {
         continue;
       }
 
-      // Numero: se salta entero.
+      // numero: se salta
       if (c >= 48 && c <= 57) {
         i++;
         while (i < n && esDigitoHex(expr.charCodeAt(i))) i++;
@@ -566,7 +530,7 @@ class AnalizadorVxml {
         continue;
       }
 
-      // Identificador.
+      // identificador
       if (esIniIdent(c) || c === 36) {
         const ini = i;
         while (i < n && esCuerpoIdent(expr.charCodeAt(i))) i++;
@@ -574,12 +538,12 @@ class AnalizadorVxml {
         if (trasPunto) { trasPunto = false; continue; }
         if (PALABRAS_CLAVE_EXPRESION.has(ident) || INTEGRADOS_VOICEXML.has(ident)) continue;
         if (this.declarados.has(ident)) continue;
-        // Shadow variable: "equipo$" -> "equipo"
+        // equipo$ -> equipo
         if (ident.charCodeAt(ident.length - 1) === 36) {
           const base = ident.slice(0, ident.length - 1);
           if (this.declarados.has(base) || INTEGRADOS_VOICEXML.has(base)) continue;
         }
-        // Clave de objeto literal: "ident :" o llamada "ident ("
+        // clave de objeto "ident :" o llamada "ident ("
         let j = i;
         while (j < n && expr.charCodeAt(j) <= 32) j++;
         const sig = j < n ? expr.charCodeAt(j) : -1;
@@ -597,19 +561,14 @@ class AnalizadorVxml {
   }
 }
 
-// ===========================================================================
-// API PUBLICA
-// ===========================================================================
+// --- API ---
 
-/**
- * Analiza un documento VoiceXML y devuelve el informe canonico en JSON.
- * Identico al de las implementaciones de JavaScript y WebAssembly.
- */
+// Informe en JSON (el mismo que dan JS y WASM).
 export function analizarTexto(texto: string, nombreArchivo: string, src?: Uint8Array | null): string {
   return serializarInforme(analizarDocumento(texto, nombreArchivo, src));
 }
 
-/** Igual que `analizarTexto` pero devuelve el objeto deserializado. */
+// Lo mismo, pero ya como objeto.
 export function analizarDocumento(
   texto: string,
   nombreArchivo: string,
@@ -618,18 +577,16 @@ export function analizarDocumento(
   return new AnalizadorVxml(texto, nombreArchivo, src).analizar();
 }
 
-// ===========================================================================
-// Utilidades
-// ===========================================================================
+// --- Utilidades ---
 
-/** `time` de SSML: numero de segundos, o numero seguido de unidad. */
+// time de SSML: un numero, con unidad o sin ella
 function esTiempoSSML(s: string): boolean {
   const t = s.trim();
   if (/^[0-9]+(\.[0-9]+)?$/.test(t)) return true;
   return /^[0-9]+(\.[0-9]+)?(ms|s|m|h)$/.test(t);
 }
 
-/** Numero de lineas: separadores + la ultima, si no termina en salto. */
+// lineas = saltos + 1 si la ultima no acaba en salto
 function contarLineas(texto: string): number {
   if (texto.length === 0) return 0;
   let l = 0;
@@ -655,11 +612,8 @@ function esDigitoHex(c: number): boolean {
     c === 46 /* . */ || c === 120 || c === 88 /* x X */;
 }
 
-/**
- * Tarjan recursivo restringido a los nodos que pasan `filtro`. Los
- * componentes fuertemente conexos son un invariante del grafo, asi que la
- * lista ordenada de ciclos coincide con la de las otras implementaciones.
- */
+// Tarjan recursivo, solo con los nodos que cumplen filtro. Las componentes
+// no dependen de como se recorra el grafo, asi que salen igual que en JS y Rust.
 function tarjan(adyac: number[][], n: number, filtro: (i: number) => boolean): number[][] {
   const idx = new Int32Array(n).fill(-1);
   const bajo = new Int32Array(n);

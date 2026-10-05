@@ -1,6 +1,5 @@
-// Para añadir una afición: copia un objeto y cambia sus datos.
-// Las imágenes se guardan en public/covers/hobbies y pueden ser .jpg o .png
-// Si se omite cover, se muestra public/covers/placeholder.svg.
+// Aficiones. Imágenes en public/covers/hobbies (si no hay cover, se usa
+// public/covers/placeholder.svg).
 
 export const hobbies = [
   {

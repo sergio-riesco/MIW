@@ -1,12 +1,6 @@
-// La música está organizada por categorías.
-// Para añadir un grupo: cópialo dentro del array "bands" de su categoría.
-// Para añadir una categoría nueva: copia un bloque completo del array "categories".
-// Las imágenes se guardan en public/covers/music.
-// Pon favorite: true en el grupo que más te guste y se marcará como favorito.
-//
-// snippet es opcional: un fragmento corto (unos 30 s) de una canción del
-// álbum, en MP3, guardado en public/media/audios. "track" es el título de la
-// canción y se muestra junto al reproductor.
+// Grupos por género. Carátulas en public/covers/music.
+// snippet (opcional): trozo de una canción del álbum en public/media/audios;
+// track es el nombre de la canción.
 
 export const categories = [
   {

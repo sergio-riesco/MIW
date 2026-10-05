@@ -12,12 +12,8 @@ const navigation = [
   { href: "/hobbies", label: "Hobbies" },
 ];
 
-/**
- * Se ejecuta de forma síncrona al analizar el HTML, antes del primer pintado,
- * para que `data-theme` ya tenga el valor correcto y recargar la página no
- * produzca ningún destello. Debe coincidir con la lógica de
- * app/components/ThemeToggle.js.
- */
+// Pone data-theme antes de pintar para que no haya parpadeo al recargar.
+// Tiene que hacer lo mismo que ThemeToggle.js.
 const themeScript = `(function(){try{var p=localStorage.getItem("theme");var t=(p==="light"||p==="dark")?p:(window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light");document.documentElement.setAttribute("data-theme",t)}catch(e){document.documentElement.setAttribute("data-theme","light")}})()`;
 
 export const metadata = {

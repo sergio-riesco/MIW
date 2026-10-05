@@ -1,4 +1,4 @@
-// Interfaz del generador: formulario -> XML -> sitio (WebAssembly) -> ZIP.
+// Interfaz: formulario -> XML -> sitio (wasm) -> ZIP.
 import { sitioVacio, type Sitio, type Par } from './model.js';
 import { aXml, deXml } from './xml.js';
 import { iniciarWasm, crearZip, descargar } from './glue.js';
@@ -11,21 +11,21 @@ const crear = <K extends keyof HTMLElementTagNameMap>(tag: K, props: Record<stri
   return e;
 };
 
-/** Archivos subidos desde el formulario: ruta dentro del sitio -> archivo. */
+// archivos subidos: ruta en el sitio -> File
 const subidos = new Map<string, File>();
-/** Salida del WebAssembly: ruta -> contenido. */
+// lo que devuelve el wasm: ruta -> contenido
 const archivos = new Map<string, string>();
-/** URLs blob: de los archivos subidos, para la vista previa. */
+// blob: de los subidos, para la vista previa
 const urls = new Map<string, string>();
-/** Carpeta de donde se leen las imágenes y vídeos de un ejemplo cargado. */
+// carpeta de los recursos del ejemplo cargado
 let baseRecursos = '';
 let sitio: Sitio = sitioVacio();
 
-// ---------- Formulario ----------
+// --- Formulario ---
 
-/** Tipo de campo. Los de archivo indican qué aceptan y en qué carpeta se guardan. */
+// tipos de campo; imagen, video y audio son de subir archivo
 type Tipo = 'text' | 'area' | 'check' | 'imagen' | 'video' | 'audio';
-/** oblig: el atributo es #REQUIRED en el DTD (se marca con *). */
+// oblig = #REQUIRED en el DTD (lleva *)
 interface Campo<T> { k: keyof T & string; et: string; tipo?: Tipo; oblig?: boolean }
 
 const ARCHIVOS: Record<'imagen' | 'video' | 'audio', { accept: string; carpeta: (c: string) => string }> = {
@@ -93,7 +93,7 @@ function lista<T>(titulo: string, carpeta: string, arr: T[], campos: Campo<T>[],
 
 const NOMBRES = { musica: 'Música', videojuegos: 'Videojuegos', series: 'Series', aficiones: 'Hobbies' } as const;
 const C = (k: string, et: string, tipo?: Tipo) => ({ k, et, tipo }) as never;
-/** Campo obligatorio. */
+// campo obligatorio
 const O = (k: string, et: string) => ({ k, et, oblig: true }) as never;
 
 function pintarFormulario() {
@@ -137,7 +137,7 @@ function pintarFormulario() {
   );
 }
 
-// ---------- XML -> sitio (WebAssembly) ----------
+// --- XML -> sitio (WebAssembly) ---
 
 const xmlArea = () => $<HTMLTextAreaElement>('xml');
 
@@ -147,21 +147,20 @@ function estado(msg: string, ok: boolean) {
   e.className = ok ? 'ok' : 'error';
 }
 
-/** Muestra los errores de validación como lista. */
 function mostrarErrores(titulo: string, errores: string[]) {
   const e = $('estado');
   e.className = 'error';
   e.replaceChildren(titulo, crear('ul', {}, ...errores.map(t => crear('li', { textContent: t }))));
 }
 
-/** Comprueba el formulario; si hay errores los muestra y devuelve false. */
+// si hay errores los enseña y devuelve false
 function formularioValido(s: Sitio, titulo: string): boolean {
   const errores = validarSitio(s);
   if (errores.length) mostrarErrores(titulo, errores);
   return errores.length === 0;
 }
 
-/** Crea el XML desde el formulario solo si es válido. */
+// XML desde el formulario, solo si es válido
 function xmlDesdeFormulario(): boolean {
   if (!formularioValido(sitio, 'No se ha creado el XML: corrige estos campos.')) return false;
   xmlArea().value = aXml(sitio);
@@ -170,7 +169,7 @@ function xmlDesdeFormulario(): boolean {
 
 async function generar(): Promise<boolean> {
   try {
-    // El XML se puede haber editado a mano: se comprueba igual que el formulario.
+    // el XML puede estar editado a mano, así que se comprueba también
     if (!formularioValido(deXml(xmlArea().value), 'No se ha generado el sitio: el XML no es válido.')) return false;
     const gen = await iniciarWasm();
     const r: string[] = gen(xmlArea().value);
@@ -192,10 +191,10 @@ async function generar(): Promise<boolean> {
   }
 }
 
-/** Atributos que apuntan a imágenes, vídeos o audios. */
+// atributos con rutas de imágenes, vídeos o audios
 const ATRIBUTO_RECURSO = /\b(src|poster|data-trailer)="([^"]+)"/g;
 
-/** Muestra una página generada en el iframe de la vista previa. */
+// pinta una página en el iframe
 function mostrar(nombre: string) {
   let html = archivos.get(nombre);
   if (!html) return;
@@ -204,11 +203,11 @@ function mostrar(nombre: string) {
   const svgUrl = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
 
   html = html
-    // CSS y JS en línea: en un iframe srcdoc no hay carpeta del sitio.
+    // en un srcdoc no hay carpeta, así que CSS y JS van en línea
     .replace('<link rel="stylesheet" href="estilos.css">', () => `<style>${archivos.get('estilos.css') ?? ''}</style>`)
     .replace('<script src="sitio.js"></script>', () => `<script>${archivos.get('sitio.js') ?? ''}<\/script>`)
     .replaceAll('"imagen-por-defecto.svg"', `"${svgUrl}"`)
-    // Archivos subidos en el formulario: URL blob.
+    // los subidos, con su blob:
     .replace(ATRIBUTO_RECURSO, (m, k: string, ruta: string) => {
       const real = ruta.replace(/&amp;/g, '&');
       const f = subidos.get(real);
@@ -217,7 +216,7 @@ function mostrar(nombre: string) {
       return `${k}="${urls.get(real)}"`;
     });
 
-  // Los recursos de un ejemplo están en su carpeta de sitios/.
+  // los recursos de los ejemplos están en sitios/<nombre>/
   if (baseRecursos) {
     html = html.replace('<head>', `<head><base href="${new URL(baseRecursos, location.href).href}">`);
   }
@@ -231,9 +230,9 @@ function mostrar(nombre: string) {
   document.querySelectorAll<HTMLElement>('#pestanas button').forEach(b => b.classList.toggle('activa', b.dataset.p === nombre));
 }
 
-// ---------- ZIP ----------
+// --- ZIP ---
 
-/** Lee un recurso: subido en el formulario o de la carpeta del ejemplo. */
+// lee un recurso subido o de la carpeta del ejemplo
 async function leerRecurso(ruta: string): Promise<Uint8Array | null> {
   const f = subidos.get(ruta);
   if (f) return new Uint8Array(await f.arrayBuffer());
@@ -259,14 +258,13 @@ async function zip() {
   const externa = (r: string) => /^(https?:|data:|blob:|mailto:|\/\/)/i.test(r);
   const xml = aXmlDesdeTexto(xmlArea().value);
 
-  // 1) Recursos que usa el sitio (rutas relativas del XML)
+  // rutas de recursos del XML
   const rutas = new Set<string>();
   for (const m of xml.matchAll(/\b(foto|imagen|trailer|fragmento)="([^"]+)"/g)) {
     const r = m[2].replace(/&amp;/g, '&');
     if (!externa(r)) rutas.add(r.replace(/^\/+/, ''));
   }
 
-  // 2) Leerlos
   const datos = new Map<string, Uint8Array>();
   const faltan: string[] = [];
   for (const r of rutas) {
@@ -274,7 +272,7 @@ async function zip() {
     if (b) datos.set(r, b); else faltan.push(r);
   }
 
-  // 3) El sitio, el XML y su DTD y XSD, para que el XML se pueda validar.
+  // el sitio + el XML con su DTD y XSD (para poder validarlo)
   const entradas = new Map<string, Uint8Array>();
   for (const [n, t] of archivos) entradas.set(n, enc.encode(t));
   entradas.set('sitio.xml', enc.encode(xml));
@@ -291,14 +289,14 @@ async function zip() {
   );
 }
 
-/** El XML del ZIP apunta al DTD y al XSD que van junto a él. */
+// en el ZIP el XML apunta al DTD y XSD que van al lado
 function aXmlDesdeTexto(xml: string): string {
   return xml
     .replace(/<!DOCTYPE sitio SYSTEM "[^"]*">/, '<!DOCTYPE sitio SYSTEM "sitio.dtd">')
     .replace(/xsi:noNamespaceSchemaLocation="[^"]*"/, 'xsi:noNamespaceSchemaLocation="sitio.xsd"');
 }
 
-// ---------- Cargar XML ----------
+// --- Cargar XML ---
 
 function cargarXml(texto: string, base: string) {
   try {
@@ -312,7 +310,7 @@ function cargarXml(texto: string, base: string) {
   }
 }
 
-// ---------- Eventos ----------
+// --- Eventos ---
 
 $('btn-xml').onclick = () => { if (xmlDesdeFormulario()) estado('XML generado desde el formulario.', true); };
 $('btn-generar').onclick = () => { if (xmlArea().value.trim() || xmlDesdeFormulario()) void generar(); };

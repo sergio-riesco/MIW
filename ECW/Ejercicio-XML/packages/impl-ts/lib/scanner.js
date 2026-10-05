@@ -1,34 +1,22 @@
-/**
- * scanner.ts -- Construye un ARBOL de nodos tipados en una sola pasada.
- * ---------------------------------------------------------------------------
- * La diferencia de diseno con la implementacion en JavaScript:
- *
- *   JavaScript (impl-js/scanner.mjs)  -> una lista PLANA de eventos con
- *   offsets y hashes FNV-1a, sin asignar un solo objeto por etiqueta.
- *
- *   TypeScript (este fichero)        -> un arbol de NODOS TIPADOS
- *   (NodoElemento | NodoTexto) con los atributos ya materializados en un Map.
- *   TS tira del tipado: el motor de analisis hace matching exhaustivo con
- *   `switch` sobre nombres, sin memorizar ningun hash. Se asigna mas memoria
- *   por etiqueta (un nodo por elemento), que es justamente lo que se quiere
- *   comparar con Rust.
- *
- * Las POSICIONES (linea y columna provisional en unidades UTF-16) y la
- * agrupacion de texto son identicas a las de JavaScript: el contrato del
- * informe necesita que cada diagnostico salga en el mismo sitio.
- *
- * Cadena <if>/<elseif>/<else>: igual que en el scanner de JS, un unico </if>
- * cierra la cadena entera (elseif/else abiertos y el if original).
- * ---------------------------------------------------------------------------
- */
-/** Hash FNV-1a de 32 bits sobre los codigos UTF-16 del nombre. */
+// scanner.ts -- convierte el texto en un arbol de nodos con tipos.
+//
+// En JS el scanner devuelve una lista plana de eventos con hashes, sin crear un
+// objeto por etiqueta. Aqui se hace al reves: un nodo por elemento
+// (NodoElemento | NodoTexto) con los atributos ya en un Map. Gasta mas memoria,
+// pero el codigo de las reglas queda mas limpio, y es parte de lo que se
+// compara.
+//
+// Lineas, columnas (en UTF-16) y agrupacion del texto son las mismas que en JS,
+// para que los diagnosticos salgan en el mismo sitio. Tambien aqui un solo
+// </if> cierra toda la cadena <if>/<elseif>/<else>.
+// Hash FNV-1a de 32 bits sobre los codigos UTF-16 del nombre.
 export function h(s) {
     let x = 0x811c9dc5 | 0;
     for (let i = 0; i < s.length; i++)
         x = Math.imul(x ^ s.charCodeAt(i), 0x01000193);
     return x >>> 0;
 }
-/** Resuelve entidades identico al contrato (solo las 5 predefinidas). */
+// Resuelve las 5 entidades predefinidas (como el contrato).
 function resolverEntidades(texto, ini, fin) {
     let hayAmp = false;
     for (let i = ini; i < fin; i++) {
@@ -97,7 +85,7 @@ function esBlanco(texto, a, b) {
             return false;
     return true;
 }
-/** Avanza linea/columna provisional por el tramo [a, b). */
+// avanza linea y columna por [a, b)
 function avanzar(texto, a, b, pos) {
     for (let q = a; q < b; q++) {
         if (texto.charCodeAt(q) === ASCII_NL) {
@@ -109,12 +97,8 @@ function avanzar(texto, a, b, pos) {
         }
     }
 }
-/**
- * Analiza `texto` y devuelve el documento (arbol de nodos) y las notas de
- * escaneo. Las columnas provisionales van en unidades UTF-16, igual que en
- * la implementacion de JavaScript; la conversion a bytes UTF-8 se hace al
- * serializar, con el contrato compartido.
- */
+// Devuelve el arbol y las notas. Las columnas van en UTF-16, como en JS; el
+// paso a bytes se hace luego con el contrato.
 export function escanearArbol(texto, alAdvertir) {
     const notas = [];
     const avisa = (msg, linea, col) => {
@@ -122,7 +106,7 @@ export function escanearArbol(texto, alAdvertir) {
         alAdvertir?.(msg, linea, col);
     };
     const doc = { tipo: "documento", hijos: [] };
-    // Pila de elementos abiertos (nodos) y sus nombres.
+    // elementos abiertos y sus nombres
     const pila = [];
     const abiertos = [];
     let profundidad = 0;
@@ -133,8 +117,7 @@ export function escanearArbol(texto, alAdvertir) {
         const c = texto.charCodeAt(pos.i);
         const iniLinea = pos.linea, iniCol = pos.colU16;
         if (c !== ASCII_LT) {
-            // --- Texto. Se agrupa hasta el siguiente '<' y solo se crea un nodo
-            //     si no es solo espacios en blanco. ---
+            // texto hasta el siguiente '<' (si son solo espacios no se crea nodo)
             let k = pos.i;
             while (k < n && texto.charCodeAt(k) !== ASCII_LT)
                 k++;
@@ -153,7 +136,7 @@ export function escanearArbol(texto, alAdvertir) {
             continue;
         }
         const sig = pos.i + 1 < n ? texto.charCodeAt(pos.i + 1) : -1;
-        // --- <?...?> ---
+        // <? ... ?>
         if (sig === ASCII_QUESTION) {
             const fin = texto.indexOf("?>", pos.i + 2);
             const hasta = fin < 0 ? n : fin;
@@ -161,7 +144,7 @@ export function escanearArbol(texto, alAdvertir) {
             pos.i = Math.min(hasta + 2, n);
             continue;
         }
-        // --- <!--...--> ---
+        // comentario
         if (sig === ASCII_BANG && texto.startsWith("<!--", pos.i)) {
             const fin = texto.indexOf("-->", pos.i + 4);
             const hasta = fin < 0 ? n : fin;
@@ -169,7 +152,7 @@ export function escanearArbol(texto, alAdvertir) {
             pos.i = Math.min(hasta + 3, n);
             continue;
         }
-        // --- <!DOCTYPE ...> y <![CDATA[...]]> ---
+        // <!DOCTYPE ...> y <![CDATA[...]]>
         if (sig === ASCII_BANG) {
             if (texto.startsWith("<![CDATA[", pos.i)) {
                 const fin = texto.indexOf("]]>", pos.i + 9);
@@ -199,7 +182,7 @@ export function escanearArbol(texto, alAdvertir) {
             pos.i = Math.min(k + 1, n);
             continue;
         }
-        // --- </...> ---
+        // cierre
         if (sig === ASCII_SLASH) {
             let j = pos.i + 2;
             while (j < n && esNombre(texto.charCodeAt(j)))
@@ -218,8 +201,7 @@ export function escanearArbol(texto, alAdvertir) {
                 break;
             }
             if (profundidad > 0) {
-                // VoiceXML cierra la cadena <if>/<elseif>/<else> con una sola </if>:
-                // se desapilan los elseif/else abiertos y el if original.
+                // un solo </if> cierra toda la cadena <if>/<elseif>/<else>
                 if (nombre === "if") {
                     while (profundidad > 0 &&
                         (abiertos[profundidad - 1] === "elseif" || abiertos[profundidad - 1] === "else")) {
@@ -256,13 +238,13 @@ export function escanearArbol(texto, alAdvertir) {
             pos.i = k + 1;
             continue;
         }
-        // --- '<' que no abre nada: es texto literal ---
+        // '<' suelto: texto
         if (sig < 0 || !esNombre(sig)) {
             avanzar(texto, pos.i, pos.i + 1, pos);
             pos.i++;
             continue;
         }
-        // --- Elemento normal ---
+        // apertura
         let j = pos.i + 1;
         let hash = 0x811c9dc5 | 0;
         while (j < n) {
@@ -303,7 +285,7 @@ export function escanearArbol(texto, alAdvertir) {
                 k++;
                 continue;
             }
-            // Nombre del atributo y su hash.
+            // nombre y hash
             const aIni = k;
             let ah = 0x811c9dc5 | 0;
             while (k < n) {
@@ -316,7 +298,7 @@ export function escanearArbol(texto, alAdvertir) {
             ah = ah >>> 0;
             const aNombre = texto.slice(aIni, k);
             void ah;
-            // Espacios hasta '='.
+            // espacios hasta el '='
             let q = k;
             while (q < n && esEspacio(texto.charCodeAt(q)))
                 q++;
@@ -329,7 +311,7 @@ export function escanearArbol(texto, alAdvertir) {
                 avisa("Atributo sin valor.", iniLinea, iniCol);
                 break;
             }
-            // Valor.
+            // valor
             const qc = texto.charCodeAt(q);
             let vIni, vFin;
             if (qc === ASCII_QUOT || qc === ASCII_APOS) {
@@ -339,7 +321,7 @@ export function escanearArbol(texto, alAdvertir) {
                 k = cierre < 0 ? n : cierre + 1;
             }
             else {
-                // XML exige comillas; sin ellas se toma hasta blanco o '>'.
+                // sin comillas: hasta espacio o '>'
                 vIni = q;
                 let w = q;
                 while (w < n && !esEspacio(texto.charCodeAt(w)) && texto.charCodeAt(w) !== ASCII_GT)

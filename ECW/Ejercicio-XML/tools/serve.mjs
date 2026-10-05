@@ -1,17 +1,11 @@
-/**
- * serve.mjs -- Servidor estatico de desarrollo para la interfaz web.
- * -----------------------------------------------------------------------------
- * Sirve la raiz del proyecto con tipos MIME correctos (.mjs, .wasm, .vxml…)
- * y dos rutas especiales:
- *
- *   GET /            -> packages/ui/index.html
- *   GET /api/corpus  -> JSON con los ficheros *.vxml del corpus
- *
- * Uso:  node tools/serve.mjs [puerto]   (por defecto PUERTO_POR_DEFECTO)
- * Si el puerto esta ocupado --o reservado por Windows/Hyper-V, que devuelve
- * EACCES en vez de EADDRINUSE-- se prueba el siguiente automaticamente.
- * -----------------------------------------------------------------------------
- */
+// serve.mjs -- servidor estatico para la interfaz web.
+//   /            -> packages/ui/index.html
+//   /api/corpus  -> lista de ficheros .vxml del corpus (JSON)
+//
+// Uso: node tools/serve.mjs [puerto]
+// Si el puerto esta ocupado (o Windows lo tiene reservado, que da EACCES en
+// lugar de EADDRINUSE) prueba con el siguiente.
+
 import { createServer } from "node:http";
 import { readFile, stat } from "node:fs/promises";
 import { join, dirname, extname, normalize, sep } from "node:path";
@@ -19,10 +13,10 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 
 const aqui = dirname(fileURLToPath(import.meta.url));
 
-/** Puerto por defecto. 5173 esta fuera de los rangos que Hyper-V/WinNAT reservan. */
+// 5173 no cae en los rangos que reserva Hyper-V en Windows
 const PUERTO_POR_DEFECTO = 5173;
 
-/** Cuantos puertos seguidos se prueban antes de rendirse. */
+// cuantos puertos probar como mucho
 const INTENTOS_PUERTO = 20;
 
 const MIME = {
@@ -40,7 +34,7 @@ const MIME = {
   ".txt": "text/plain; charset=utf-8",
 };
 
-/** Lista de ficheros *.vxml del corpus, ordenados, con ruta y tamano. */
+// ficheros .vxml del corpus con su ruta y tamano
 async function listaCorpus(raiz) {
   const { readdir } = await import("node:fs/promises");
   const salida = [];
@@ -103,7 +97,7 @@ export function crearServidor(raizProyecto) {
   });
 }
 
-/** Arranca el servidor y devuelve {servidor, puerto} una vez escuchando. */
+// arranca y devuelve { servidor, puerto }
 export function arrancar(raizProyecto, puerto = PUERTO_POR_DEFECTO) {
   const servidor = crearServidor(raizProyecto);
   const primero = puerto;
@@ -114,7 +108,7 @@ export function arrancar(raizProyecto, puerto = PUERTO_POR_DEFECTO) {
       resolve({ servidor, puerto: servidor.address().port });
     });
 
-    // puerto 0 = "elige tu el que sea libre": no hay nada que reintentar.
+    // con puerto 0 el sistema elige uno libre, no hay que reintentar
     function reintentar(err) {
       const recuperable = err.code === "EACCES" || err.code === "EADDRINUSE";
       if (!recuperable || puerto === 0 || puerto - primero >= INTENTOS_PUERTO) {
@@ -135,7 +129,7 @@ export function arrancar(raizProyecto, puerto = PUERTO_POR_DEFECTO) {
   });
 }
 
-// Lanzado directamente: `node tools/serve.mjs [puerto]`
+// si se ejecuta directamente con node
 const directo = import.meta.url === pathToFileURL(process.argv[1] || "").href;
 if (directo) {
   const raiz = join(aqui, "..");

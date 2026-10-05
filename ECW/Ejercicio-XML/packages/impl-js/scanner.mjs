@@ -1,36 +1,20 @@
-/**
- * scanner.mjs -- Analizador XML de un solo paso, sin arbol DOM.
- *
- * ESTRATEGIA (JavaScript):
- *   Se trabaja directamente sobre el string con `charCodeAt`, sin construir
- *   ninguna estructura intermedia de XML. El objetivo es NO asignar objetos
- *   por etiqueta: los atributos se acumulan en arrays tipados indices por el
- *   hash FNV-1a del nombre. El segundo paso de `analizar` consulta esos hashes
- *   y solo entonces materializa strings, y solo para los atributos que de
- *   verdad necesita.
- *
- *   Este es el punto fuerte de JavaScript en este problema: recorrer un string
- *   UTF-16 con la tabla de codigos es una operacion JIT-friendly sobre datos
- *   primitivos, y los strings de JavaScript ya viven en UTF-16 en memoria,
- *   mientras que un lenguaje con cadenas UTF-8 tiene que convertirlos.
- *
- * Especificacion XML 1.0 (Fifth Edition) seguida en lo esencial:
- *   - Se ignoran comentarios (<!-- -->), instrucciones de proceso (<? ?>) y
- *     DOCTYPE.
- *   - Las entidades se resuelven al construir el valor del atributo o el texto.
- *   - Un DTD interno con <!ENTITY se rechaza (billion laughs / expansion
- *     recursiva) y se reporta como aviso, no como excepcion.
- *   - No se admiten prefijos de espacio de nombres: VoiceXML esta registrado en
- *     el espacio por defecto http://www.w3.org/2001/vxml y las versiones 2.0 y
- *     2.1 no permiten reasignarlo, de modo que un elemento con prefijo se
- *     reporta como no reconocido, que es lo que hace un motor real.
- *
- * NOTA SOBRE COLUMNAS: el scanner acumula columnas en UNIDADES UTF-16 porque
- * es lo que resulta natural en un string de JavaScript. La columna definitiva
- * que aparece en el informe se calcula despues en bytes UTF-8 (ver
- * `resolverColumnaByte` en vxml-lint.mjs) para que sea comparable con las
- * otras dos implementaciones. Aqui se llama `colU16` para que no se confunda.
- */
+// scanner.mjs -- lee el XML en una pasada, sin construir un DOM.
+//
+// Recorre el string con charCodeAt y va sacando eventos (abrir, cerrar,
+// texto). Para no crear objetos por cada etiqueta, los atributos se guardan
+// en arrays tipados y se identifican por el hash FNV-1a de su nombre; el
+// string del valor solo se crea luego, si alguna regla lo necesita.
+//
+// Del XML 1.0 se cubre lo que hace falta aqui:
+//   - comentarios, <? ?> y DOCTYPE se saltan
+//   - las entidades se resuelven en los valores y en el texto
+//   - un DTD interno con <!entity se rechaza con un aviso (evita el
+//     "billion laughs")
+//   - no hay prefijos de espacio de nombres: VoiceXML usa siempre el espacio
+//     por defecto, asi que un elemento con prefijo queda como desconocido
+//
+// Las columnas se cuentan en UTF-16 (colU16), que es lo natural en JS. La
+// conversion a bytes UTF-8 se hace despues con crearColumnas (contrato.mjs).
 
 const ASCII_LT = 60, ASCII_GT = 62, ASCII_SLASH = 47, ASCII_EQ = 61;
 const ASCII_QUOT = 34, ASCII_APOS = 39, ASCII_AMP = 38, ASCII_NL = 10;
@@ -40,24 +24,24 @@ const ASCII_RBRACKET = 93, ASCII_COLON = 58, ASCII_HASH = 35;
 const ASCII_A = 65, ASCII_Z = 90, ASCII_0 = 48, ASCII_9 = 57;
 const ASCII_UNDERSCORE = 95, ASCII_DOT = 46;
 
-/** Tokens */
+// tipos de evento
 export const T = { INICIO: 1, AUTO: 2, CIERRE: 3, TEXTO: 4 };
 
-/** Hash FNV-1a de 32 bits sobre los codigos UTF-16 del nombre. */
+// FNV-1a de 32 bits sobre los codigos UTF-16 del nombre.
 export function h(s) {
   let x = 0x811c9dc5 | 0;
   for (let i = 0; i < s.length; i++) x = Math.imul(x ^ s.charCodeAt(i), 0x01000193);
   return x >>> 0;
 }
 
-/** Hashes de nombres de elemento usados con frecuencia. */
+// hashes de los elementos que mas se consultan
 export const EL = {
   vxml: h("vxml"), form: h("form"), field: h("field"), goto: h("goto"),
   prompt: h("prompt"), nomatch: h("nomatch"), noinput: h("noinput"),
   filled: h("filled"), block: h("block"), initial: h("initial"),
 };
 
-/** Hashes de nombres de atributo usados con frecuencia. */
+// y de los atributos
 export const AT = {
   id: h("id"), href: h("href"), next: h("next"), event: h("event"),
   cond: h("cond"), expr: h("expr"), srcexpr: h("srcexpr"), type: h("type"),
@@ -65,32 +49,12 @@ export const AT = {
   count: h("count"), version: h("version"),
 };
 
-/**
- * @typedef {Object} Evento
- * @property {number} t
- * @property {string} nombre
- * @property {number} hash
- * @property {number} linea
- * @property {number} colU16
- * @property {number} orden
- * @property {number} ini      offset inicial en UTF-16
- * @property {number} fin      offset final en UTF-16
- * @property {Uint32Array|null} aPos
- * @property {Uint16Array|null} aLen
- * @property {Uint8Array|null}  aQ
- * @property {Uint32Array|null} aH
- * @property {number} n
- */
+// Evento: { t, nombre, hash, linea, colU16, orden, ini, fin, n,
+//           aPos, aLen, aQ, aH }
+// ini/fin son offsets UTF-16; aPos/aLen/aQ/aH describen los n atributos.
 
-/**
- * Analiza `texto` en una sola pasada y devuelve la secuencia de eventos.
- *
- * @param {string} texto
- * @param {(msg: string, linea: number, col: number) => void} [alAdvertir]
- * @returns {Evento[]}
- */
+// Devuelve la lista de eventos de `texto`. alAdvertir(msg, linea, col) es opcional.
 export function escanear(texto, alAdvertir) {
-  /** @type {Evento[]} */
   const ev = [];
   const n = texto.length;
   const avisa = alAdvertir || NOOP;
@@ -100,11 +64,10 @@ export function escanear(texto, alAdvertir) {
   let colU16 = 1; // provisional, en unidades UTF-16
   let orden = 0;
 
-  /** @type {string[]} */
   const pila = [];
   let profundidad = 0;
 
-  /** Avanza linea/columna provisional por el tramo [a, b). */
+  // avanza linea y columna por el tramo [a, b)
   const avanzar = (a, b) => {
     for (let q = a; q < b; q++) {
       if (texto.charCodeAt(q) === ASCII_NL) { linea++; colU16 = 1; } else { colU16++; }
@@ -115,8 +78,7 @@ export function escanear(texto, alAdvertir) {
     const c = texto.charCodeAt(i);
 
     if (c !== ASCII_LT) {
-      // --- Texto. Se agrupa hasta el siguiente '<' y solo se emite si no es
-      //     solo espacios en blanco (el XML indentado genera mucho). ---
+      // Texto hasta el siguiente '<'. Si son solo espacios (sangria) no se emite.
       let k = i;
       while (k < n && texto.charCodeAt(k) !== ASCII_LT) k++;
       if (!esBlanco(texto, i, k)) {
@@ -132,7 +94,7 @@ export function escanear(texto, alAdvertir) {
 
     const sig = i + 1 < n ? texto.charCodeAt(i + 1) : -1;
 
-    // --- <?...?>  (incluye la declaracion <?xml ... ?>) ---
+    // <? ... ?>, incluida la declaracion <?xml ?>
     if (sig === ASCII_QUESTION) {
       const fin = texto.indexOf("?>", i + 2);
       const hasta = fin < 0 ? n : fin;
@@ -141,7 +103,7 @@ export function escanear(texto, alAdvertir) {
       continue;
     }
 
-    // --- <!--...-->  comentario ---
+    // comentario
     if (sig === ASCII_BANG && texto.startsWith("<!--", i)) {
       const fin = texto.indexOf("-->", i + 4);
       const hasta = fin < 0 ? n : fin;
@@ -150,13 +112,12 @@ export function escanear(texto, alAdvertir) {
       continue;
     }
 
-    // --- <!DOCTYPE ...>  y  <![CDATA[...]]> ---
+    // <!DOCTYPE ...> y <![CDATA[...]]>
     if (sig === ASCII_BANG) {
       if (texto.startsWith("<![CDATA[", i)) {
         const fin = texto.indexOf("]]>", i + 9);
         const hasta = fin < 0 ? n : fin;
-        // El contenido CDATA se trata como texto opaco; se ignora para el
-        // analisis de prompts porque no es locucion sintetica.
+        // El CDATA no se lee en voz alta, asi que no cuenta para los prompts.
         avanzar(i, hasta);
         i = Math.min(hasta + 3, n);
         continue;
@@ -181,7 +142,7 @@ export function escanear(texto, alAdvertir) {
       continue;
     }
 
-    // --- </...> ---
+    // etiqueta de cierre
     if (sig === ASCII_SLASH) {
       let j = i + 2;
       while (j < n && esNombre(texto.charCodeAt(j))) j++;
@@ -196,15 +157,10 @@ export function escanear(texto, alAdvertir) {
       });
       if (profundidad > 0) {
         const abierto = pila[profundidad - 1];
-        // VoiceXML cierra la cadena <if>/<elseif>/<else> con una sola etiqueta
-        // </if>, y esa etiqueta cierra la CADENA ENTERA:
-        //
+        // Un solo </if> cierra toda la cadena <if>/<elseif>/<else>:
         //   <if cond="a">A<elseif cond="b"/>B<elseif cond="c">C</if>
-        //            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-        //
-        // Es decir, un unico </if> debe desapilar el <elseif> que quedo
-        // abierto Y el <if> original. Un comprobador ingenuo que solo mire el
-        // tope de la pila daria aqui un falso positivo de desajuste.
+        // asi que hay que sacar de la pila el <elseif> abierto y tambien el <if>.
+        // Si solo se mirase la cima, saldria un falso error de etiquetas.
         if (nombre === "if") {
           while (profundidad > 0 &&
                  (pila[profundidad - 1] === "elseif" || pila[profundidad - 1] === "else")) {
@@ -234,14 +190,14 @@ export function escanear(texto, alAdvertir) {
       continue;
     }
 
-    // --- '<' que no abre nada: es texto literal ---
+    // un '<' suelto se toma como texto
     if (sig < 0 || !esNombre(sig)) {
       avanzar(i, i + 1);
       i++;
       continue;
     }
 
-    // --- Elemento normal ---
+    // etiqueta de apertura
     const lineaTag = linea, colTag = colU16, offTag = i;
     let j = i + 1;
     let hash = 0x811c9dc5 | 0;
@@ -252,9 +208,8 @@ export function escanear(texto, alAdvertir) {
       j++;
     }
     const nombre = texto.slice(i + 1, j);
-    // Sin `>>> 0` el hash puede quedar con el bit alto a uno y ser NEGATIVO
-    // como entero con signo, con lo que jamas igualaria a las constantes
-    // unsigned de h() y los elementos affectedos nunca se reconocerian.
+    // >>> 0 para que el hash sea sin signo; si no, con el bit alto a 1 sale
+    // negativo y no coincide con las constantes de h().
     hash = hash >>> 0;
 
     let nAt = 0;
@@ -297,7 +252,7 @@ export function escanear(texto, alAdvertir) {
         vFin = cierre < 0 ? n : cierre;
         k = cierre < 0 ? n : cierre + 1;
       } else {
-        // XML exige comillas; sin ellas se toma hasta blanco o '>'.
+        // sin comillas (no es XML valido): hasta espacio o '>'
         vIni = q;
         let w = q;
         while (w < n && !esEspacio(texto.charCodeAt(w)) && texto.charCodeAt(w) !== ASCII_GT) w++;
@@ -342,7 +297,7 @@ export function escanear(texto, alAdvertir) {
 
 function NOOP() {}
 
-/** Caracteres validos en un nombre XML (NameChar, subconjunto ASCII). */
+// caracteres de nombre XML (solo la parte ASCII)
 function esNombre(c) {
   return (c >= ASCII_A && c <= ASCII_Z) || (c >= 97 && c <= 122) ||
     (c >= ASCII_0 && c <= ASCII_9) || c === ASCII_UNDERSCORE ||
@@ -353,7 +308,7 @@ function esEspacio(c) {
   return c === ASCII_SPACE || c === ASCII_NL || c === ASCII_TAB || c === ASCII_CR;
 }
 
-/** True si el tramo [a, b) es solo espacios en blanco. */
+// ¿[a, b) son solo espacios?
 function esBlanco(texto, a, b) {
   for (let i = a; i < b; i++) {
     if (!esEspacio(texto.charCodeAt(i))) return false;
@@ -361,14 +316,7 @@ function esBlanco(texto, a, b) {
   return true;
 }
 
-/**
- * Resuelve las entidades XML del trozo [ini, fin) de `texto`.
- * Las entidades no reconocidas (numeric references) se dejan tal cual.
- * @param {string} texto
- * @param {number} ini
- * @param {number} fin
- * @returns {string}
- */
+// Resuelve las entidades de texto[ini, fin). Las que no conoce las deja tal cual.
 export function resolverEntidades(texto, ini, fin) {
   let hayAmp = false;
   for (let i = ini; i < fin; i++) {

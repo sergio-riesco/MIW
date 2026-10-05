@@ -1,38 +1,25 @@
-// ============================================================================
-// lib.rs -- Motor de analisis de VXML Doctor (implementacion WebAssembly/Rust).
-// ============================================================================
-// ESTRATEGIA (Rust):
-//   - El escaner trabaja directamente sobre los BYTES UTF-8 del documento,
-//     sin decodificar a string salvo donde hace falta de verdad (valores de
-//     atributos, texto de prompts). Las columnas se miden en bytes desde el
-//     inicio de la linea, que es exactamente lo que publica el contrato.
-//   - Los eventos se guardan en ESTRUCTURA DE ARRAYS (SoA): un Vec por campo
-//     (tipo, hash, linea, columna, offsets, ...). No hay ni un objeto por
-//     etiqueta ni un nodo por elemento: todo son arreglos planos tipados.
-//   - El nombre de cada elemento se guarda como RANGO DE BYTES sobre el
-//     documento (n_ini..n_fin); solo se materializa un string cuando un
-//     diagnostico lo necesita de verdad.
-//   - Los atributos se consultan por hash FNV-1a de 32 bits, como en JS;
-//     los valores con entidades se materializan solo para los atributos que
-//     las reglas necesitan (id, href, next, cond, expr, ...).
-//   - Tarjan es ITERATIVO (dos pilas paralelas: nodo y cursor de aristas),
-//     sin recursion y sin dependencia del tamano de la pila de la VM.
-//   - El serializador JSON es un port 1:1 de `serializarInforme` del
-//     contrato compartido: la garantia de salida identica byte a byte.
+// lib.rs -- el analizador en Rust, compilado a WebAssembly.
 //
-// A diferencia de JavaScript y TypeScript NO se importa nada del modulo
-// compartido: el catalogo de reglas va incrustado como constantes Rust
-// (reglas_gen.rs, regenerado por tools/gen-reglas.mjs).
-// ============================================================================
+// Trabaja directamente sobre los bytes UTF-8, sin pasar el documento a String
+// (solo se crean strings para los valores que usan las reglas). Asi las
+// columnas ya salen en bytes, que es lo que pide el contrato.
+//
+// Los eventos se guardan como estructura de arrays: un Vec por campo (tipo,
+// hash, linea, columna...), sin un objeto por etiqueta. El nombre de cada
+// elemento es un rango del documento y solo se copia si un diagnostico lo
+// necesita. Los atributos se buscan por hash FNV-1a, igual que en JS.
+//
+// Tarjan es iterativo, con dos pilas (nodo y siguiente arista). El JSON se
+// escribe con una copia de serializarInforme del contrato, y las reglas
+// vienen de reglas_gen.rs (lo genera tools/gen-reglas.mjs), porque desde
+// Rust no se puede importar nada de JS.
 
 mod reglas_gen;
 
 use reglas_gen::regla_por_nombre;
 use std::collections::{BTreeMap, HashSet};
 
-// ===========================================================================
-// Hash FNV-1a de 32 bits sobre bytes (identico al h() de JavaScript).
-// ===========================================================================
+// FNV-1a de 32 bits, igual que h() en JS.
 #[inline(always)]
 fn hash_nombre(s: &[u8]) -> u32 {
     let mut x: u32 = 0x811c_9dc5;
@@ -42,7 +29,7 @@ fn hash_nombre(s: &[u8]) -> u32 {
     x
 }
 
-// --- Hashes de elementos usados en el camino caliente -----------------------
+// --- Hashes de elementos ---
 const H_VXML: u32 = 0x01430dd2;
 const H_FORM: u32 = 0x4058c747;
 const H_FIELD: u32 = 0x67826267;
@@ -66,7 +53,7 @@ const H_DISCONNECT: u32 = 0x45e6feeb;
 const H_RETURN: u32 = 0x85ee37bf;
 const H_TRANSFER: u32 = 0xe2857f86;
 
-// --- Hashes de atributos -----------------------------------------------------
+// --- Hashes de atributos ---
 const H_ID: u32 = 0x37386ae0;
 const H_HREF: u32 = 0x9aa418d8;
 const H_NEXT: u32 = 0x5cb68de8;
@@ -81,7 +68,7 @@ const H_SRC: u32 = 0xd33ce1c9;
 const H_VERSION: u32 = 0x4671ae97;
 const H_XMLLANG: u32 = 0x31281438;
 
-// Tipos de evento (identicos al enum T del scanner de JavaScript).
+// Tipos de evento (los mismos que T en el scanner de JS).
 const T_INICIO: u8 = 1;
 const T_AUTO: u8 = 2;
 const T_CIERRE: u8 = 3;
@@ -97,18 +84,17 @@ const C_FILLED: usize = 5;
 const C_GOTO: usize = 6;
 const C_PROMPT: usize = 7;
 
-/// Tipos validos para el atributo type de <field> (el orden no importa).
+/// Valores validos de type en <field>.
 const TIPOS_FIELD: [&str; 9] = [
     "string", "number", "boolean", "currency", "date", "digits",
     "phonenumber", "time", "telephone",
 ];
 
-/// Simbolos molestos para TTS: el ORDEN importa, `hallados.join(",")` del
-/// contrato recorre la lista tal cual (Set de JavaScript, orden de insercion).
+/// Simbolos que el TTS lee mal. Mismo orden que en el contrato, porque el
+/// detalle los lista en ese orden.
 const SIMBOLOS_TTS: [&str; 9] = ["&", "%", "#", "$", "/", "@", "|", "+", "="];
 
-/// Identificadores que el motor expone siempre (regla VXML015). Copia exacta
-/// del Set INTEGRADOS_VOICEXML del contrato compartido.
+/// Identificadores que siempre existen (VXML015). Copia de INTEGRADOS_VOICEXML.
 fn es_integrado(ident: &str) -> bool {
     matches!(
         ident,
@@ -127,9 +113,7 @@ fn es_integrado(ident: &str) -> bool {
     )
 }
 
-/// Palabras clave de la sintaxis ECMAScript que se filtran antes de VXML015.
-/// Copia exacta de PALABRAS_CLAVE_EXPRESION (sin la duplicacion de "typeof",
-/// que un Set de JavaScript colapsa de todos modos).
+/// Palabras clave que se ignoran en VXML015 (copia de PALABRAS_CLAVE_EXPRESION).
 fn es_clave_expresion(ident: &str) -> bool {
     matches!(
         ident,
@@ -143,13 +127,10 @@ fn es_clave_expresion(ident: &str) -> bool {
     )
 }
 
-// ===========================================================================
-// Escaner: una pasada sobre los bytes, eventos en estructura de arrays.
-// ===========================================================================
+// --- Escaner ---
 
-/// SoA de eventos. Cada campo es un Vec paralelo indexado por evento; los
-/// atributos de los elementos viven en sus propias SoA, referenciadas por
-/// (a0, n): para el evento e, los atributos son a_h[a0[e]..a0[e]+n[e]].
+/// Eventos, un Vec por campo. Los atributos del evento e estan en
+/// a_h[a0[e]..a0[e] + n[e]] (y lo mismo en a_pos, a_len...).
 #[derive(Default)]
 struct Eventos {
     t: Vec<u8>,
@@ -200,7 +181,7 @@ impl Eventos {
     }
 }
 
-/// Localizacion minima de un evento para empujar diagnosticos.
+/// Lo justo de un evento para crear un diagnostico.
 #[derive(Clone, Copy)]
 struct EvPos {
     linea: u32,
@@ -218,7 +199,7 @@ fn es_espacio(c: u8) -> bool {
     c == b' ' || c == b'\n' || c == b'\t' || c == b'\r'
 }
 
-/// Busca `needle` en doc desde `from`, o None. Version lineal simple.
+/// Busca needle en doc a partir de from.
 fn find_sub(doc: &[u8], from: usize, needle: &[u8]) -> Option<usize> {
     if from + needle.len() > doc.len() {
         return None;
@@ -231,7 +212,7 @@ fn find_sub(doc: &[u8], from: usize, needle: &[u8]) -> Option<usize> {
     None
 }
 
-/// Avanza la posicion [a, b) contando saltos de linea.
+/// Avanza linea y columna por [a, b).
 fn avanzar(doc: &[u8], a: usize, b: usize, linea: &mut u32, linea_start: &mut usize) {
     for q in a..b {
         if doc[q] == b'\n' {
@@ -250,9 +231,8 @@ fn es_blanco(doc: &[u8], a: usize, b: usize) -> bool {
     true
 }
 
-/// Escanea el documento en una pasada. No guarda la pila de balance porque
-/// en esta implementacion las notas de aviso no forman parte del informe
-/// canonico JSON (el contrato las deja fuera de la serializacion).
+/// Saca los eventos del documento. A diferencia de JS no lleva la pila de
+/// etiquetas abiertas: solo servia para los avisos, que no salen en el JSON.
 fn escanear(doc: &[u8]) -> Eventos {
     let n = doc.len();
     let mut ev = Eventos::default();
@@ -264,7 +244,7 @@ fn escanear(doc: &[u8]) -> Eventos {
         let c = doc[i];
 
         if c != b'<' {
-            // --- Texto: se agrupa hasta el siguiente '<'. ---
+            // texto hasta el siguiente '<'
             let mut k = i;
             while k < n && doc[k] != b'<' {
                 k += 1;
@@ -279,7 +259,7 @@ fn escanear(doc: &[u8]) -> Eventos {
 
         let sig = if i + 1 < n { doc[i + 1] } else { 0 };
 
-        // --- <?...?> (incluye la declaracion <?xml ... ?>) ---
+        // <? ... ?>
         if sig == b'?' {
             let fin = find_sub(doc, i + 2, b"?>").map_or(n, |f| f);
             avanzar(doc, i, fin, &mut linea, &mut linea_start);
@@ -287,7 +267,7 @@ fn escanear(doc: &[u8]) -> Eventos {
             continue;
         }
 
-        // --- <!--...--> comentario ---
+        // comentario
         if sig == b'!' && doc.get(i + 2..i + 4) == Some(b"--") {
             let fin = find_sub(doc, i + 4, b"-->").map_or(n, |f| f);
             avanzar(doc, i, fin, &mut linea, &mut linea_start);
@@ -295,7 +275,7 @@ fn escanear(doc: &[u8]) -> Eventos {
             continue;
         }
 
-        // --- <!DOCTYPE ...> y <![CDATA[...]]> ---
+        // <!DOCTYPE ...> y <![CDATA[...]]>
         if sig == b'!' {
             if doc.get(i..i + 9) == Some(b"<![CDATA[") {
                 let fin = find_sub(doc, i + 9, b"]]>").map_or(n, |f| f);
@@ -321,7 +301,7 @@ fn escanear(doc: &[u8]) -> Eventos {
             continue;
         }
 
-        // --- </...> ---
+        // cierre
         if sig == b'/' {
             let mut j = i + 2;
             while j < n && es_nombre(doc[j]) {
@@ -347,14 +327,14 @@ fn escanear(doc: &[u8]) -> Eventos {
             continue;
         }
 
-        // --- '<' que no abre nada: es texto literal ---
+        // '<' suelto: texto
         if !es_nombre(sig) {
             avanzar(doc, i, i + 1, &mut linea, &mut linea_start);
             i += 1;
             continue;
         }
 
-        // --- Elemento normal ---
+        // apertura
         let linea_tag = linea;
         let off_tag = i;
         let mut j = i + 1;
@@ -459,9 +439,7 @@ fn escanear(doc: &[u8]) -> Eventos {
     ev
 }
 
-// ===========================================================================
-// Resolucion de entidades XML (las 5 predefinidas; el resto se deja tal cual).
-// ===========================================================================
+// Entidades: solo las 5 predefinidas, el resto se deja como esta.
 
 fn utf8(b: &[u8]) -> &str {
     match std::str::from_utf8(b) {
@@ -517,9 +495,7 @@ fn resolver_entidades(doc: &[u8]) -> String {
     r
 }
 
-// ===========================================================================
-// Pasada 2: construir el modelo (contadores, formularios, saltos, reglas).
-// ===========================================================================
+// --- Pasada 2: modelo y reglas ---
 
 struct Marco {
     hash: u32,
@@ -628,7 +604,7 @@ impl<'a> Analizador<'a> {
         }
     }
 
-    /// Empuja un diagnostico resolviendo el catalogo incrustado.
+    /// Anade un diagnostico (gravedad y mensaje salen del catalogo).
     fn empuja(&mut self, regla: &'static str, ev: EvPos, elemento: &str, detalle: &str) {
         let r = regla_por_nombre(regla).expect("regla desconocida en el catalogo");
         self.ds.push(Diagnostico {
@@ -654,7 +630,7 @@ impl<'a> Analizador<'a> {
         s
     }
 
-    /// Presencia de `cond` con algun caracter que no sea espacio/tab/CR/LF.
+    /// ¿Tiene cond con algo que no sean espacios?
     fn atributo_cond_no_vacio(&self, ei: usize) -> bool {
         let n = self.ev.n[ei] as usize;
         let a0 = self.ev.a0[ei] as usize;
@@ -679,7 +655,7 @@ impl<'a> Analizador<'a> {
         for ei in 0..n_ev {
             let t = self.ev.t[ei];
 
-            // --- Texto entre elementos -----------------------------------
+            // --- Texto entre elementos ---
             if t == T_TEXTO {
                 self.n_textos += 1;
                 if self.profundidad_prompt > 0 {
@@ -693,8 +669,8 @@ impl<'a> Analizador<'a> {
                         }
                     }
                     if !hallados.is_empty() {
-                        // El texto vive en el elemento mas interno abierto, que
-                        // no siempre es el <prompt> (puede ser <s>, <audio>...).
+                        // el texto puede estar dentro de un <s>, <audio>... no
+                        // solo directamente en el <prompt>
                         let elemento = match self.pila.last() {
                             Some(m) => self.nombre_ev(m.ev).to_string(),
                             None => "prompt".to_string(),
@@ -716,10 +692,9 @@ impl<'a> Analizador<'a> {
                 continue;
             }
 
-            // --- Cierre de un elemento ------------------------------------
+            // --- Cierre de un elemento ---
             if t == T_CIERRE {
-                // Un unico </if> desapila los <elseif>/<else> abiertos Y el
-                // <if> original (contrato del scanner compartido).
+                // un </if> cierra tambien los <elseif>/<else> abiertos
                 if self.ev.hash[ei] == H_IF {
                     while let Some(m) = self.pila.last() {
                         if m.hash != H_ELSEIF && m.hash != H_ELSE {
@@ -762,12 +737,11 @@ impl<'a> Analizador<'a> {
                 continue;
             }
 
-            // --- Apertura de un elemento (INICIO y AUTO) -------------------
+            // --- Apertura de un elemento (inicio y auto) ---
             self.n_elementos += 1;
             self.n_atributos += self.ev.n[ei];
 
-            // Atributos de interes, localizados por hash (ultimo gana, igual
-            // que en JavaScript: el switch sobrescribe).
+            // atributos que interesan; si se repite uno, gana el ultimo (como en JS)
             let n_at = self.ev.n[ei] as usize;
             let a0 = self.ev.a0[ei] as usize;
             let mut v_id: Option<String> = None;
@@ -802,8 +776,7 @@ impl<'a> Analizador<'a> {
                 }
             }
 
-            // Expresiones ECMAScript (VXML015), ANTES de anadir el name a los
-            // declarados, para no auto-confirmar una lectura.
+            // VXML015 antes de declarar el name, para que no se valide a si mismo
             let evp = self.evpos(ei);
             for a in 0..n_at {
                 let h = self.ev.a_h[a0 + a];
@@ -840,7 +813,7 @@ impl<'a> Analizador<'a> {
                 self.n_prompts += 1;
             }
 
-            // Contadores de subarbol.
+            // contadores de subarbol
             if hash == H_EXIT || hash == H_DISCONNECT || hash == H_RETURN || hash == H_TRANSFER {
                 self.c[C_SALIDA] += 1;
             }
@@ -927,7 +900,7 @@ impl<'a> Analizador<'a> {
                 }
             }
 
-            // --- Abrir marco (solo si no es autocerrado) ---
+            // abrir marco (si no es <x/>)
             if t == T_INICIO {
                 let mut marco = Marco {
                     hash,
@@ -972,8 +945,8 @@ impl<'a> Analizador<'a> {
     }
 
     fn cerrar_formulario(&mut self, marco: &Marco, sub: &[u32; 8]) {
-        // Primero se copian los datos que hacen falta; despues se abandona el
-        // prestamo sobre self.formularios para poder llamar a empuja.
+        // copio lo que hace falta para soltar el prestamo de self.formularios
+        // antes de llamar a empuja
         let (tiene_salida, campos, id) = {
             let f = &mut self.formularios[marco.idx_form as usize];
             f.tiene_salida = sub[C_SALIDA] > 0;
@@ -990,15 +963,12 @@ impl<'a> Analizador<'a> {
         }
     }
 
-    // -----------------------------------------------------------------------
-    // Pasada 3: grafo de flujo entre forms.
-    // -----------------------------------------------------------------------
+    // --- Pasada 3: grafo entre forms ---
 
     fn resolver_grafo(&mut self) -> Grafo {
         let n = self.formularios.len();
 
-        // por_id ordenado (BTreeMap) para que la iteracion sea determinista;
-        // el orden final lo garantiza de todos modos el sort de diagnosticos.
+        // BTreeMap para recorrerlo siempre en el mismo orden
         let mut por_id: BTreeMap<String, Vec<usize>> = BTreeMap::new();
         for (i, f) in self.formularios.iter().enumerate() {
             if f.id.is_empty() {
@@ -1084,9 +1054,9 @@ impl<'a> Analizador<'a> {
             self.empuja("form-inaccesible", ev, "form", &id);
         }
 
-        // --- VXML003 -- ciclos sin salida -----------------------------------
-        // Punto fijo: un form es "seguro" si su subarbol contiene una salida
-        // o salta a otro form seguro.
+        // --- VXML003 -- ciclos sin salida ---
+        // un form es "seguro" si tiene una salida o salta a otro form seguro
+        // (se repite hasta que no cambia nada)
         let mut seguro = vec![0u8; n];
         let mut trabajo: Vec<usize> = Vec::new();
         for i in 0..n {
@@ -1110,7 +1080,7 @@ impl<'a> Analizador<'a> {
             }
         }
 
-        // Componentes fuertemente conexas del subgrafo de forms inseguros.
+        // componentes fuertemente conexas entre los forms no seguros
         let componentes = tarjan(&adyac, n, &|x| seguro[x] == 0);
         let mut ciclos: Vec<Vec<usize>> = componentes
             .into_iter()
@@ -1153,9 +1123,7 @@ impl<'a> Analizador<'a> {
         }
     }
 
-    // -----------------------------------------------------------------------
-    // VXML015 -- identificadores no declarados.
-    // -----------------------------------------------------------------------
+    // --- VXML015: identificadores no declarados ---
 
     fn revisar_expresion(&mut self, expr: &str, ev: EvPos) {
         let b = expr.as_bytes();
@@ -1253,8 +1221,7 @@ fn es_digito_hex(c: u8) -> bool {
     c.is_ascii_hexdigit() || c == b'.' || c == b'x' || c == b'X'
 }
 
-/// Tarjan iterativo restringido a los nodos que pasan `filtro`, identico al
-/// de la implementacion JavaScript (dos pilas paralelas).
+/// Tarjan iterativo (como el de JS) solo con los nodos que cumplen filtro.
 fn tarjan(adyac: &[Vec<usize>], n: usize, filtro: &dyn Fn(usize) -> bool) -> Vec<Vec<usize>> {
     let mut idx = vec![-1i32; n];
     let mut bajo = vec![0i32; n];
@@ -1335,11 +1302,9 @@ fn tiene_auto_bucle(adyac: &[Vec<usize>], comp: &[usize]) -> bool {
     false
 }
 
-// ===========================================================================
-// Utilidades
-// ===========================================================================
+// --- Utilidades ---
 
-/** `time` de SSML: numero de segundos, o numero seguido de unidad. */
+// time de SSML: un numero, con unidad o sin ella.
 fn es_tiempo_ssml(s: &str) -> bool {
     let t = s.trim();
     let b = t.as_bytes();
@@ -1367,7 +1332,7 @@ fn es_tiempo_ssml(s: &str) -> bool {
     matches!(&b[i..], b"ms" | b"s" | b"m" | b"h")
 }
 
-/// Numero de lineas: separadores + la ultima, si no termina en salto.
+/// Lineas = saltos + 1 si la ultima no acaba en salto.
 fn contar_lineas(doc: &[u8]) -> u32 {
     if doc.is_empty() {
         return 0;
@@ -1385,9 +1350,7 @@ fn contar_lineas(doc: &[u8]) -> u32 {
     }
 }
 
-// ===========================================================================
-// Serializacion canonica del informe (port 1:1 de serializarInforme).
-// ===========================================================================
+// --- JSON del informe (igual que serializarInforme del contrato) ---
 
 struct InformeForm {
     id: String,
@@ -1414,7 +1377,7 @@ fn push_u32(r: &mut String, n: u32) {
     r.push_str(&n.to_string());
 }
 
-/** Escapa una cadena para JSON sin comillas (identico a escJSON del contrato). */
+// igual que escJSON del contrato
 fn esc_json(r: &mut String, s: &str) {
     for ch in s.chars() {
         match ch {
@@ -1534,13 +1497,9 @@ fn contar_campos(formularios: &[Formulario]) -> u32 {
     t
 }
 
-// ===========================================================================
-// API PUBLICA
-// ===========================================================================
+// --- API ---
 
-/**
- * Analiza un documento VoiceXML y devuelve el informe JSON canonico (String).
- */
+// Analiza el documento y devuelve el informe en JSON.
 fn analizar_bytes(doc: &[u8], nombre: &str) -> String {
     let ev = escanear(doc);
     let mut a = Analizador::nuevo(doc, ev);
@@ -1548,7 +1507,7 @@ fn analizar_bytes(doc: &[u8], nombre: &str) -> String {
     let n_saltos = a.saltos.len() as u32;
     let grafo = a.resolver_grafo();
 
-    // Orden canonico de diagnosticos: (linea, columna, regla, detalle).
+    // orden: linea, columna, regla, detalle
     a.ds.sort_by(|x, y| {
         x.linea
             .cmp(&y.linea)
@@ -1599,18 +1558,11 @@ fn analizar_bytes(doc: &[u8], nombre: &str) -> String {
     serializar_informe(&informe)
 }
 
-// ===========================================================================
-// ABI WebAssembly
-// ===========================================================================
+// --- ABI WebAssembly ---
 
-/**
- * vxml_analizar(data, len, nombre, len_nombre, out, cap) -> usize
- *
- * Analiza el documento `data[0..len]` y escribe el informe JSON canonico en
- * `out` (hasta `cap` bytes). Devuelve SIEMPRE el tamano total del informe.
- * Si `out` es nulo o `cap` es insuficiente no se escribe nada y el llamador
- * debe volver a llamar con un buffer del tamano devuelto.
- */
+// vxml_analizar(data, len, nombre, len_nombre, out, cap) -> tamano del JSON
+// Escribe el informe en out si cabe en cap bytes. Si out es nulo o no cabe,
+// no escribe nada: hay que volver a llamar con un buffer de ese tamano.
 #[no_mangle]
 pub extern "C" fn vxml_analizar(
     data: *const u8,
@@ -1640,8 +1592,7 @@ pub extern "C" fn vxml_analizar(
     needed
 }
 
-/// Reserva `n` bytes en el heap de Rust y devuelve el puntero. El llamador
-/// debe devolverlos con vxml_dealloc.
+/// Reserva n bytes; se liberan con vxml_dealloc.
 #[no_mangle]
 pub extern "C" fn vxml_alloc(n: usize) -> *mut u8 {
     let mut v: Vec<u8> = Vec::with_capacity(n);
@@ -1650,7 +1601,7 @@ pub extern "C" fn vxml_alloc(n: usize) -> *mut u8 {
     p
 }
 
-/// Libera `n` bytes reservados por vxml_alloc.
+/// Libera lo reservado con vxml_alloc.
 #[no_mangle]
 pub extern "C" fn vxml_dealloc(p: *mut u8, n: usize) {
     unsafe {

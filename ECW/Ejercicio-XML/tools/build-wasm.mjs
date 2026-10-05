@@ -1,15 +1,7 @@
-/**
- * build-wasm.mjs
- * ---------------------------------------------------------------------------
- * Compila la implementacion de WebAssembly con cargo (target
- * wasm32-unknown-unknown) y copia el .wasm a packages/impl-wasm/lib/.
- *
- * Requiere el toolchain de Rust con el target wasm32-unknown-unknown
- * instalado (`rustup target add wasm32-unknown-unknown`).
- *
- * Uso:  npm run build:wasm
- * ---------------------------------------------------------------------------
- */
+// build-wasm.mjs -- compila la version Rust a wasm32-unknown-unknown y copia
+// el .wasm a packages/impl-wasm/lib/ (npm run build:wasm).
+// Hace falta: rustup target add wasm32-unknown-unknown
+
 import { execFileSync } from "node:child_process";
 import { copyFileSync, mkdirSync } from "node:fs";
 import { join, dirname } from "node:path";
@@ -19,7 +11,7 @@ const aqui = dirname(fileURLToPath(import.meta.url));
 const raiz = join(aqui, "..");
 const dirWasm = join(raiz, "packages", "impl-wasm");
 
-// En Windows cargo no esta en el PATH por defecto de la shell de Node.
+// en Windows cargo puede no estar en el PATH que ve Node
 const cargoBin = join(process.env.USERPROFILE || "", ".cargo", "bin");
 process.env.PATH = cargoBin + ";" + (process.env.PATH || "");
 

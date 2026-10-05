@@ -5,7 +5,7 @@ import Breadcrumb from "../../components/Breadcrumb";
 import { categories } from "../../data/music";
 import styles from "./categoria.module.css";
 
-// Genera una página estática por cada categoría en el momento de la compilación.
+// Una página estática por género, generada al compilar.
 export function generateStaticParams() {
   return categories.map((category) => ({ category: category.id }));
 }
@@ -82,7 +82,6 @@ export default async function MusicCategoryPage({ params }) {
                     <figcaption>
                       Fragmento de «{band.snippet.track}»
                     </figcaption>
-                    {/* preload="none": no se descarga nada hasta pulsar play. */}
                     <audio controls preload="none" src={band.snippet.src}>
                       <a href={band.snippet.src}>
                         Descargar el fragmento de {band.snippet.track}

@@ -13,21 +13,18 @@ import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.DefaultHandler;
 
 /**
- * Valida documentos del lenguaje contra el DTD y contra el XML Schema.
+ * Valida los documentos contra el DTD y contra el XSD, solo con JAXP (lo que
+ * trae Java, sin librerías).
  *
- * Solo usa la biblioteca estándar de Java (JAXP), sin dependencias:
- *   - DTD: analizador SAX con validación activada; usa el DOCTYPE del documento.
- *   - XSD: SchemaFactory con esquema/sitio.xsd.
+ *   java tools/Validar.java              todos los ejemplos/*.xml
+ *   java tools/Validar.java a.xml b.xml  esos documentos
  *
- * Uso (Java 11 o superior ejecuta el .java directamente, sin compilar):
- *   java tools/Validar.java                 valida todos los ejemplos/*.xml
- *   java tools/Validar.java a.xml b.xml     valida esos documentos
- *
- * Termina con código 1 si algún documento no es válido.
+ * Con Java 11 o más se ejecuta el .java directamente. Si algo no es válido,
+ * sale con código 1.
  */
 public class Validar {
 
-    /** Guarda los errores en vez de detener la validación en el primero. */
+    /** Apunta todos los errores en vez de parar en el primero. */
     static class Errores implements ErrorHandler {
         final List<String> lista = new ArrayList<>();
 

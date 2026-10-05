@@ -1,7 +1,6 @@
-/* Página de una categoría: lista vertical de grupos con su carátula. */
+/* Página de un género: lista de grupos */
 
-/* Enlace de vuelta a /musica. La miga de pan ya enlaza, pero en texto
-   pequeño pasa desapercibida, así que se repite aquí como botón visible. */
+/* Botón para volver a /musica (la miga de pan se ve poco) */
 .back {
   margin-bottom: 1.5rem;
 }
@@ -91,7 +90,7 @@
   font-size: 0.88rem;
 }
 
-/* Fragmento de audio del álbum. */
+/* Fragmento de audio */
 .snippet {
   margin: 0.6rem 0 0;
 }

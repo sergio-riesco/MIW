@@ -1,22 +1,11 @@
-/**
- * generar-corpus.mjs
- * ---------------------------------------------------------------------------
- * Genera un corpus grande y REPRODUCIBLE de documentos VoiceXML para el banco
- * de pruebas de rendimiento.
- *
- * Por que generarlo y no descargarlo:
- *   - Es reproducible byte a byte: la misma semilla da el mismo corpus, asi que
- *     las cifras del informe son verificables por cualquiera.
- *   - Permite barrelar perfiles de defecto concretos y saber cuantos
- *     diagnosticos deben salir, lo que hace posible el test diferencial.
- *   - Evita depender de ficheros de terceros con licencias y codificaciones
- *     dispares.
- *
- * Se usa un PRNG propio (mulberry32) en lugar de Math.random para que la
- * semilla produzca siempre la misma secuencia.
- *
- * Uso:  node corpus/generar-corpus.mjs [carpetaDestino]
- */
+// generar-corpus.mjs -- genera el corpus grande para el banco de pruebas.
+//
+// Lo genero en vez de bajar documentos de internet porque asi siempre sale el
+// mismo (misma semilla, mismos ficheros), puedo meter los defectos que quiera
+// y no hay problemas de licencias. Por eso uso un PRNG propio (mulberry32) y
+// no Math.random.
+//
+// Uso: node corpus/generar-corpus.mjs [carpetaDestino]
 
 import { mkdirSync, writeFileSync, rmSync, existsSync } from "node:fs";
 import { join, dirname } from "node:path";
@@ -25,7 +14,7 @@ import { fileURLToPath } from "node:url";
 const aqui = dirname(fileURLToPath(import.meta.url));
 const destino = process.argv[2] || join(aqui, "grande");
 
-/** PRNG determinista de 32 bits. */
+// mulberry32
 function mulberry32(semilla) {
   let a = semilla >>> 0;
   return function () {
@@ -63,9 +52,7 @@ const TTS_LIMPIO = [
   "Le quedan dos intentos.",
 ];
 
-// ===========================================================================
-// Generador
-// ===========================================================================
+// --- Generador ---
 
 /**
  * @param {object} cfg
@@ -123,7 +110,7 @@ function generarDocumento(cfg) {
       L.push(`      <field name="${campo}" type="${tipo}">`);
 
       if (defecto()) {
-        // Field sin prompt: VXML004
+        // field sin prompt (VXML004)
         L.push(`        <grammar type="application/srgs+xml" src="${campo}.grxml"/>`);
         L.push("        <filled>");
         L.push(`          <goto next="#${ids[Math.min(f + 1, cfg.forms - 1)]}"/>`);
@@ -139,7 +126,7 @@ function generarDocumento(cfg) {
         L.push(`          <goto next="#${ids[Math.min(f + 1, cfg.forms - 1)]}"/>`);
         L.push("        </filled>");
         if (defecto()) {
-          // nomatch que ni reprompta ni sale: VXML006
+          // nomatch sin reprompt ni salida (VXML006)
           L.push("        <nomatch>");
           L.push("          No le he entendido.");
           L.push("        </nomatch>");
@@ -154,7 +141,7 @@ function generarDocumento(cfg) {
       L.push("      </field>");
     }
 
-    // Saltos: ciclo, destino inexistente o destino valido.
+    // saltos: ciclo, destino que no existe o destino bueno
     const claseSalto = rnd();
     if (claseSalto < 0.08) {
       L.push("      <goto next=\"#form_que_no_existe\"/>");
@@ -179,20 +166,12 @@ function generarDocumento(cfg) {
   return { texto: L.join("\n"), esperado };
 }
 
-// ===========================================================================
-// Plan del corpus
-// ===========================================================================
+// --- Plan del corpus ---
 
-/**
- * perfiles: nombre, numero de documentos, y parametros del generador.
- * El total ronda los 6 MB, suficiente para que la diferencia entre las tres
- * implementaciones sea significativa sin que el banco de pruebas tarde
- * minutos ni el repositorio crezca sin control.
- *
- * El numero de documentos de cada perfil se ajusta despues para que el tiempo
- * de analisis quede en el mismo orden de magnitud en todos ellos, de modo que
- * comparar perfiles no mida sobre todo el tamano del fichero.
- */
+// Perfiles: nombre, cuantos documentos y parametros. En total unos 6 MB:
+// suficiente para que se note la diferencia sin que el banco tarde minutos.
+// Hay menos documentos de los perfiles grandes para que cada perfil pese
+// mas o menos lo mismo en el tiempo total.
 const PERFILES = [
   { nombre: "pequeno", docs: 40, forms: 6, camposMin: 1, camposMax: 3, semilla: 1001, desc: "Dialogos pequenos, carga tipica de un IVR real." },
   { nombre: "mediano", docs: 20, forms: 40, camposMin: 2, camposMax: 6, semilla: 2002, desc: "Dialogos medianos, el perfil mas cercano a produccion." },

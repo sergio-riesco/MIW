@@ -1,14 +1,7 @@
-/**
- * gen-reglas.mjs
- * ---------------------------------------------------------------------------
- * Genera packages/impl-wasm/src/reglas_gen.rs a partir de packages/core/
- * reglas.json (la FUENTE UNICA DE VERDAD del catalogo de reglas).
- *
- * La implementacion de WebAssembly no puede importar el JSON ni el modulo JS
- * compartido, asi que se la embebe el mismo catalogo como constantes Rust.
- * Regenerar con `npm run gen:reglas` tras editar reglas.json.
- * ---------------------------------------------------------------------------
- */
+// gen-reglas.mjs -- genera packages/impl-wasm/src/reglas_gen.rs a partir de
+// packages/core/reglas.json. Rust no puede leer el JSON en tiempo de ejecucion,
+// asi que las reglas se le pasan como constantes. Hay que volver a lanzarlo
+// (npm run gen:reglas) cada vez que se cambia reglas.json.
 
 import { readFileSync, writeFileSync } from "node:fs";
 import { join, dirname } from "node:path";
@@ -17,7 +10,7 @@ import { fileURLToPath } from "node:url";
 const aqui = dirname(fileURLToPath(import.meta.url));
 const catalog = JSON.parse(readFileSync(join(aqui, "..", "packages", "core", "reglas.json"), "utf8"));
 
-/** Escapa una cadena como literal Rust. */
+// Escapa una cadena como literal Rust.
 function escRust(s) {
   return s
     .replace(/\\/g, "\\\\")

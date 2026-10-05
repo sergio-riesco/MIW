@@ -3,26 +3,18 @@
 import { useEffect, useId, useRef, useState } from "react";
 import styles from "./TrailerDialog.module.css";
 
-/**
- * Botón transparente que cubre una portada y abre el tráiler en una ventana
- * modal, sin salir de la página. La portada ya reacciona al pasar el ratón,
- * así que no necesita icono.
- *
- * Usa el elemento <dialog> nativo: showModal() bloquea el resto de la página,
- * lleva el foco dentro de la ventana, cierra con Escape y devuelve el foco al
- * botón al cerrarse. El <video> solo se crea mientras la ventana está
- * abierta, así que no se descarga nada hasta que se pulsa.
- */
+// Botón invisible encima de la portada que abre el tráiler en un <dialog>.
+// Con showModal() el navegador ya se encarga del foco y de cerrar con Escape.
+// El <video> solo existe con la ventana abierta: no descarga nada antes y
+// deja de sonar al cerrar.
 export default function TrailerDialog({ title, src }) {
   const dialogRef = useRef(null);
   const titleId = useId();
   const [open, setOpen] = useState(false);
   const [error, setError] = useState(false);
 
-  // El diálogo se puede cerrar con Escape, con el botón o pulsando fuera.
-  // En todos los casos el navegador lanza el evento "close", y al recibirlo
-  // se quita el <video> para que deje de sonar. Se escucha directamente en
-  // el elemento porque React no lo propaga de forma fiable en <dialog>.
+  // Al cerrar (Escape, botón o clic fuera) llega "close" y quito el vídeo.
+  // Lo escucho a mano porque el onClose de React en <dialog> no siempre llega.
   useEffect(() => {
     const dialog = dialogRef.current;
     const alCerrar = () => setOpen(false);
@@ -42,7 +34,7 @@ export default function TrailerDialog({ title, src }) {
     dialogRef.current.close();
   }
 
-  // Un clic en el fondo oscuro (fuera del contenido) también cierra.
+  // clic en el fondo oscuro = cerrar
   function alPulsarFondo(event) {
     if (event.target === dialogRef.current) {
       cerrar();

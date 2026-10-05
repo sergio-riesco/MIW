@@ -1,14 +1,14 @@
 import { sitioVacio } from './model.js';
 const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-/** Atributos en el orden dado; se omiten los vacíos y los booleanos a false
- *  (es su valor por defecto en el DTD). */
+// Atributos en orden. Los vacíos y los false no se escriben (false ya es el
+// valor por defecto).
 const attrs = (o) => Object.entries(o).filter(([, v]) => v !== '' && v !== false)
     .map(([k, v]) => ` ${k}="${v === true ? 'true' : esc(String(v))}"`).join('');
 const nodo = (n, a, texto = '', pad = '    ') => texto ? `${pad}<${n}${attrs(a)}>${esc(texto)}</${n}>` : `${pad}<${n}${attrs(a)}/>`;
-/** Rutas del DTD y del XSD que se escriben en los documentos generados. */
+// el XML generado apunta a estos dos
 const DTD = 'sitio.dtd';
 const XSD = 'sitio.xsd';
-/** Sitio (formulario) -> documento XML, válido contra sitio.dtd y sitio.xsd. */
+/** Formulario -> XML. */
 export function aXml(s) {
     const sec = (k) => attrs({ ...s.secciones[k] });
     const o = [
@@ -60,7 +60,7 @@ export function aXml(s) {
     o.push('</sitio>');
     return o.join('\n') + '\n';
 }
-/** Documento XML -> Sitio (para editar en el formulario un XML existente). */
+/** XML -> formulario. */
 export function deXml(xml) {
     const d = new DOMParser().parseFromString(xml, 'application/xml');
     if (d.querySelector('parsererror'))

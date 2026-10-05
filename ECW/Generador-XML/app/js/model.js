@@ -1,5 +1,4 @@
-// Modelo de datos del formulario. Es la misma estructura que el lenguaje
-// XML (esquema/sitio.dtd); xml.ts convierte en los dos sentidos.
+// Datos del formulario. Misma estructura que el XML; xml.ts pasa de uno a otro.
 const seccionVacia = () => ({ titulo: '', introduccion: '', descripcion: '' });
 export const sitioVacio = () => ({
     autor: '', idioma: 'es', pie: '', resumen: '', parrafos: '', foto: '',

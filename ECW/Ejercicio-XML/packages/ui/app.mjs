@@ -1,30 +1,25 @@
-/**
- * app.mjs -- Logica de la interfaz web de VXML Doctor.
- * -----------------------------------------------------------------------------
- * Carga los tres motores en el NAVEGADOR y muestra sus informes:
- *
- *   - JavaScript      packages/impl-js/vxml-lint.mjs  (referencia)
- *   - TypeScript      packages/impl-ts/lib/vxml-lint.js (compilado a ESM)
- *   - WebAssembly     packages/impl-wasm/lib/vxml_doctor.wasm via fetch
- *
- * Todos dependen del catalogo compartido packages/core/contrato.mjs, que en el
- * navegador recibe reglas.json inyectado en globalThis.__VXML_CATALOGO: por eso
- * el primer paso es descargarlo por HTTP ANTES de importar ningun motor.
- * -----------------------------------------------------------------------------
- */
+// app.mjs -- interfaz web de VXML Doctor.
+//
+// Carga los tres motores en el navegador:
+//   JavaScript   packages/impl-js/vxml-lint.mjs
+//   TypeScript   packages/impl-ts/lib/vxml-lint.js (ya compilado)
+//   WebAssembly  packages/impl-wasm/lib/vxml_doctor.wasm (con fetch)
+//
+// El contrato necesita el catalogo de reglas en globalThis.__VXML_CATALOGO, asi
+// que lo primero es descargar reglas.json, antes de importar ningun motor.
 
-// --- 0. Catalogo compartido --------------------------------------------------
+// --- Catalogo ---
 const respCatalogo = await fetch(new URL("../core/reglas.json", import.meta.url));
 if (!respCatalogo.ok) {
   document.body.insertAdjacentHTML("afterbegin", `<p style="color:#b91c1c">No se pudo cargar reglas.json (${respCatalogo.status}).</p>`);
   throw new Error("Sin catalogo no hay motores.");
 }
 globalThis.__VXML_CATALOGO = await respCatalogo.json();
-// Indice id -> regla: los motores solo emiten el id (VXML004), asi que el catalogo
-// aporta el nombre tecnico, el resumen y la norma para mostrarlo en la interfaz.
+// id -> regla: los motores solo dan el id (VXML004); el nombre, el resumen
+// y la norma se sacan del catalogo.
 const REGLAS_POR_ID = new Map(globalThis.__VXML_CATALOGO.reglas.map((r) => [r.id, r]));
 
-// --- 1. Motores (carga perezosa) ---------------------------------------------
+// --- Motores (se cargan al usarlos) ---
 let motores = null;
 async function cargarMotores() {
   if (motores) return motores;
@@ -42,13 +37,13 @@ async function cargarMotores() {
   return motores;
 }
 
-// --- 2. Referencias DOM ------------------------------------------------------
+// --- DOM ---
 const $ = (id) => document.getElementById(id);
 const texto = $("texto"), estado = $("estado"), cuerpo = $("cuerpo"),
   comparativa = $("comparativa"), tablaComparativa = $("tabla-comparativa"),
   origen = $("origen"), fichero = $("fichero");
 
-// --- 3. Selector de corpus ---------------------------------------------------
+// --- Selector de documento ---
 try {
   const r = await fetch("/api/corpus");
   if (r.ok) {
@@ -95,7 +90,7 @@ fichero.addEventListener("change", async () => {
 
 texto.addEventListener("input", () => { bytesActuales = null; });
 
-// --- 4. Resaltado del selector de motor --------------------------------------
+// --- Selector de motor ---
 for (const label of $("motores").querySelectorAll("label")) {
   label.addEventListener("click", () => {
     for (const l of $("motores").querySelectorAll("label")) l.classList.toggle("sel", l === label);
@@ -107,7 +102,7 @@ function motorSeleccionado() {
   return document.querySelector('input[name="motor"]:checked').value;
 }
 
-// --- 5. Analisis -------------------------------------------------------------
+// --- Analisis ---
 function obtenerBytes() {
   if (bytesActuales) return bytesActuales;
   return new TextEncoder().encode(texto.value);
@@ -219,21 +214,14 @@ function pintarInforme(inf, ms, motor) {
   cuerpo.appendChild(pre);
 }
 
-/**
- * Escapa texto del documento antes de insertarlo en HTML.
- * Escapa tambien las comillas para poder reutilizarse dentro de atributos
- * (por ejemplo el title con la ayuda de una regla).
- */
+// Escapa para meterlo en el HTML (tambien comillas, por si va en un atributo).
 function escHTML(s) {
   const d = document.createElement("div");
   d.textContent = s;
   return d.innerHTML.replace(/"/g, "&quot;");
 }
 
-/**
- * Filtra la tabla de diagnosticos por gravedad sin volver a construirla: solo se
- * ocultan las filas que no encajan, de modo el informe se repinta al instante.
- */
+// Filtra por gravedad ocultando filas, sin volver a pintar la tabla.
 function conectarFiltrosDiagnosticos() {
   const filasDiag = cuerpo.querySelectorAll("tr.diag");
   const aviso = $("diag-vacio");
@@ -252,7 +240,7 @@ function conectarFiltrosDiagnosticos() {
   }
 }
 
-// --- 6. Comparativa de los tres motores --------------------------------------
+// --- Comparar los tres ---
 async function comparar() {
   estado.textContent = "Comparando los tres motores …";
   try {

@@ -1,10 +1,9 @@
-// JavaScript de los sitios generados: botón de tema claro/oscuro y ventana
-// de los tráileres. El sitio funciona sin él; solo añade estas dos cosas.
+// JS de los sitios generados: botón de tema y ventana de los tráileres.
+// Sin él el sitio funciona igual, solo sin esas dos cosas.
 (function () {
   "use strict";
 
-  // ---- Tema claro / oscuro --------------------------------------------
-  // La preferencia se guarda en localStorage; sin ella, se sigue al sistema.
+  // Tema: lo guardado en localStorage o, si no hay nada, el del sistema.
   var raiz = document.documentElement;
   var botonTema = document.getElementById("tema");
 
@@ -24,17 +23,15 @@
     botonTema.addEventListener("click", function () {
       var nuevo = oscuro() ? "light" : "dark";
       raiz.dataset.theme = nuevo;
-      try { localStorage.setItem("tema", nuevo); } catch (e) { /* sin almacenamiento */ }
+      try { localStorage.setItem("tema", nuevo); } catch (e) { /* sin localStorage */ }
       pintarBoton();
     });
     pintarBoton();
   }
 
-  // ---- Ventana del tráiler ---------------------------------------------
-  // Cada portada con tráiler lleva un botón con data-trailer. Al pulsarlo se
-  // abre el <dialog> con el vídeo; el <video> solo existe mientras la
-  // ventana está abierta, así que no se descarga nada antes y deja de
-  // sonar al cerrar.
+  // Tráileres: cada portada con vídeo tiene un botón con data-trailer. El
+  // <video> se crea al abrir y se quita al cerrar, así no se baja antes de
+  // tiempo y deja de sonar.
   var ventana = document.getElementById("ventana-trailer");
   if (!ventana || typeof ventana.showModal !== "function") return;
 
@@ -75,9 +72,9 @@
   });
 
   ventana.querySelector(".cerrar").addEventListener("click", cerrar);
-  // Escape también cierra: el navegador lanza "close".
+  // con Escape el navegador lanza "close"
   ventana.addEventListener("close", vaciar);
-  // Un clic en el fondo oscuro (fuera del contenido) cierra.
+  // clic fuera = cerrar
   ventana.addEventListener("click", function (e) {
     if (e.target === ventana) cerrar();
   });

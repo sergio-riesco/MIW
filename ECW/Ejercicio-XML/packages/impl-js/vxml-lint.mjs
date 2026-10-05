@@ -1,21 +1,14 @@
-/**
- * vxml-lint.mjs -- Motor de analisis de VXML Doctor (implementacion JavaScript).
- *
- * ESTRATEGIA (JavaScript):
- *   - Una sola pasada sobre el texto para el escaneo (ver scanner.mjs).
- *   - Una sola pasada sobre la lista de eventos para construir el modelo.
- *   - Nombres comparados por hash FNV-1a: nunca se comparan subcadenas, y solo
- *     se materializa un string cuando su valor hace falta de verdad.
- *   - El subarbol de cada elemento se mide con contadores incrementales
- *     (diferencia entre el valor al abrir y al cerrar), sin recorrer el arbol.
- *   - Sin recursividad: Tarjan es iterativo, para no depender del limite de la
- *     pila de llamadas de V8.
- *
- * La columna publicada es un desplazamiento en BYTES UTF-8 desde el inicio de
- * la linea (ver `columnaByte`), no una columna en unidades UTF-16. Es una
- * decision del contrato compartido para que el informe sea comparable con las
- * implementaciones de TypeScript y WebAssembly.
- */
+// vxml-lint.mjs -- el analizador en JavaScript (la version de referencia).
+//
+// Va en dos pasadas: el scanner saca la lista de eventos y aqui se recorre
+// para montar el modelo y aplicar las reglas. Los nombres se comparan por su
+// hash FNV-1a y los strings solo se crean cuando hace falta el valor.
+// Lo que hay dentro de cada elemento se cuenta con contadores (valor al cerrar
+// menos valor al abrir), sin volver a recorrer nada. Tarjan es iterativo para
+// no depender del tamano de la pila.
+//
+// Las columnas del informe van en bytes UTF-8 (ver crearColumnas en el
+// contrato), igual que en las otras dos versiones.
 
 import { escanear, resolverEntidades, T, h } from "./scanner.mjs";
 import {
@@ -25,7 +18,7 @@ import {
   serializarInforme, ordenarDiagnosticos, crearColumnas,
 } from "../core/contrato.mjs";
 
-// --- Hashes de elementos usados en el camino caliente ----------------------
+// --- Hashes de elementos usados en el camino caliente ---
 const EL_VXML = h("vxml");
 const EL_FORM = h("form");
 const EL_FIELD = h("field");
@@ -43,7 +36,7 @@ const EL_BREAK = h("break");
 const EL_AUDIO = h("audio");
 const EL_SCRIPT = h("script");
 
-// --- Hashes de atributos ----------------------------------------------------
+// --- Hashes de atributos ---
 const AT_ID = h("id");
 const AT_HREF = h("href");
 const AT_NEXT = h("next");
@@ -59,17 +52,15 @@ const AT_PROMPT = h("prompt");
 const AT_VERSION = h("version");
 const AT_XMLLANG = h("xml:lang");
 
-/** Atributos cuyo valor es codigo ECMAScript (se inspecciona con VXML015). */
+// atributos con codigo ECMAScript (los mira VXML015)
 const AT_EXPRESION = new Set([AT_COND, AT_EXPR, AT_SRCEXPR]);
 
-/** Nombres de contadores que definen el subarbol de un elemento. */
+// contadores que se miden por subarbol
 const CONTADORES = [
   "salida", "reprompt", "catch", "nomatch", "noinput", "filled", "goto", "prompt",
 ];
 
-// ===========================================================================
-// API PUBLICA
-// ===========================================================================
+// --- API ---
 
 /**
  * Analiza un documento VoiceXML y devuelve el informe canonico en JSON.
@@ -97,13 +88,10 @@ export function analizarDocumento(texto, nombreArchivo, src) {
   const bytes = src || new TextEncoder().encode(texto);
   const utf8 = crearColumnas(bytes, texto);
 
-  /** @type {{msg: string, linea: number, col: number}[]} */
   const notas = [];
   const eventos = escanear(texto, (msg, linea, colU16) => {
     notas.push({ msg, linea, col: utf8.columnaByte(colU16, linea) });
   });
-
-  /** @type {any[]} */
   const ds = [];
   const empuja = (nombre, ev, detalle) => {
     const idx = INDICE_NOMBRE.get(nombre);
@@ -117,18 +105,13 @@ export function analizarDocumento(texto, nombreArchivo, src) {
     });
   };
 
-  // ---------------------------------------------------------------------
-  // PASADA 2: construir el modelo
-  // ---------------------------------------------------------------------
+  // --- Pasada 2: modelo ---
   const C = {
     salida: 0, reprompt: 0, catch: 0, nomatch: 0, noinput: 0, filled: 0,
     goto: 0, prompt: 0,
   };
-  /** @type {any[]} */
   const pila = [];
-  /** @type {any[]} */
   const formularios = [];
-  /** @type {any[]} */
   const saltos = [];
   const declarados = new Set();
   const alertas = new Set(); // evita repetir VXML015 por atributo
@@ -137,13 +120,13 @@ export function analizarDocumento(texto, nombreArchivo, src) {
   let nElementos = 0, nAtributos = 0, nTextos = 0, nPrompts = 0, nScripts = 0;
   let profundidadPrompt = 0;
   let ordenElemento = 0;
-  /** Indice del form abierto mas interno, o -1. */
+  // form abierto mas interno (-1 si no hay)
   let idxForm = -1;
 
   for (let ei = 0; ei < eventos.length; ei++) {
     const ev = eventos[ei];
 
-    // --- Texto entre elementos -----------------------------------------
+    // texto
     if (ev.t === T.TEXTO) {
       nTextos++;
       if (profundidadPrompt > 0) {
@@ -151,8 +134,7 @@ export function analizarDocumento(texto, nombreArchivo, src) {
         const hallados = [];
         for (const s of SIMBOLOS_TTS) if (cuerpo.indexOf(s) >= 0) hallados.push(s);
         if (hallados.length) {
-          // El texto vive en el elemento mas interno abierto, que no siempre
-          // es el <prompt> (puede ser un <s>, un <value> o un <audio>).
+          // puede estar dentro de un <s>, <value> o <audio>, no solo en el <prompt>
           const marco = pila.length ? pila[pila.length - 1] : null;
           empuja("simbolo-tts-ilegible",
             { linea: ev.linea, colU16: ev.colU16, nombre: marco ? marco.ev.nombre : "prompt" },
@@ -162,14 +144,11 @@ export function analizarDocumento(texto, nombreArchivo, src) {
       continue;
     }
 
-    // --- Cierre de un elemento ------------------------------------------
+    // cierre
     if (ev.t === T.CIERRE) {
-      // VoiceXML cierra la cadena <if>/<elseif>/<else> con una sola etiqueta:
-      // un </if> desapila los <elseif>/<else> abiertos Y el <if> original.
-      // El scanner ya hace lo mismo con su pila de nombres (scanner.mjs); aqui
-      // la pila de marcos debe comportarse igual, o un <form> cuya cadena <if>
-      // no este mediada por <filled> nunca se cerraria y se perderian las
-      // reglas de formulario.
+      // Un </if> cierra tambien los <elseif>/<else> abiertos (como en el
+      // scanner). Si no, en algunos casos el <form> no se llegaba a cerrar y
+      // se perdian sus reglas.
       if (ev.nombre === "if") {
         while (
           pila.length &&
@@ -205,12 +184,12 @@ export function analizarDocumento(texto, nombreArchivo, src) {
       continue;
     }
 
-    // --- Apertura de un elemento ----------------------------------------
+    // apertura
     nElementos++;
     ordenElemento++;
     nAtributos += ev.n;
 
-    // Atributos de interes, localizados por hash.
+    // atributos que interesan
     let vId = null, vHref = null, vNext = null, vEvent = null, vType = null;
     let vName = null, vTime = null, vSrc = null, vExpr = null;
     let vPrompt = null, vLang = null, vVersion = null;
@@ -233,8 +212,7 @@ export function analizarDocumento(texto, nombreArchivo, src) {
       }
     }
 
-    // Expresiones ECMAScript (VXML015). Se hace aqui, antes de anadir `vName`
-    // a los declarados, para no auto-confirmar una lectura.
+    // VXML015 antes de declarar vName, para que no se valide a si mismo
     for (let a = 0; a < ev.n; a++) {
       if (!AT_EXPRESION.has(ev.aH[a])) continue;
       const expr = resolverEntidades(texto, ev.aPos[a], ev.aPos[a] + ev.aLen[a]);
@@ -253,7 +231,7 @@ export function analizarDocumento(texto, nombreArchivo, src) {
     if (ev.hash === EL_SCRIPT) nScripts++;
     if (ev.hash === EL_PROMPT) nPrompts++;
 
-    // Contadores de subarbol.
+    // contadores de subarbol
     if (ELEMENTOS_SALIDA.has(ev.nombre)) C.salida++;
     if (ev.hash === EL_REPROMPT) C.reprompt++;
     if (ev.hash === EL_CATCH) C.catch++;
@@ -287,7 +265,7 @@ export function analizarDocumento(texto, nombreArchivo, src) {
       }
     }
 
-    // --- Abrir marco (solo si no es autocerrado) ---
+    // abrir marco (si no es <x/>)
     if (ev.t === T.INICIO) {
       const marco = { hash: ev.hash, ev, esPrompt: false, promptAttr: false, nextAttr: false, idxForm: -1, idxFormPadre: -1 };
       for (const k of CONTADORES) marco[k] = C[k];
@@ -297,8 +275,7 @@ export function analizarDocumento(texto, nombreArchivo, src) {
         marco.esPrompt = true;
       }
       if (ev.hash === EL_FIELD) {
-        // Un field no puede contener forms, asi que el form abierto sigue
-        // siendo el vigente: los <goto> de su interior deben atribuirse a el.
+        // dentro de un field no hay forms: sus <goto> son del form de fuera
         marco.idxForm = idxForm;
         marco.idxFormPadre = idxForm;
         marco.promptAttr = vPrompt !== null && vPrompt.trim() !== "";
@@ -318,14 +295,10 @@ export function analizarDocumento(texto, nombreArchivo, src) {
     }
   }
 
-  // ---------------------------------------------------------------------
-  // PASADA 3: grafo de flujo entre forms
-  // ---------------------------------------------------------------------
+  // --- Pasada 3: grafo entre forms ---
   const grafo = resolverGrafo(formularios, saltos, empuja);
 
-  // ---------------------------------------------------------------------
-  // Cierre del informe
-  // ---------------------------------------------------------------------
+  // --- Informe ---
   for (const d of ds) {
     d.columna = utf8.columnaByte(d._colU16, d.linea);
     delete d._colU16;
@@ -361,20 +334,17 @@ export function analizarDocumento(texto, nombreArchivo, src) {
   return informe;
 }
 
-// ===========================================================================
-// SUBPASADAS
-// ===========================================================================
+// --- Auxiliares ---
 
-/** Diferencia de contadores entre la apertura de un marco y su cierre. */
+// contadores al cerrar menos contadores al abrir
 function subarbol(marco, C) {
   const s = {};
   for (const k of CONTADORES) s[k] = C[k] - marco[k];
-  // El prompt cuenta como subarbol de si mismo para la deteccion de
-  // field-sin-prompt, asi que no se ha descontado (marco.prompt = -1).
+  // para field-sin-prompt el propio prompt cuenta (por eso marco.prompt = -1)
   return s;
 }
 
-/** Al cerrar un <form>: aplica VXML005 y VXML016 a sus campos. */
+// Al cerrar un <form>: VXML005 y VXML016.
 function cerrarFormulario(marco, sub, formularios, empuja) {
   const f = formularios[marco.idxForm];
   f.tieneSalida = sub.salida > 0;
@@ -389,7 +359,7 @@ function cerrarFormulario(marco, sub, formularios, empuja) {
   }
 }
 
-/** El atributo existe y no esta vacio ni en blanco. */
+// ¿existe y no esta en blanco?
 function atributoNoVacio(texto, ev, hashBuscado) {
   for (let a = 0; a < ev.n; a++) {
     if (ev.aH[a] !== hashBuscado) continue;
@@ -408,14 +378,9 @@ function contarCampos(formularios) {
   return t;
 }
 
-/**
- * Construye y valida el grafo de navegacion entre forms.
- * Aplica VXML001, VXML002, VXML003, VXML012 y VXML017.
- */
+// Grafo de forms: VXML001, VXML002, VXML003, VXML012 y VXML017.
 function resolverGrafo(formularios, saltos, empuja) {
   const n = formularios.length;
-
-  /** @type {Map<string, number[]>} */
   const porId = new Map();
   for (let i = 0; i < n; i++) {
     const id = formularios[i].id;
@@ -425,7 +390,7 @@ function resolverGrafo(formularios, saltos, empuja) {
     l.push(i);
   }
 
-  // VXML012 -- ids de form duplicados.
+  // VXML012: ids repetidos
   for (const [id, lista] of porId) {
     if (lista.length < 2) continue;
     for (let k = 1; k < lista.length; k++) {
@@ -450,12 +415,12 @@ function resolverGrafo(formularios, saltos, empuja) {
     nAristas++;
     if (s.form >= 0 && s.form < n) {
       adyac[s.form].push(destino);
-      // VXML017 -- salto al propio form.
+      // VXML017: goto al propio form
       if (s.form === destino) empuja("goto-a-si-mismo", s.ev, id);
     }
   }
 
-  // VXML002 -- forms no alcanzables. El primer form se ejecuta al entrar.
+  // VXML002: forms a los que no se llega (el primero siempre se ejecuta)
   const alcanzable = new Uint8Array(n);
   for (let i = 0; i < n; i++) for (const d of adyac[i]) alcanzable[d] = 1;
   const inalcanzables = [];
@@ -468,9 +433,9 @@ function resolverGrafo(formularios, saltos, empuja) {
     empuja("form-inaccesible", evDeForm(f), f.id);
   }
 
-  // --- VXML003 -- ciclos sin salida ---------------------------------------
-  // 1) Punto fijo: un form es "seguro" si su subarbol contiene una salida
-  //    (exit, return, disconnect, transfer) o salta a otro form seguro.
+  // VXML003: ciclos sin salida.
+  // Un form es "seguro" si tiene exit/return/disconnect/transfer o salta a
+  // otro seguro; se repite hasta que no cambia nada.
   const seguro = new Uint8Array(n);
   const trabajo = [];
   for (let i = 0; i < n; i++) if (formularios[i].tieneSalida) { seguro[i] = 1; trabajo.push(i); }
@@ -484,7 +449,7 @@ function resolverGrafo(formularios, saltos, empuja) {
     }
   }
 
-  // 2) Componentes fuertemente conexas del subgrafo de forms inseguros.
+  // Luego, componentes fuertemente conexas entre los no seguros.
   const componentes = tarjan(adyac, n, (i) => seguro[i] === 0);
   const ciclos = componentes.filter((c) => c.length > 1 || tieneAutoBucle(adyac, c));
   for (const comp of ciclos) comp.sort((a, b) => formularios[a].orden - formularios[b].orden);
@@ -498,7 +463,7 @@ function resolverGrafo(formularios, saltos, empuja) {
   return { nodos: n, aristas: nAristas, ciclos: ciclos.length, inalcanzables, alcanzable };
 }
 
-/** Envoltura de evento para un form (los forms se analizan en la pasada 3). */
+// evento minimo de un form para la pasada 3
 function evDeForm(f) {
   return { linea: f.linea, colU16: f.colU16, nombre: "form" };
 }
@@ -554,7 +519,7 @@ function tarjan(adyac, n, filtro) {
         continue;
       }
 
-      // Todas las aristas de v procesadas: sale del marco y propaga a su padre.
+      // v ya no tiene mas aristas: se vuelve al padre
       pilaNodos.pop();
       if (pilaNodos.length) {
         const padre = pilaNodos[pilaNodos.length - 1];
@@ -581,9 +546,7 @@ function tieneAutoBucle(adyac, comp) {
   return false;
 }
 
-// ===========================================================================
-// VXML015 -- identificadores no declarados
-// ===========================================================================
+// --- VXML015: identificadores no declarados ---
 
 function revisarExpresion(expr, ev, declarados, alertas, empuja) {
   const n = expr.length;
@@ -592,7 +555,7 @@ function revisarExpresion(expr, ev, declarados, alertas, empuja) {
   while (i < n) {
     const c = expr.charCodeAt(i);
 
-    // Cadena: se salta entera.
+    // cadena: se salta
     if (c === 34 || c === 39) {
       const q = c;
       i++;
@@ -606,7 +569,7 @@ function revisarExpresion(expr, ev, declarados, alertas, empuja) {
       continue;
     }
 
-    // Numero: se salta entero.
+    // numero: se salta
     if (c >= 48 && c <= 57) {
       i++;
       while (i < n && esDigitoHex(expr.charCodeAt(i))) i++;
@@ -614,7 +577,7 @@ function revisarExpresion(expr, ev, declarados, alertas, empuja) {
       continue;
     }
 
-    // Identificador.
+    // identificador
     if (esIniIdent(c) || c === 36) {
       const ini = i;
       while (i < n && esCuerpoIdent(expr.charCodeAt(i))) i++;
@@ -622,12 +585,12 @@ function revisarExpresion(expr, ev, declarados, alertas, empuja) {
       if (trasPunto) { trasPunto = false; continue; }
       if (PALABRAS_CLAVE_EXPRESION.has(ident) || INTEGRADOS_VOICEXML.has(ident)) continue;
       if (declarados.has(ident)) continue;
-      // Shadow variable: "equipo$" -> "equipo"
+      // equipo$ -> equipo
       if (ident.charCodeAt(ident.length - 1) === 36) {
         const base = ident.slice(0, ident.length - 1);
         if (declarados.has(base) || INTEGRADOS_VOICEXML.has(base)) continue;
       }
-      // Clave de objeto literal: "ident :"
+      // clave de objeto: "ident :"
       let j = i;
       while (j < n && expr.charCodeAt(j) <= 32) j++;
       const sig = j < n ? expr.charCodeAt(j) : -1;
@@ -656,18 +619,16 @@ function esDigitoHex(c) {
     c === 46 /* . */ || c === 120 || c === 88 /* x X */;
 }
 
-// ===========================================================================
-// Utilidades
-// ===========================================================================
+// --- Utilidades ---
 
-/** `time` de SSML: numero de segundos, o numero seguido de unidad. */
+// time de SSML: un numero, con unidad o sin ella
 function esTiempoSSML(s) {
   const t = s.trim();
   if (/^[0-9]+(\.[0-9]+)?$/.test(t)) return true;
   return /^[0-9]+(\.[0-9]+)?(ms|s|m|h)$/.test(t);
 }
 
-/** Numero de lineas: separadores + la ultima, si no termina en salto. */
+// lineas = saltos + 1 si la ultima no acaba en salto
 function contarLineas(texto) {
   if (texto.length === 0) return 0;
   let l = 0;

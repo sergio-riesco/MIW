@@ -1,21 +1,8 @@
-/**
- * cargador-wasm.mjs -- Carga el motor WebAssembly/Rust en el NAVEGADOR.
- * -----------------------------------------------------------------------------
- * Variante de packages/impl-wasm/wasm.mjs para navegador: en lugar de leer el
- * .wasm del disco con node:fs se descarga por HTTP con fetch. La ABI es la
- * misma:
- *
- *   vxml_alloc(n)          -> ptr
- *   vxml_dealloc(ptr, n)   -> void
- *   vxml_analizar(data,len,nombre,lenNombre,out,cap) -> usize
- *
- * al igual que el protocolo de dos llamadas (primero con out nulo para conocer
- * el tamano del JSON, despues con un buffer a medida).
- * -----------------------------------------------------------------------------
- */
-const urlWasm = new URL("../impl-wasm/lib/vxml_doctor.wasm", import.meta.url);
+// cargador-wasm.mjs -- como impl-wasm/wasm.mjs pero para el navegador: el
+// .wasm se descarga con fetch en vez de leerlo del disco. Las funciones y la
+// doble llamada a vxml_analizar son las mismas.
 
-/** @type {WebAssembly.Instance | null} */
+const urlWasm = new URL("../impl-wasm/lib/vxml_doctor.wasm", import.meta.url);
 let instancia = null;
 
 export async function cargarMotorWasm() {
@@ -40,7 +27,7 @@ function liberar(p, n) {
   if (p !== 0 && n > 0) instancia.exports.vxml_dealloc(p, n);
 }
 
-/** Informe JSON canonico de `bytes` (Uint8Array) con nombre `nombre`. */
+// informe JSON de bytes (Uint8Array)
 export function analizarTextoWasm(bytes, nombre) {
   const mem = instancia.exports.memory;
   const pDoc = escribirEnRust(bytes);
@@ -61,7 +48,7 @@ export function analizarTextoWasm(bytes, nombre) {
   return json;
 }
 
-/** Igual que analizarTextoWasm pero admite un string y lo codifica UTF-8. */
+// lo mismo, pasando un string
 export function analizarTexto(texto, nombre) {
   return analizarTextoWasm(new TextEncoder().encode(texto), nombre);
 }

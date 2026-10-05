@@ -1,4 +1,4 @@
-/* Botón invisible que cubre toda la portada. */
+/* Botón invisible encima de la portada */
 .trigger {
   position: absolute;
   z-index: 1;
@@ -15,7 +15,7 @@
   outline-offset: -3px;
 }
 
-/* Ventana modal con el vídeo. */
+/* Ventana del vídeo */
 .dialog {
   width: min(56rem, calc(100vw - 2rem));
   padding: 1rem;

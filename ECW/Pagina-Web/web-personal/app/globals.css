@@ -1,20 +1,7 @@
-/* ------------------------------------------------------------------
-   Base: variables de tema, reset y tipografía.
-   Solo entra aquí lo que usan todas las páginas. Los estilos propios de
-   cada página o componente van en su archivo .module.css.
-   ------------------------------------------------------------------ */
+/* Estilos comunes a todas las páginas. Lo de cada página va en su .module.css */
 
-/* ------------------------------------------------------------------
-   Temas.
-
-   El atributo `data-theme` de <html> es la única fuente de verdad y vale
-   "light" o "dark". Lo fija el script en línea de app/layout.js mientras el
-   navegador analiza el HTML, antes del primer pintado, de modo que recargar
-   nunca produce un destello ni un cambio brusco de color.
-
-   La consulta de medios solo entra en juego si el atributo no existe (por
-   ejemplo, si el JavaScript está bloqueado); en ese caso manda el sistema.
-   ------------------------------------------------------------------ */
+/* Temas: data-theme lo pone el script de layout.js antes de pintar, así no
+   hay parpadeo al recargar. */
 
 :root,
 :root[data-theme="light"] {
@@ -49,7 +36,7 @@
   --border: #33403c;
 }
 
-/* Solo se aplica si no hay tema explícito: entonces manda el sistema. */
+/* Sin data-theme (p. ej. con JS desactivado) manda el sistema */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme]) {
     --background: #141817;
@@ -142,7 +129,7 @@ img {
   max-width: 100%;
 }
 
-/* Estructura compartida por todas las páginas */
+/* Estructura común */
 
 .container {
   width: min(calc(100% - 2rem), 64rem);

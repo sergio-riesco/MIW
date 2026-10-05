@@ -1,28 +1,19 @@
-/**
- * dtd-a-xsd.mjs -- Genera esquema/sitio.xsd a partir de esquema/sitio.dtd.
- *
- * El DTD es la definición de partida del lenguaje; el XML Schema se obtiene
- * de él de forma automática:
- *
- *   <!ELEMENT x (a, b?, c*)>    ->  xs:sequence con minOccurs / maxOccurs
- *   <!ELEMENT x (a | b)>        ->  xs:choice
- *   <!ELEMENT x (#PCDATA)>      ->  texto (xs:simpleContent si tiene atributos)
- *   <!ELEMENT x EMPTY>          ->  tipo complejo solo con atributos
- *   CDATA #REQUIRED / #IMPLIED  ->  use="required" / use="optional"
- *   CDATA "valor"               ->  default="valor"
- *   (a|b) "valor"               ->  xs:restriction con xs:enumeration
- *
- * Un DTD no tiene tipos de datos: todo atributo es texto. El XSD sí, así que
- * al convertir se aplican los tipos de la tabla TIPOS según el nombre del
- * atributo (un año, una URL, un idioma...). Es lo que el XSD aporta frente
- * al DTD.
- *
- * Los atributos xmlns:xsi y xsi:* se declaran en el DTD solo para que los
- * documentos sean válidos también contra él; en XSD son implícitos y se
- * omiten.
- *
- * Uso: node tools/dtd-a-xsd.mjs   (o npm run xsd)
- */
+// dtd-a-xsd.mjs -- genera esquema/sitio.xsd a partir de esquema/sitio.dtd.
+//
+//   <!ELEMENT x (a, b?, c*)>   ->  xs:sequence con minOccurs/maxOccurs
+//   <!ELEMENT x (a | b)>       ->  xs:choice
+//   <!ELEMENT x (#PCDATA)>     ->  texto (xs:simpleContent si tiene atributos)
+//   <!ELEMENT x EMPTY>         ->  solo atributos
+//   #REQUIRED / #IMPLIED       ->  use="required" / opcional
+//   CDATA "valor"              ->  default="valor"
+//   (a|b)                      ->  xs:enumeration
+//
+// En el DTD todo atributo es texto; al pasar a XSD le doy a cada uno el
+// tipo de la tabla TIPOS segun su nombre (año, URL, idioma).
+// xmlns:xsi y xsi:* solo estan en el DTD para que los documentos validen
+// tambien contra el; en el XSD no hacen falta.
+//
+// Uso: npm run xsd
 import { readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -31,7 +22,7 @@ const raiz = join(dirname(fileURLToPath(import.meta.url)), "..");
 const RUTA_DTD = join(raiz, "esquema", "sitio.dtd");
 const RUTA_XSD = join(raiz, "esquema", "sitio.xsd");
 
-/** Tipo XSD que se da a cada atributo CDATA según su nombre. */
+// tipo XSD de cada atributo, por su nombre
 const TIPOS = {
   idioma: "xs:language",
   anio: "xs:gYear",
@@ -42,23 +33,21 @@ const TIPOS = {
   enlace: "xs:anyURI",
 };
 
-// ----------------------------------------------------------------------------
-// Lectura del DTD
-// ----------------------------------------------------------------------------
+// --- Lectura del DTD ---
 
 const dtd = readFileSync(RUTA_DTD, "utf8").replace(/<!--[\s\S]*?-->/g, " ");
 
-/** Elementos en orden de aparición: nombre -> modelo de contenido (texto). */
+// nombre -> modelo de contenido, en el orden del DTD
 const elementos = new Map();
 for (const m of dtd.matchAll(/<!ELEMENT\s+([\w:.-]+)\s+([^>]+)>/g)) {
   elementos.set(m[1], m[2].trim());
 }
 
-/** Atributos de cada elemento: nombre -> [{nombre, tipo, valores, uso, defecto}]. */
+// nombre -> lista de atributos
 const atributos = new Map();
 for (const m of dtd.matchAll(/<!ATTLIST\s+([\w:.-]+)([^>]*)>/g)) {
   const lista = atributos.get(m[1]) ?? [];
-  // nombre  (tipo | (enumeración))  (#REQUIRED | #IMPLIED | #FIXED "v" | "v")
+  // nombre  tipo|(a|b)  #REQUIRED|#IMPLIED|#FIXED "v"|"v"
   const re = /([\w:.-]+)\s+(CDATA|ID|IDREF|NMTOKEN|\([^)]*\))\s+(#REQUIRED|#IMPLIED|#FIXED\s+"[^"]*"|"[^"]*")/g;
   for (const a of m[2].matchAll(re)) {
     const [, nombre, tipo, uso] = a;
@@ -73,11 +62,9 @@ for (const m of dtd.matchAll(/<!ATTLIST\s+([\w:.-]+)([^>]*)>/g)) {
   atributos.set(m[1], lista);
 }
 
-// ----------------------------------------------------------------------------
-// Modelo de contenido: (a, (b | c)*, d?) -> árbol
-// ----------------------------------------------------------------------------
+// --- Modelo de contenido: (a, (b | c)*, d?) -> árbol ---
 
-/** Convierte un modelo de contenido del DTD en un árbol de grupos. */
+// "(a, (b | c)*, d?)" -> arbol de grupos
 function analizarModelo(texto) {
   const tokens = texto.match(/#PCDATA|[\w:.-]+|[(),|?*+]/g);
   let i = 0;
@@ -109,7 +96,7 @@ function analizarModelo(texto) {
   return particula();
 }
 
-/** minOccurs y maxOccurs según el sufijo ? * + (sin sufijo: exactamente uno). */
+// ? * + -> minOccurs/maxOccurs (sin nada: exactamente uno)
 function ocurrencias(nodo) {
   switch (nodo.ocurrencia) {
     case "?": return ' minOccurs="0"';
@@ -119,9 +106,7 @@ function ocurrencias(nodo) {
   }
 }
 
-// ----------------------------------------------------------------------------
-// Escritura del XSD
-// ----------------------------------------------------------------------------
+// --- Escritura del XSD ---
 
 const esc = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
 
@@ -162,7 +147,7 @@ function elementoXsd(nombre, modelo) {
   const attrs = atributosXsd(nombre, "      ");
   const sangria = "  ";
 
-  // Solo texto
+  // solo texto
   if (/^\(\s*#PCDATA\s*\)\*?$/.test(modelo)) {
     if (!attrs) return `${sangria}<xs:element name="${nombre}" type="xs:string"/>\n`;
     return (
@@ -178,7 +163,7 @@ function elementoXsd(nombre, modelo) {
     );
   }
 
-  // Vacío: solo atributos
+  // vacio
   if (modelo === "EMPTY") {
     return (
       `${sangria}<xs:element name="${nombre}">\n` +
@@ -193,7 +178,7 @@ function elementoXsd(nombre, modelo) {
     throw new Error(`Contenido mixto no soportado en <${nombre}>: ${modelo}`);
   }
 
-  // Elementos hijos
+  // con hijos
   let arbol = analizarModelo(modelo);
   if (!arbol.hijos) arbol = { grupo: "sequence", hijos: [arbol] };
   return (

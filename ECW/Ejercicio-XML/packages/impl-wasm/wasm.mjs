@@ -1,29 +1,20 @@
-/**
- * wasm.mjs -- Envoltura Node para la implementacion WebAssembly/Rust.
- * ---------------------------------------------------------------------------
- * Carga packages/impl-wasm/lib/vxml_doctor.wasm y expone la misma API que las
- * otras dos implementaciones:
- *
- *   await cargarMotorWasm()        -> carga el modulo una sola vez
- *   analizarTextoWasm(bytes, nombre) -> informe JSON canonico (string)
- *
- * La ABI de Rust es:
- *   vxml_alloc(n)          -> ptr          (heap de Rust, hay que liberarlo)
- *   vxml_dealloc(ptr, n)   -> void
- *   vxml_analizar(data,len,nombre,lenNombre,out,cap) -> usize (tamano del JSON)
- *
- * Se usa el protocolo de dos llamadas: primero con out nulo para conocer el
- * tamano, despues con un buffer hecho a medida. Todo lo que se reserva con
- * vxml_alloc se libera con vxml_dealloc al terminar.
- * ---------------------------------------------------------------------------
- */
+// wasm.mjs -- carga vxml_doctor.wasm en Node y ofrece la misma API que las
+// otras dos versiones: cargarMotorWasm() y analizarTextoWasm(bytes, nombre).
+//
+// Funciones que exporta el modulo de Rust:
+//   vxml_alloc(n) -> ptr
+//   vxml_dealloc(ptr, n)
+//   vxml_analizar(data, len, nombre, lenNombre, out, cap) -> tamano del JSON
+//
+// vxml_analizar se llama dos veces: la primera con out = 0 para saber cuanto
+// ocupa el JSON y la segunda con un buffer de ese tamano. Todo lo reservado
+// con vxml_alloc se libera al final.
+
 import { readFileSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const aqui = dirname(fileURLToPath(import.meta.url));
-
-/** @type {WebAssembly.Instance | null} */
 let instancia = null;
 
 export function rutaWasm() {
@@ -38,7 +29,7 @@ export async function cargarMotorWasm() {
   return instancia;
 }
 
-/** Escribe `datos` en el heap de Rust y devuelve su puntero. */
+// copia datos a la memoria de Rust y devuelve el puntero
 function escribirEnRust(datos) {
   const mem = instancia.exports.memory;
   const n = datos.length;
@@ -52,7 +43,7 @@ function liberar(p, n) {
   if (p !== 0 && n > 0) instancia.exports.vxml_dealloc(p, n);
 }
 
-/** El informe JSON canonico de `bytes` (Uint8Array) con nombre `nombre`. */
+// informe JSON de bytes (Uint8Array)
 export function analizarTextoWasm(bytes, nombre) {
   const mem = instancia.exports.memory;
   const pDoc = escribirEnRust(bytes);
@@ -74,7 +65,7 @@ export function analizarTextoWasm(bytes, nombre) {
   return json;
 }
 
-/** Igual que analizarTextoWasm pero admite un string y lo codifica. */
+// lo mismo, pasando un string
 export function analizarTexto(texto, nombre) {
   return analizarTextoWasm(new TextEncoder().encode(texto), nombre);
 }

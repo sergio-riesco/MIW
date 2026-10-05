@@ -1,6 +1,6 @@
-// JavaScript: carga del módulo WebAssembly, creación de ZIP (sin dependencias) y descarga.
+// Carga del .wasm, ZIP hecho a mano y descarga.
 let generar = null;
-/** Carga e inicializa el WASM compilado desde Rust (una sola vez). */
+// carga el wasm la primera vez
 export async function iniciarWasm() {
     if (generar)
         return generar;
@@ -25,7 +25,7 @@ function crc32(b) {
         c = TABLA[(c ^ b[i]) & 255] ^ (c >>> 8);
     return (c ^ 0xffffffff) >>> 0;
 }
-/** ZIP "store" (sin compresión). archivos: [{ nombre, datos: Uint8Array }] */
+// ZIP sin comprimir. archivos: [{ nombre, datos: Uint8Array }]
 export function crearZip(archivos) {
     const enc = new TextEncoder();
     const partes = [];

@@ -151,9 +151,10 @@ como mejor encaja en su lenguaje:
     (src/reglas_gen.rs). Se compila a wasm32-unknown-unknown y exporta
     vxml_analizar, vxml_alloc, vxml_dealloc y la memoria.
 
-Los ciclos del grafo se buscan con el algoritmo de Tarjan en versión
-iterativa en los tres lenguajes, para no depender del tamaño de la
-pila.
+Los ciclos del grafo se buscan con el algoritmo de Tarjan. En
+JavaScript y Rust es iterativo, para no depender del tamaño de la pila;
+en TypeScript es recursivo, que se lee mejor, y un documento VoiceXML
+no tiene tantos formularios como para llenar la pila.
 
 
 7. COMPARATIVA DE RENDIMIENTO

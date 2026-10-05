@@ -1,15 +1,9 @@
-/**
- * generar.mjs -- Genera los sitios web de los ejemplos desde la consola.
- *
- * Usa el mismo módulo WebAssembly que la interfaz web (app/pkg): lee cada
- * ejemplos/<nombre>.xml y escribe el sitio en sitios/<nombre>/.
- *
- * Las imágenes, vídeos y audios de cada sitio ya están en su carpeta de
- * sitios/ (las rutas del XML son relativas a ella); aquí solo se comprueba
- * que existen.
- *
- * Uso: node tools/generar.mjs [nombre...]   (sin nombres: todos los ejemplos)
- */
+// generar.mjs -- genera sitios/<nombre>/ a partir de ejemplos/<nombre>.xml
+// con el mismo .wasm que usa la interfaz (app/pkg).
+// Las imagenes, videos y audios ya estan en la carpeta de cada sitio; aqui
+// solo se avisa si falta alguno.
+//
+// Uso: node tools/generar.mjs [nombre...]   (sin nombres, todos)
 import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { basename, dirname, join } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
@@ -22,8 +16,7 @@ if (!existsSync(join(pkg, "generador_wasm_bg.wasm"))) {
   process.exit(1);
 }
 
-// wasm-pack genera el envoltorio para el navegador (--target web); en Node se
-// le pasan los bytes del .wasm en vez de descargarlo con fetch.
+// el envoltorio de wasm-pack es para navegador; en Node le paso los bytes
 const modulo = await import(pathToFileURL(join(pkg, "generador_wasm.js")).href);
 await modulo.default({ module_or_path: readFileSync(join(pkg, "generador_wasm_bg.wasm")) });
 
@@ -55,7 +48,7 @@ for (const nombre of ejemplos) {
     if (salida[i].endsWith(".html")) paginas.push(salida[i]);
   }
 
-  // Recursos que el XML usa y no están en la carpeta del sitio.
+  // archivos que usa el XML y no estan en la carpeta
   const faltan = [...xml.matchAll(/\b(?:foto|imagen|trailer|fragmento)="([^"]+)"/g)]
     .map((m) => m[1].replace(/&amp;/g, "&"))
     .filter((r) => !/^(https?:|data:)/i.test(r) && !existsSync(join(destino, r)));

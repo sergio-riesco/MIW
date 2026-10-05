@@ -1,16 +1,10 @@
-/**
- * serve.mjs -- Servidor estático para probar la interfaz y los sitios.
- *
- *   http://localhost:5174/                 interfaz del generador (app/)
- *   http://localhost:5174/sitios/<nombre>/ sitios generados
- *
- * Sirve la carpeta del proyecto con los tipos MIME correctos (.wasm, .mjs,
- * .mp4...) y admite peticiones Range, que el navegador usa para avanzar y
- * retroceder en los vídeos. Hace falta servirlo por HTTP: los módulos ES y
- * el .wasm no se cargan desde file://.
- *
- * Uso: node tools/serve.mjs [puerto]
- */
+// serve.mjs -- servidor estatico para probar la interfaz y los sitios.
+//   http://localhost:5174/                  interfaz (app/)
+//   http://localhost:5174/sitios/<nombre>/  sitios generados
+// Acepta peticiones Range, que es lo que usa el navegador para moverse por
+// los videos.
+//
+// Uso: node tools/serve.mjs [puerto]
 import { createReadStream } from "node:fs";
 import { stat } from "node:fs/promises";
 import { createServer } from "node:http";
@@ -71,7 +65,7 @@ createServer(async (req, res) => {
     "Cache-Control": "no-store",
   };
 
-  // Range: bytes=inicio-fin (vídeo y audio)
+  // Range: bytes=inicio-fin
   const rango = /^bytes=(\d*)-(\d*)$/.exec(req.headers.range || "");
   if (rango) {
     const inicio = rango[1] ? Number(rango[1]) : info.size - Number(rango[2]);

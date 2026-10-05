@@ -1,6 +1,4 @@
-/* Series: serie destacada en formato 16:9 y rejilla de tarjetas.
-   A diferencia de Videojuegos (carrusel 2:3) y Música (índices de categorías),
-   aquí las portadas son panorámicas porque las series se ven en horizontal. */
+/* Series: la actual destacada y el resto en rejilla, portadas 16:9 */
 
 .sectionHeader {
   display: flex;
@@ -33,7 +31,7 @@
   box-shadow: 0 0 0 0.25rem var(--current-glow);
 }
 
-/* Serie en curso: portada ancha a la izquierda y datos a la derecha. */
+/* serie actual: vídeo a la izquierda, datos a la derecha */
 .featured {
   display: grid;
   margin-bottom: 3rem;

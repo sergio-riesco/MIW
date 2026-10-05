@@ -6,11 +6,8 @@ import styles from "./ThemeToggle.module.css";
 const STORAGE_KEY = "theme";
 const DARK_QUERY = "(prefers-color-scheme: dark)";
 
-/**
- * `useLayoutEffect` avisa de que no hace nada en el servidor. En el cliente
- * corre antes de pintar, que es justo lo que necesitamos para reaplicar el
- * tema si React lo ha borrado.
- */
+// useLayoutEffect da un aviso en el servidor, así que allí uso useEffect.
+// En el cliente corre antes de pintar, que es lo que hace falta aquí.
 const useIsomorphicLayoutEffect =
   typeof window === "undefined" ? useEffect : useLayoutEffect;
 
@@ -25,11 +22,8 @@ function emit() {
   listeners.forEach((listener) => listener());
 }
 
-/**
- * El atributo del DOM es la única fuente de verdad, y lo fija el script en
- * línea de app/layout.js antes de pintar. Así el botón nunca discrepa de lo
- * que se ve en pantalla ni provoca errores de hidratación.
- */
+// El tema se lee siempre del atributo data-theme de <html>, que pone el
+// script de layout.js antes de pintar. Así el botón coincide con lo que se ve.
 function getSnapshot() {
   return document.documentElement.dataset.theme === "dark" ? "dark" : "light";
 }
@@ -46,12 +40,12 @@ function readPreference() {
   try {
     return window.localStorage.getItem(STORAGE_KEY);
   } catch {
-    // Si el almacenamiento no está disponible, se sigue la preferencia del sistema.
+    // sin localStorage, se sigue al sistema
     return null;
   }
 }
 
-/** Sin preferencia guardada se sigue al sistema; si la hay, manda la elegida. */
+// Preferencia guardada o, si no hay, la del sistema.
 function resolveTheme() {
   const saved = readPreference();
   return saved === "light" || saved === "dark" ? saved : getSystemTheme();
@@ -69,13 +63,13 @@ export default function ThemeToggle() {
   const theme = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
   const isDark = theme === "dark";
 
-  // En desarrollo, el montaje doble de Strict Mode reinicia <html> y borra el
-  // atributo que puso el script en línea. Esto lo repone antes de pintar.
+  // En desarrollo, Strict Mode monta dos veces y React borra data-theme de
+  // <html>. Esto lo vuelve a poner antes de pintar.
   useIsomorphicLayoutEffect(() => {
     applyTheme(resolveTheme());
   }, []);
 
-  // Sigue los cambios del sistema, pero solo mientras no haya elección propia.
+  // Si el sistema cambia de tema y no hay nada guardado, se sigue.
   useEffect(() => {
     const media = window.matchMedia(DARK_QUERY);
 
@@ -89,7 +83,7 @@ export default function ThemeToggle() {
     return () => media.removeEventListener("change", onSystemThemeChange);
   }, []);
 
-  // Mantiene las pestañas abiertas en el mismo tema.
+  // Otras pestañas abiertas cambian también.
   useEffect(() => {
     function onStorage(event) {
       if (event.key === STORAGE_KEY) {
@@ -107,7 +101,7 @@ export default function ThemeToggle() {
     try {
       window.localStorage.setItem(STORAGE_KEY, nextTheme);
     } catch {
-      // El cambio de tema sigue funcionando aunque no se pueda guardar.
+      // si no se puede guardar, el cambio vale solo para esta visita
     }
 
     applyTheme(nextTheme);

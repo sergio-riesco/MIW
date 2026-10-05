@@ -1,7 +1,5 @@
-// Para añadir un videojuego, copia un objeto y cambia sus datos.
-// Las imágenes se guardan en public/covers/videogames.
-// trailer es opcional: ruta a un vídeo MP4 en public/media/videos/videojuegos.
-// Si está, al pulsar la portada se abre el vídeo en una ventana.
+// Videojuegos. Portadas en public/covers/videogames y tráileres
+// (opcionales) en public/media/videos/videojuegos.
 
 export const videogames = [
   {

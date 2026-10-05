@@ -1,11 +1,6 @@
-/**
- * generar-informe.mjs -- Convierte resultados.json en un informe legible.
- * -----------------------------------------------------------------------------
- * Lee packages/bench/resultados.json (producido por bench.mjs) y genera
- * packages/bench/informe.html, un informe HTML autocontenido (sin
- * dependencias externas, apto para imprimir).
- * -----------------------------------------------------------------------------
- */
+// generar-informe.mjs -- genera informe.html a partir de resultados.json.
+// Es un HTML sin dependencias, se puede abrir o imprimir directamente.
+
 import { readFileSync, writeFileSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -22,20 +17,18 @@ const MOTORES = [
 const fmt = (n, d = 1) => (typeof n === "number" ? n.toFixed(d) : "–");
 const med = (p) => p.medianaMs;
 
-// El mas rapido como referencia para la columna "x veces mas lento".
+// el mas rapido es la referencia de la columna "x veces"
 const masRapido = Math.min(...MOTORES.map((m) => med(r.porImplementacion[m.id])));
-// Y el mas lento como 100 % de las barras del resumen.
+// y el mas lento marca el 100 % de las barras
 const masLento = Math.max(...MOTORES.map((m) => med(r.porImplementacion[m.id])));
 const ratio = (ms) => (ms / masRapido).toFixed(2) + "×";
 
 const fecha = new Date(r.fecha).toLocaleString("es-ES", { dateStyle: "long", timeStyle: "short" });
 
-// Documentos de mayor a menor tamano.
+// documentos de mayor a menor
 const ficheros = Object.entries(r.porFichero).sort((a, b) => b[1].bytes - a[1].bytes);
 
-// ---------------------------------------------------------------------------
-// HTML autocontenido
-// ---------------------------------------------------------------------------
+// --- HTML ---
 const bar = (ms, max) => {
   const w = Math.max(2, Math.round((ms / max) * 100));
   return `<div class="bar" style="width:${w}%"></div>`;
@@ -68,7 +61,7 @@ const filasFichero = ficheros.map(([f, d]) => {
   </tr>`;
 }).join("\n");
 
-// Estimacion de velocidad relativa para la cabecera.
+// para la frase de la cabecera
 const aceleracion = (r.porImplementacion.js.medianaMs / r.porImplementacion.wasm.medianaMs).toFixed(2);
 
 const html = `<!DOCTYPE html>

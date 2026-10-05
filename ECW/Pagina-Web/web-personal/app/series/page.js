@@ -12,7 +12,7 @@ export const metadata = {
 export default function SeriesPage() {
   const currentSeries = series.find((show) => show.current);
   const favorites = series.filter((show) => show.favorite);
-  // La que estoy viendo se muestra arriba en grande, así que se quita de la rejilla.
+  // la actual sale arriba en grande, no en la rejilla
   const rest = series.filter((show) => !show.current);
 
   return (
@@ -41,8 +41,7 @@ export default function SeriesPage() {
           <article className={styles.featured}>
             <div className={styles.featuredCover}>
               {currentSeries.trailer ? (
-                // Con preload="none" el vídeo no se descarga hasta que se
-                // pulsa reproducir; mientras tanto se ve la portada.
+                // preload="none": no se baja hasta darle a play
                 <video
                   controls
                   preload="none"

@@ -30,7 +30,7 @@ export default function HobbiesPage() {
                   alt=""
                   fill
                   sizes="(max-width: 640px) 100vw, 22rem"
-                  // La primera afición es la que aparece sin hacer scroll.
+                  // la primera se ve sin hacer scroll
                   priority={index === 0}
                   unoptimized={hobby.cover?.endsWith(".svg")}
                 />

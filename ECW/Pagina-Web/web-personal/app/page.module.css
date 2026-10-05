@@ -1,4 +1,4 @@
-/* Página de inicio: la lista de datos y el índice de secciones. */
+/* Inicio */
 
 .factList {
   margin: 0 0 2.5rem;
@@ -25,14 +25,14 @@
   margin: 0;
 }
 
-/* Segunda línea de cada dato: la universidad del estudio. */
+/* segunda línea de un dato (la universidad) */
 .factDetail {
   display: block;
   color: var(--muted);
   font-size: 0.95rem;
 }
 
-/* Presentación: el texto y la foto uno al lado del otro. */
+/* texto y foto lado a lado */
 .profile {
   display: grid;
   grid-template-columns: 1fr auto;
@@ -51,7 +51,7 @@
   border-radius: 0.5rem;
 }
 
-/* Contacto: el <address> solo envuelve la lista de datos. */
+/* contacto */
 .contact {
   font-style: normal;
 }

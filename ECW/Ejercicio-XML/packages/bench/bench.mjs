@@ -1,27 +1,17 @@
-/**
- * bench.mjs -- Banco de pruebas de las tres implementaciones de VXML Doctor.
- * -----------------------------------------------------------------------------
- * Ejecutar con:   node --expose-gc packages/bench/bench.mjs
- * (el script "bench" del package.json ya lo hace)
- *
- * Que mide:
- *   - arranqueMs   : carga del modulo del motor (import / compile+instantiate).
- *   - primerMs     : primer analisis de un fichero tras cargar el motor
- *                    (JIT frio: el coste que veria una pagina web por primera
- *                    vez).
- *   - pasadasMs[]  : N pasadas sobre TODO el corpus/grande, con gc() entre
- *                    pasada y pasada para no contaminar una con la anterior.
- *   - Mediana/min/max de las pasadas y MiB/s por implementacion.
- *   - porFichero   : mediana por fichero (usada por el informe).
- *
- * Garantia de validez: durante el calentamiento se comprueba que las tres
- * implementaciones emiten exactamente el mismo JSON byte a byte; si no, el
- * banco aborta y no publica ningun numero.
- *
- * El orden de las implementaciones se rota en cada pasada para que el arranque
- * en frio de V8 y cualquier deriva termica se repartan por igual.
- * -----------------------------------------------------------------------------
- */
+// bench.mjs -- mide las tres versiones sobre el corpus grande.
+// Se ejecuta con node --expose-gc (npm run bench ya lo hace).
+//
+// Guarda en resultados.json:
+//   arranqueMs  cargar el motor (import, o compilar e instanciar el wasm)
+//   primerMs    primer analisis despues de cargar (sin JIT caliente)
+//   pasadasMs   N pasadas sobre todo corpus/grande, con gc() entre medias
+//   porFichero  mediana de cada documento
+// y de ahi saca mediana, minimo, maximo y MiB/s.
+//
+// Antes de medir comprueba que las tres sacan el mismo JSON; si no, para.
+// El orden de las versiones va rotando en cada pasada para repartir efectos
+// como el calentamiento de V8.
+
 import { readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -31,9 +21,7 @@ const aqui = dirname(fileURLToPath(import.meta.url));
 const raiz = join(aqui, "..", "..");
 const corpusDir = join(raiz, "corpus", "grande");
 
-// ---------------------------------------------------------------------------
-// Carga de motores (el import de JS y TS se mide como parte del arranque)
-// ---------------------------------------------------------------------------
+// --- Carga de motores (el import cuenta como arranque) ---
 const t0 = process.hrtime.bigint();
 const { analizarTexto: jsAnalizar } = await import("../impl-js/vxml-lint.mjs");
 const t1 = process.hrtime.bigint();
@@ -59,9 +47,7 @@ const arranque = {
   wasm: ms(t2, t4), // import de la envoltura + compile/instantiate del .wasm
 };
 
-// ---------------------------------------------------------------------------
-// Corpus
-// ---------------------------------------------------------------------------
+// --- Corpus ---
 const ficheros = readdirSync(corpusDir).filter((f) => f.endsWith(".vxml")).sort();
 const documentos = ficheros.map((f) => {
   const buf = readFileSync(join(corpusDir, f));
@@ -71,9 +57,7 @@ const bytesTotales = documentos.reduce((a, d) => a + d.nBytes, 0);
 
 const PASADAS = 9;
 
-// ---------------------------------------------------------------------------
-// Primer analisis (JIT frio) y calentamiento
-// ---------------------------------------------------------------------------
+// --- Primer analisis y calentamiento ---
 const primer = {};
 for (const m of motor) {
   const d = documentos[0];
@@ -82,7 +66,7 @@ for (const m of motor) {
   primer[m.id] = ms(t, process.hrtime.bigint());
 }
 
-// Diagnostico de referencia (JS) para verificar identidad byte a byte.
+// el de JS es la referencia para comparar
 const refPorFichero = documentos.map((d) => motor[0].analizar(d.texto, d.bytes));
 
 for (let p = 0; p < 2; p++) {
@@ -98,12 +82,8 @@ for (let p = 0; p < 2; p++) {
   }
 }
 
-// ---------------------------------------------------------------------------
-// Pasadas medidas (se rota el orden de los motores para repartir el calor)
-// ---------------------------------------------------------------------------
-/** @type {Record<string, number[]>} */
+// --- Pasadas (rotando el orden de los motores) ---
 const pasadas = { js: [], ts: [], wasm: [] };
-/** @type {Record<string, {js: number, ts: number, wasm: number}[]>} */
 const porFichero = documentos.map(() => ({ js: [], ts: [], wasm: [] }));
 
 for (let p = 0; p < PASADAS; p++) {
@@ -169,9 +149,7 @@ const informe = {
 const salida = join(aqui, "resultados.json");
 writeFileSync(salida, JSON.stringify(informe, null, 2));
 
-// ---------------------------------------------------------------------------
-// Resumen por consola
-// ---------------------------------------------------------------------------
+// --- Resumen ---
 console.log(`Motor JS/TS cargados; WASM compile+instantiate OK (${arranque.wasm.toFixed(1)} ms).`);
 console.log(`Corpus: ${documentos.length} ficheros, ${(bytesTotales / 1024 ** 2).toFixed(2)} MiB, ${PASADAS} pasadas medidas.\n`);
 for (const m of motor) {

@@ -1,4 +1,4 @@
-/* Botón de cambio de tema. Solo lo usa components/ThemeToggle.js */
+/* Botón de tema claro/oscuro */
 
 .themeToggle {
   display: grid;
@@ -8,8 +8,7 @@
   border: 1px solid var(--border);
   border-radius: 50%;
   place-items: center;
-  /* --surface, no --background: en modo oscuro el header comparte fondo con el
-     body y el botón se perdería si usara el mismo color. */
+  /* surface y no background: en oscuro el botón se confundiría con la cabecera */
   background: var(--surface);
   color: var(--text);
   cursor: pointer;

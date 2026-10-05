@@ -1,10 +1,7 @@
-// Las series están en una sola lista.
-// Para añadir una: copia un objeto, cambia id, title, genre y description.
-// Las portadas se guardan en public/covers/series.
-// Usa current: true para la que estés viendo ahora y favorite: true para la favorita.
-// trailer es opcional: ruta a un vídeo MP4 en public/media/videos/series.
-// En la serie que estás viendo se muestra en lugar de la portada; en las
-// demás, al pulsar la portada se abre el vídeo en una ventana.
+// Series. Portadas en public/covers/series y tráileres (opcionales) en
+// public/media/videos/series.
+// current: la que estoy viendo (su tráiler sale en la página).
+// favorite: la favorita.
 
 export const series = [
    {

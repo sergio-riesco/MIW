@@ -1,4 +1,4 @@
-/* Estilos de la interfaz web de VXML Doctor. */
+/* Interfaz de VXML Doctor */
 
 :root {
   --tinta: #1c2733;
@@ -231,7 +231,7 @@ th {
   white-space: nowrap;
 }
 
-/* Tabla de formularios: cabecera fija y scroll si hay muchos. */
+/* tabla de formularios: cabecera fija y scroll */
 .tabla-scroll {
   max-height: 340px;
   overflow: auto;
@@ -296,7 +296,7 @@ td.mono,
   border-color: #fecaca;
 }
 
-/* Diagnósticos: filtros por gravedad, regla con nombre tecnico y severidad como marca. */
+/* diagnósticos: filtros por gravedad */
 .filtros {
   display: flex;
   flex-wrap: wrap;
@@ -378,7 +378,7 @@ button.filtro:disabled {
   border-color: var(--linea);
 }
 
-/* Sin seleccionar, cada boton de filtro conserva el color de su gravedad. */
+/* sin seleccionar, cada filtro mantiene el color de su gravedad */
 button.filtro.sev-error:not(.sel) {
   color: var(--error);
   border-color: #fecaca;

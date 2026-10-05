@@ -1,6 +1,4 @@
-/* ================================================================
-   Estilos de la demo del filtro Game Boy (WebAssembly vs JavaScript)
-   ================================================================ */
+/* Demo del filtro Game Boy */
 
 body {
     font-family: system-ui, -apple-system, sans-serif;
@@ -18,9 +16,7 @@ code {
     font-family: ui-monospace, monospace;
 }
 
-/* ------------------------------------------------------------
-   Controles
-   ------------------------------------------------------------ */
+/* Controles */
 
 .controls {
     display: flex;
@@ -47,9 +43,7 @@ code {
     margin-top: 0.75rem;
 }
 
-/* ------------------------------------------------------------
-   Los tres canvas
-   ------------------------------------------------------------ */
+/* Los tres canvas */
 
 .canvas-container {
     display: flex;
@@ -65,8 +59,7 @@ code {
     border-radius: 0.5rem;
     border: 1px solid #e2e8f0;
 
-    /* En pantallas estrechas las tarjetas bajan de una en una, así
-       que el canvas no tiene que encogerse. */
+    /* en móvil van una debajo de otra */
     flex: 1 1 320px;
     min-width: 240px;
 }
@@ -85,7 +78,7 @@ canvas {
     background: #000;
     border-radius: 0.25rem;
 
-    /* Al ampliar la imagen se ven los píxeles, como en la consola. */
+    /* que se vean los píxeles al ampliar, como en la consola */
     image-rendering: pixelated;
 }
 
@@ -107,9 +100,7 @@ canvas {
 .ok { color: #15803d; }
 .error { color: #b91c1c; }
 
-/* ------------------------------------------------------------
-   Tabla de tiempos
-   ------------------------------------------------------------ */
+/* Tabla de tiempos */
 
 table {
     width: 100%;
@@ -151,9 +142,7 @@ td.win {
     color: #15803d;
 }
 
-/* ------------------------------------------------------------
-   Código fuente del .wat
-   ------------------------------------------------------------ */
+/* Código fuente del .wat */
 
 #contenido {
     white-space: pre-wrap;

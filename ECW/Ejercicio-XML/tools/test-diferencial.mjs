@@ -1,21 +1,9 @@
-/**
- * test-diferencial.mjs -- Prueba de conformidad entre las tres implementaciones.
- * -----------------------------------------------------------------------------
- * Carga el motor JavaScript (referencia), el TypeScript compilado y el
- * WebAssembly/Rust, analiza TODO el corpus (casos manuales + corpus/grande)
- * y compara los informes JSON canonicos BYTE A BYTE:
- *
- *   1. JS infra vs JS infra              (autoconsistencia)
- *   2. TS  igual a JS byte a byte
- *   3. WASM igual a JS byte a byte
- *
- * El nombre de archivo se pasa VACIO en las tres implementaciones; lo que se
- * compara es exactamente lo que publica la API publica de cada motor.
- *
- * Salida: un resumen por fichero (IGUAL/DIFERENTE) y un veredicto global.
- * Termina con codigo de salida != 0 si hay cualquier diferencia.
- * -----------------------------------------------------------------------------
- */
+// test-diferencial.mjs -- comprueba que las tres versiones dan el mismo informe.
+//
+// Analiza todo el corpus (casos manuales y corpus/grande) con JS, TS y WASM y
+// compara los JSON byte a byte. El nombre de archivo se pasa vacio en las tres.
+// Si hay alguna diferencia, sale con codigo distinto de 0.
+
 import { readFileSync, readdirSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -25,7 +13,7 @@ import { cargarMotorWasm, analizarTextoWasm } from "../packages/impl-wasm/wasm.m
 
 const raiz = join(dirname(fileURLToPath(import.meta.url)), "..", "corpus");
 
-/** Lista ficheros *.vxml de un directorio, ordenados. */
+// .vxml de una carpeta, ordenados
 function ficheros(dir) {
   return readdirSync(dir).filter((f) => f.endsWith(".vxml")).sort().map((f) => join(dir, f));
 }
@@ -42,7 +30,7 @@ for (const ruta of rutas) {
   const buf = readFileSync(ruta);
   const bytes = new Uint8Array(buf);
 
-  // Cada motor recibe (texto, nombre="", src). La ruta WASM recibe bytes+nombre.
+  // JS y TS reciben (texto, "", bytes); WASM recibe (bytes, "")
   const js = jsAnalizar(buf.toString("utf8"), "", bytes);
   const ts = tsAnalizar(buf.toString("utf8"), "", bytes);
   const wasm = analizarTextoWasm(bytes, "");
@@ -72,7 +60,7 @@ if (fallos > 0) {
 }
 console.log("OK: las tres implementaciones emiten informes identicos byte a byte.");
 
-/** Offset del primer byte en el que difieren dos strings. */
+// primera posicion en la que difieren
 function primerOffset(a, b) {
   const n = Math.min(a.length, b.length);
   for (let i = 0; i < n; i++) if (a.charCodeAt(i) !== b.charCodeAt(i)) return i;

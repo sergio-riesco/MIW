@@ -1,4 +1,4 @@
-/* Aficiones: cada una en una fila con su imagen a la izquierda. */
+/* Aficiones: una por fila, imagen a la izquierda */
 
 .list {
   display: grid;
@@ -8,7 +8,7 @@
   list-style: none;
 }
 
-/* Separadores finos entre filas, como en la lista anterior. */
+/* líneas entre filas */
 .list li + li {
   margin-top: 0.25rem;
   padding-top: 1.5rem;
@@ -79,7 +79,7 @@
     gap: 1rem;
   }
 
-  /* En móvil la imagen no debe comerse media pantalla. */
+  /* que en móvil no ocupe media pantalla */
   .cover {
     max-width: 20rem;
   }

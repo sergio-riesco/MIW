@@ -1,7 +1,7 @@
 import Link from "next/link";
 import styles from "./Breadcrumb.module.css";
 
-// items: [{ label, href }, ...] — el último es la página actual y no se enlaza.
+// items: [{ label, href }, ...]. El último es la página actual (sin enlace).
 export default function Breadcrumb({ items }) {
   const lastIndex = items.length - 1;
 

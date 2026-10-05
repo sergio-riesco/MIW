@@ -1,7 +1,6 @@
-// Modelo de datos del formulario. Es la misma estructura que el lenguaje
-// XML (esquema/sitio.dtd); xml.ts convierte en los dos sentidos.
+// Datos del formulario. Misma estructura que el XML; xml.ts pasa de uno a otro.
 
-/** Dato personal o forma de contacto del perfil. */
+/** Dato o contacto del perfil. */
 export interface Par { etiqueta: string; texto: string; detalle: string; enlace: string }
 
 export interface Grupo {
@@ -21,7 +20,7 @@ export interface Serie {
 
 export interface Aficion { titulo: string; texto: string; imagen: string; enlace: string; textoEnlace: string }
 
-/** Atributos comunes de las cuatro secciones. */
+/** Lo que comparten las cuatro secciones. */
 export interface Seccion { titulo: string; introduccion: string; descripcion: string }
 export type ClaveSeccion = 'musica' | 'videojuegos' | 'series' | 'aficiones';
 

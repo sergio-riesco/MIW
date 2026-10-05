@@ -1,20 +1,17 @@
-// Comprobaciones del formulario antes de crear el XML.
-//
-// Son las restricciones de esquema/sitio.dtd y esquema/sitio.xsd que el
-// navegador no puede comprobar por sí solo (no valida contra un XSD sin
-// bibliotecas externas): atributos #REQUIRED y tipos de datos del XSD.
-// Así el formulario solo produce documentos válidos.
+// Comprueba el formulario antes de crear el XML: los campos #REQUIRED del DTD
+// y los tipos del XSD (año e idioma). El navegador no sabe validar contra un
+// XSD sin librerías, así que lo hago a mano.
 import type { Sitio } from './model.js';
 
-/** xs:language: "es", "en", "es-ES"... */
+// xs:language: es, en, es-ES...
 const IDIOMA = /^[a-zA-Z]{1,8}(-[a-zA-Z0-9]{1,8})*$/;
 
-/** xs:gYear: año de al menos cuatro cifras, con zona horaria opcional. */
+// xs:gYear: 4 cifras o más (puede llevar zona horaria)
 const ANIO = /^-?\d{4,}(Z|[+-]\d{2}:\d{2})?$/;
 
 const vacio = (s: string) => s.trim() === '';
 
-/** Devuelve los errores encontrados; si no hay ninguno, la lista está vacía. */
+/** Lista de errores (vacía si está todo bien). */
 export function validarSitio(s: Sitio): string[] {
   const errores: string[] = [];
   const falta = (que: string) => errores.push(`Falta ${que}.`);

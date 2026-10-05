@@ -1,24 +1,9 @@
-// ================================================================
-// El mismo filtro, pero escrito en JavaScript puro
-// ================================================================
-//
-// Esto es una traducción literal de filtroGB.wat. Mismos colores de
-// paleta, misma búsqueda del color más cercano y mismo bucle de píxeles.
-//
-// El objetivo no es escribir el JavaScript más rápido del mundo, sino
-// ejecutar EXACTAMENTE el mismo algoritmo fuera de WebAssembly. Así
-// la comparación mide al runtime (WASM contra el motor de JavaScript)
-// y no a dos algoritmos distintos.
-//
-// Si el JavaScript estuviera escrito de otra forma la comparación no
-// valdría para nada, porque la diferencia se podría deber al código y
-// no a la compilación.
+// El mismo filtro que filtroGB.wat, pasado a JavaScript línea a línea.
+// No está optimizado a propósito: para comparar tiempos tiene que ser el
+// mismo algoritmo, si no la diferencia vendría del código y no de dónde
+// se ejecuta.
 
-// ------------------------------------------------------------
-// Paleta de 4 colores de Game Boy
-// ------------------------------------------------------------
-//
-// Del más oscuro al más claro, en el mismo orden que en el .wat.
+// Misma paleta y mismo orden que en el .wat (de oscuro a claro).
 
 export function paletteJS(index) {
     if (index === 0) return 0x0f380f; // #0F380F, el más oscuro
@@ -27,12 +12,7 @@ export function paletteJS(index) {
     return 0x9bbc0f;                 // #9BBC0F, el más claro
 }
 
-// ------------------------------------------------------------
-// Color de la paleta más cercano por distancia de color
-// ------------------------------------------------------------
-//
-// Distancia euclídea al cuadrado, sin ponderación ni nada:
-//   (r - pr)² + (g - pg)² + (b - pb)²
+// Color de la paleta más cercano: (r - pr)² + (g - pg)² + (b - pb)²
 
 export function nearestJS(r, g, b) {
     let bestDistance = 0x7fffffff;
@@ -41,7 +21,7 @@ export function nearestJS(r, g, b) {
     for (let i = 0; i < 4; i++) {
         const color = paletteJS(i);
 
-        // 0xRRGGBB -> R, G, B
+        // 0xRRGGBB -> r, g, b
         const pr = color >>> 16;
         const pg = (color >>> 8) & 255;
         const pb = color & 255;
@@ -61,17 +41,13 @@ export function nearestJS(r, g, b) {
     return best;
 }
 
-// Escribe un color 0xRRGGBB en un píxel RGBA, y conserva el alfa.
+// Escribe un 0xRRGGBB en el píxel y deja el alfa que tenía.
 function writePixel(dst, offset, color, a) {
     dst[offset] = color >>> 16;
     dst[offset + 1] = (color >>> 8) & 255;
     dst[offset + 2] = color & 255;
     dst[offset + 3] = a;
 }
-
-// ------------------------------------------------------------
-// Filtro de color: un píxel de salida por cada píxel de entrada
-// ------------------------------------------------------------
 
 export function processPixelsJS(src, dst, count) {
     for (let i = 0; i < count; i++) {

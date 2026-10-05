@@ -1,75 +1,66 @@
-//! Generador de sitios web personales a partir de un documento XML <sitio>
-//! (lenguaje definido en esquema/sitio.dtd y esquema/sitio.xsd).
+//! Genera el sitio web a partir de un documento <sitio> (ver esquema/sitio.dtd).
 //!
-//! Se compila a WebAssembly y expone `generar(xml)` a JavaScript. Devuelve
-//! una lista plana [ruta1, contenido1, ruta2, contenido2, ...] con las
-//! páginas HTML, la hoja de estilos, el JavaScript del sitio y la imagen por
-//! defecto. El HTML y el CSS siguen la plantilla del sitio web personal.
+//! Se compila a WebAssembly y exporta generar(xml), que devuelve una lista
+//! [ruta, contenido, ruta, contenido, ...] con las páginas, el CSS, el JS y
+//! la imagen por defecto. El HTML es el de mi web personal.
 
 use roxmltree::{Document, Node, ParsingOptions};
 use wasm_bindgen::prelude::*;
 
-/// Hoja de estilos del sitio generado.
 const CSS: &str = include_str!("plantilla.css");
 
-/// Imagen que se muestra cuando un elemento no indica la suya.
+/// Para cuando un elemento no tiene imagen.
 const IMAGEN_POR_DEFECTO: &str = include_str!("imagen-por-defecto.svg");
 const RUTA_IMAGEN_POR_DEFECTO: &str = "imagen-por-defecto.svg";
 
-/// Va en el <head>: aplica el tema guardado antes de pintar, sin parpadeo.
+/// En el <head>, para poner el tema antes de pintar (si no, parpadea).
 const JS_TEMA_HEAD: &str = "<script>try{var t=localStorage.getItem(\"tema\");if(t)document.documentElement.dataset.theme=t}catch(e){}</script>";
 
-/// JavaScript del sitio: botón de tema y ventana de los tráileres.
+/// Botón de tema y ventana de los tráileres.
 const JS_SITIO: &str = include_str!("sitio.js");
 
-// ----------------------------------------------------------------------------
-// Utilidades
-// ----------------------------------------------------------------------------
+// --- Utilidades ---
 
-/// Escapa texto para HTML (contenido y valores de atributos).
+/// Escapa para HTML (texto y atributos).
 fn esc(s: &str) -> String {
     s.replace('&', "&amp;").replace('<', "&lt;").replace('>', "&gt;").replace('"', "&quot;")
 }
 
-/// Valor de un atributo, o "" si no está.
 fn at<'a>(n: Node<'a, '_>, k: &str) -> &'a str {
     n.attribute(k).unwrap_or("")
 }
 
-/// Atributo booleano del lenguaje (true|false, por defecto false).
+/// true/false (si no está, false).
 fn si(n: Node, k: &str) -> bool {
     n.attribute(k) == Some("true")
 }
 
-/// Texto del elemento sin espacios sobrantes.
 fn texto<'a>(n: Node<'a, '_>) -> &'a str {
     n.text().unwrap_or("").trim()
 }
 
-/// Hijos con una etiqueta concreta.
 fn hijos<'a, 'b>(n: Node<'a, 'b>, t: &'static str) -> impl Iterator<Item = Node<'a, 'b>> {
     n.children().filter(move |c| c.has_tag_name(t))
 }
 
-/// Evita enlaces `javascript:` en los href.
+/// Para no meter enlaces javascript:.
 fn enlace_seguro(e: &str) -> bool {
     !e.trim().to_lowercase().starts_with("javascript:")
 }
 
-/// <img> decorativa (el título ya está en el texto de al lado); si no hay
-/// imagen se usa la imagen por defecto.
+/// alt vacío porque el título ya está al lado. Sin imagen, la de por defecto.
 fn img(src: &str, clase: &str, perezosa: bool) -> String {
     let src = if src.is_empty() { RUTA_IMAGEN_POR_DEFECTO } else { src };
     let carga = if perezosa { " loading=\"lazy\"" } else { "" };
     format!("<img class=\"{clase}\" src=\"{}\" alt=\"\"{carga}>", esc(src))
 }
 
-/// Párrafo con clase, o nada si el texto está vacío.
+/// <p> solo si hay texto.
 fn parrafo(clase: &str, t: &str) -> String {
     if t.is_empty() { String::new() } else { format!("<p class=\"{clase}\">{}</p>", esc(t)) }
 }
 
-/// Botón transparente sobre una portada que abre el tráiler en la ventana.
+/// Botón invisible sobre la portada que abre el tráiler.
 fn boton_trailer(src: &str, titulo: &str) -> String {
     if src.is_empty() {
         return String::new();
@@ -80,7 +71,7 @@ fn boton_trailer(src: &str, titulo: &str) -> String {
     )
 }
 
-/// Nombre de archivo a partir de un texto: "Rock progresivo" -> "rock-progresivo".
+/// "Rock progresivo" -> "rock-progresivo"
 fn slug(s: &str) -> String {
     let mut o = String::new();
     for c in s.to_lowercase().chars() {
@@ -97,20 +88,18 @@ fn slug(s: &str) -> String {
     o.trim_end_matches('-').to_string()
 }
 
-// ----------------------------------------------------------------------------
-// Páginas
-// ----------------------------------------------------------------------------
+// --- Páginas ---
 
 struct Pagina {
     archivo: String,
-    nombre: String,                // nombre en el menú y en el <title>
+    nombre: String,                // menú y <title>
     h1: String,
     lead: String,
     cuerpo: String,
-    migas: Vec<(String, String)>,  // (texto, href); href vacío = página actual
+    migas: Vec<(String, String)>,  // (texto, href); sin href = página actual
     en_menu: bool,
-    activa: String,                // archivo que se marca en el menú
-    con_trailers: bool,            // si necesita la ventana del tráiler
+    activa: String,                // qué se marca en el menú
+    con_trailers: bool,            // ¿lleva la ventana del tráiler?
 }
 
 fn pagina(archivo: &str, nombre: &str, h1: &str, lead: &str, cuerpo: String) -> Pagina {
@@ -127,7 +116,7 @@ fn pagina(archivo: &str, nombre: &str, h1: &str, lead: &str, cuerpo: String) -> 
     }
 }
 
-/// Las cuatro secciones: (elemento, archivo, nombre, descripción por defecto).
+/// (elemento, archivo, nombre, descripción por defecto)
 const SECCIONES: [(&str, &str, &str, &str); 4] = [
     ("musica", "musica.html", "Música", "Mis grupos y artistas favoritos, organizados por género."),
     ("videojuegos", "videojuegos.html", "Videojuegos", "Los videojuegos que más me gustan y el que estoy jugando ahora."),
@@ -135,7 +124,7 @@ const SECCIONES: [(&str, &str, &str, &str); 4] = [
     ("aficiones", "hobbies.html", "Hobbies", "Mis aficiones y lo que hago en mi tiempo libre."),
 ];
 
-/// index.html: presentación, datos, contacto y enlaces a las secciones.
+/// index.html
 fn pagina_inicio(raiz: Node, autor: &str) -> Pagina {
     let mut cuerpo = String::new();
     let mut lead = String::new();
@@ -206,8 +195,7 @@ fn pagina_inicio(raiz: Node, autor: &str) -> Pagina {
     inicio
 }
 
-/// musica.html (índice de géneros) y una página por género, con el
-/// fragmento de audio de cada álbum.
+/// musica.html y una página por género (con los fragmentos de audio).
 fn paginas_musica(m: Node) -> Vec<Pagina> {
     let mut tarjetas = String::new();
     let mut generos: Vec<Pagina> = Vec::new();
@@ -276,7 +264,7 @@ fn paginas_musica(m: Node) -> Vec<Pagina> {
     paginas
 }
 
-/// videojuegos.html: carrusel horizontal; cada portada abre su tráiler.
+/// videojuegos.html: carrusel; cada portada abre su tráiler.
 fn pagina_videojuegos(v: Node) -> Pagina {
     let juegos: Vec<_> = hijos(v, "juego").collect();
     let hay_trailers = juegos.iter().any(|j| !at(*j, "trailer").is_empty());
@@ -325,8 +313,7 @@ fn pagina_videojuegos(v: Node) -> Pagina {
     p
 }
 
-/// series.html: la serie actual destacada (con su tráiler en la página), la
-/// rejilla con el resto y la favorita.
+/// series.html: la actual arriba con su vídeo, el resto en rejilla.
 fn pagina_series(s: Node) -> Pagina {
     let todas: Vec<_> = hijos(s, "serie").collect();
     let resto: Vec<_> = todas.iter().filter(|e| !si(**e, "actual")).collect();
@@ -338,8 +325,7 @@ fn pagina_series(s: Node) -> Pagina {
         let portada = if trailer.is_empty() {
             img(at(*e, "imagen"), "cover-img", false)
         } else {
-            // preload="none": no se descarga nada hasta pulsar play; mientras,
-            // se ve la portada.
+            // preload="none": no se baja hasta darle a play
             let poster = if at(*e, "imagen").is_empty() { RUTA_IMAGEN_POR_DEFECTO } else { at(*e, "imagen") };
             format!(
                 "<video controls preload=\"none\" poster=\"{}\" aria-label=\"Tráiler de {}\"><source src=\"{t}\" type=\"video/mp4\"><a href=\"{t}\">Descargar el tráiler</a></video>",
@@ -384,7 +370,7 @@ fn pagina_series(s: Node) -> Pagina {
     p
 }
 
-/// hobbies.html: una fila por afición, con enlace opcional.
+/// hobbies.html
 fn pagina_aficiones(h: Node) -> Pagina {
     let filas: String = hijos(h, "aficion").enumerate().map(|(i, a)| {
         let enlace = at(a, "enlace");
@@ -402,9 +388,7 @@ fn pagina_aficiones(h: Node) -> Pagina {
     pagina("hobbies.html", "Hobbies", at(h, "titulo"), at(h, "introduccion"), format!("<ul class=\"filas\">{filas}</ul>"))
 }
 
-// ----------------------------------------------------------------------------
-// Plantilla común
-// ----------------------------------------------------------------------------
+// --- Plantilla común ---
 
 const VENTANA_TRAILER: &str = "<dialog class=\"ventana\" id=\"ventana-trailer\" aria-labelledby=\"ventana-titulo\"><div class=\"ventana-cab\"><h2 id=\"ventana-titulo\"></h2><button class=\"cerrar\" type=\"button\" aria-label=\"Cerrar el tráiler\"><span aria-hidden=\"true\">✕</span></button></div><div class=\"ventana-video\"></div></dialog>";
 
@@ -440,15 +424,12 @@ fn html_pagina(p: &Pagina, todas: &[Pagina], autor: &str, idioma: &str, pie: &st
     )
 }
 
-// ----------------------------------------------------------------------------
-// Punto de entrada
-// ----------------------------------------------------------------------------
+// --- Punto de entrada ---
 
 #[wasm_bindgen]
 pub fn generar(xml: &str) -> Result<Vec<String>, JsError> {
-    // Los documentos llevan <!DOCTYPE sitio SYSTEM "sitio.dtd">: hay que
-    // permitir el DTD. El DTD externo no se descarga; la validación contra
-    // el DTD y el XSD se hace aparte (tools/Validar.java).
+    // Los documentos traen DOCTYPE, así que hay que permitirlo. El DTD no se
+    // lee aquí: la validación se hace aparte con tools/Validar.java.
     let opciones = ParsingOptions { allow_dtd: true, ..ParsingOptions::default() };
     let doc = Document::parse_with_options(xml, opciones)
         .map_err(|e| JsError::new(&format!("XML mal formado: {e}")))?;
