@@ -2,12 +2,16 @@
 // Para añadir una: copia un objeto, cambia id, title, genre y description.
 // Las portadas se guardan en public/covers/series.
 // Usa current: true para la que estés viendo ahora y favorite: true para la favorita.
+// trailer es opcional: ruta a un vídeo MP4 en public/media/videos/series.
+// En la serie que estás viendo se muestra en lugar de la portada; en las
+// demás, al pulsar la portada se abre el vídeo en una ventana.
 
 export const series = [
    {
     id: "breaking-bad",
     title: "Breaking Bad",
     cover: "/covers/series/breaking-bad.png",
+    trailer: "/media/videos/series/breaking-bad.mp4",
     genre: "Thriller",
     season: "2008",
     description:
@@ -18,6 +22,7 @@ export const series = [
     id: "the-boys",
     title: "The Boys",
     cover: "/covers/series/the-boys.png",
+    trailer: "/media/videos/series/the-boys.mp4",
     genre: "Súperhéroes",
     season: "2019",
     description:
@@ -27,6 +32,7 @@ export const series = [
     id: "invincible",
     title: "Invincible",
     cover: "/covers/series/invincible.png",
+    trailer: "/media/videos/series/invincible.mp4",
     genre: "Súperhéroes",
     season: "2021",
     description:
@@ -36,6 +42,7 @@ export const series = [
     id: "better-call-saul",
     title: "Better Call Saul",
     cover: "/covers/series/better-call-saul.png",
+    trailer: "/media/videos/series/better-call-saul.mp4",
     genre: "Thriller",
     season: "2015",
     description:
@@ -48,6 +55,7 @@ export const series = [
     genre: "Misterio - Super Héroes",
     season: "2026",
     description: "La que estoy viendo ahora mismo.",
+    trailer: "/media/videos/series/lanterns.mp4",
     current: true,
   },
 ];

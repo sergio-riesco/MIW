@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Breadcrumb from "../components/Breadcrumb";
+import TrailerDialog from "../components/TrailerDialog";
 import { videogames } from "../data/videogames";
 import styles from "./videojuegos.module.css";
 
@@ -29,7 +30,10 @@ export default function VideojuegosPage() {
         <div className={styles.sectionHeader}>
           <div>
             <h2 id="lista">Mis juegos</h2>
-            <p className={styles.sectionHint}>Desliza la lista para ver más.</p>
+            <p className={styles.sectionHint}>
+              Desliza la lista para ver más y pulsa una portada para ver su
+              tráiler.
+            </p>
           </div>
           {currentGame && (
             <p className={styles.currentGame}>
@@ -67,6 +71,9 @@ export default function VideojuegosPage() {
                     <span className={`${styles.badge} ${styles.badgeFavorite}`}>
                       ★ Favorito
                     </span>
+                  )}
+                  {game.trailer && (
+                    <TrailerDialog title={game.title} src={game.trailer} />
                   )}
                 </div>
 

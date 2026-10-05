@@ -76,6 +76,20 @@ export default async function MusicCategoryPage({ params }) {
               <div className={styles.info}>
                 <h2>{band.name}</h2>
                 {band.album && <p className={styles.album}>{band.album}</p>}
+
+                {band.snippet && (
+                  <figure className={styles.snippet}>
+                    <figcaption>
+                      Fragmento de «{band.snippet.track}»
+                    </figcaption>
+                    {/* preload="none": no se descarga nada hasta pulsar play. */}
+                    <audio controls preload="none" src={band.snippet.src}>
+                      <a href={band.snippet.src}>
+                        Descargar el fragmento de {band.snippet.track}
+                      </a>
+                    </audio>
+                  </figure>
+                )}
               </div>
 
               {band.favorite && <span className={styles.badge}>★ Favorito</span>}

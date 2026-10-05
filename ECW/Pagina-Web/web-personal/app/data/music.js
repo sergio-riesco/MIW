@@ -3,6 +3,10 @@
 // Para añadir una categoría nueva: copia un bloque completo del array "categories".
 // Las imágenes se guardan en public/covers/music.
 // Pon favorite: true en el grupo que más te guste y se marcará como favorito.
+//
+// snippet es opcional: un fragmento corto (unos 30 s) de una canción del
+// álbum, en MP3, guardado en public/media/audios. "track" es el título de la
+// canción y se muestra junto al reproductor.
 
 export const categories = [
   {
@@ -14,18 +18,21 @@ export const categories = [
         name: "Pink Floyd",
         cover: "/covers/music/pink-floyd.png",
         album: "The Dark Side of the Moon (1973)",
+        snippet: { src: "/media/audios/pink-floyd.mp3", track: "Money" },
       },
       {
         id: "king-crimson",
         name: "King Crimson",
         cover: "/covers/music/king-crimson.png",
         album: "In the Court of the Crimson King (1969)",
+        snippet: { src: "/media/audios/king-crimson.mp3", track: "21st Century Schizoid Man" },
       },
       {
         id: "alan-parsons-project",
         name: "The Alan Parsons Project",
         cover: "/covers/music/alan-parsons-project.png",
-        album: "Tales of Mystery and Imagination (1976)",
+        album: "Eye in the Sky (1982)",
+        snippet: { src: "/media/audios/alan-parsons-project.mp3", track: "Eye in the Sky" },
       },
     ],
   },
@@ -38,6 +45,7 @@ export const categories = [
         name: "Electric Light Orchestra",
         cover: "/covers/music/electric-light-orchestra.png",
         album: "Out of the Blue (1977)",
+        snippet: { src: "/media/audios/electric-light-orchestra.mp3", track: "Mr. Blue Sky" },
       },
     ],
   },
@@ -50,6 +58,7 @@ export const categories = [
         name: "Blue Öyster Cult",
         cover: "/covers/music/blue-oyster-cult.png",
         album: "Agents of Fortune (1976)",
+        snippet: { src: "/media/audios/blue-oyster-cult.mp3", track: "(Don't Fear) The Reaper" },
       },
     ],
   },

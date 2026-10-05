@@ -1,0 +1,156 @@
+==================================================================
+ Estándares y Computación Web - Trabajo I
+ Aplicación en WebAssembly nativo: Filtro Game Boy
+==================================================================
+
+Autor: Sergio Riesco
+URL de despliegue: <completar con la URL donde esté publicada>
+
+
+1. QUÉ HACE LA APLICACIÓN
+------------------------------------------------------------------
+
+Convierte cualquier imagen al aspecto de la pantalla de la Game Boy
+original: cada píxel se sustituye por el más cercano de los cuatro
+tonos de verde de su paleta (#0F380F, #306230, #8BAC0F y #9BBC0F).
+
+El filtro está escrito a mano en el formato de texto de WebAssembly
+(filtroGB.wat), sin generarlo desde C, C++ ni Rust. Para comparar,
+el mismo algoritmo está traducido línea a línea a JavaScript
+(filtroGB-js.js), y la página ejecuta las dos versiones sobre la
+misma imagen.
+
+Características:
+
+  - Se puede cargar cualquier imagen del equipo. Al abrir la página
+    se muestra una imagen de ejemplo generada en un canvas.
+  - Se elige la resolución de trabajo: 160 x 144 (la de la Game Boy),
+    el doble, el cuádruple o la original con un tope de 400 px.
+  - Muestra lado a lado la imagen original, el resultado de
+    WebAssembly y el de JavaScript.
+  - Comprueba que los dos resultados son idénticos píxel a píxel.
+  - Mide las dos implementaciones (pasadas, tiempo por pasada y
+    megapíxeles por segundo) y dice cuál es más rápida y cuánto.
+  - Muestra el código fuente del .wat en la propia página.
+
+
+2. CÓMO FUNCIONA EL MÓDULO WEBASSEMBLY
+------------------------------------------------------------------
+
+filtroGB.wat define:
+
+  - (memory (export "memory") 48)
+      Memoria lineal de 48 páginas (3 MiB) compartida con JavaScript.
+      Si una imagen no cabe, JavaScript la amplía con memory.grow().
+
+  - $palette(index) -> 0xRRGGBB
+      Devuelve uno de los cuatro colores de la paleta.
+
+  - $nearest(r, g, b) -> índice
+      Busca el color de la paleta más cercano con la distancia
+      euclídea al cuadrado (sin raíz, porque solo se compara).
+
+  - process(src, dst, count)   [exportada]
+      Recorre "count" píxeles RGBA a partir de la dirección "src",
+      escribe el color de la paleta en "dst" y conserva el alfa.
+
+En cada llamada, filtroGB.js coloca la imagen de entrada al principio
+de la memoria y reserva justo detrás el mismo espacio para la salida:
+
+    0                 count*4             count*8
+    | píxeles entrada  | píxeles salida    |
+
+El módulo no importa ninguna función de JavaScript: todo el cálculo
+se hace dentro de WebAssembly.
+
+
+3. VENTAJAS DE WEBASSEMBLY FRENTE A JAVASCRIPT
+------------------------------------------------------------------
+
+  - Rendimiento predecible. El .wasm ya llega tipado (solo enteros
+    i32) y se compila a código máquina al cargarlo. No hay fase de
+    calentamiento, no hay desoptimizaciones si cambian los tipos y no
+    hay pausas del recolector de basura, porque el filtro no reserva
+    memoria.
+
+  - Control total de la memoria. La imagen se procesa en una zona de
+    memoria lineal que gestiona el propio programa, byte a byte, sin
+    crear objetos.
+
+  - Portabilidad y seguridad. El mismo binario de 410 bytes funciona
+    en cualquier navegador moderno y se ejecuta aislado (sandbox),
+    sin acceso a nada que JavaScript no le pase.
+
+  - Tamaño. El módulo compilado ocupa 410 bytes.
+
+Sobre la velocidad medida: con este filtro la diferencia entre las
+dos versiones es pequeña, y la página lo explica. El trabajo por
+píxel es muy simple, y V8 compila ese tipo de bucles sobre
+TypedArray casi tan bien como WebAssembly. Además, WebAssembly paga
+el coste de copiar la imagen a su memoria y de vuelta. La ventaja de
+WebAssembly crece cuando el cálculo por píxel es más pesado, cuando
+se usan instrucciones SIMD, o en motores sin compilador JIT.
+
+
+4. ESTRUCTURA DEL PROYECTO
+------------------------------------------------------------------
+
+Todos los archivos están en la misma carpeta y no dependen de nada
+de fuera de ella:
+
+  filtroGB.html    Página de la aplicación.
+  filtroGB.css     Estilos de la página.
+  filtroGB.wat     Código fuente del filtro en WebAssembly (texto).
+  filtroGB.wasm    Módulo compilado a partir de filtroGB.wat.
+  filtroGB.js      Carga el .wasm y hace de puente con la página
+                   (copia la imagen a la memoria y llama a process).
+  filtroGB-js.js   El mismo filtro en JavaScript puro, para comparar.
+  benchmark.js     Funciones para medir y comparar los tiempos.
+  favicon.svg      Icono de la pestaña, con los colores de la paleta.
+  leeme.txt        Este archivo.
+
+
+5. DESPLIEGUE
+------------------------------------------------------------------
+
+La página usa módulos ES y fetch() para cargar el .wasm y el .wat,
+así que tiene que servirse por HTTP. Abrir filtroGB.html con doble
+clic (file://) no funciona.
+
+5.1. Compilar el módulo (solo si se modifica filtroGB.wat)
+
+    wat2wasm filtroGB.wat -o filtroGB.wasm
+
+  wat2wasm forma parte de WABT (WebAssembly Binary Toolkit):
+  https://github.com/WebAssembly/wabt/releases
+
+5.2. Probar en local (cualquiera de estas opciones)
+
+    python -m http.server 8000
+    npx serve .
+
+  y abrir http://localhost:8000/filtroGB.html (con "npx serve" el
+  puerto es el que indique la consola).
+
+5.3. Publicar
+
+  Basta con subir los archivos de la carpeta a cualquier servidor de
+  archivos estáticos (por ejemplo GitHub Pages). No hace falta
+  compilar nada en el servidor.
+
+  Conviene que el servidor envíe filtroGB.wasm con el tipo MIME
+  "application/wasm" para que el navegador lo compile mientras lo
+  descarga (WebAssembly.instantiateStreaming). Si no lo hace, la
+  aplicación lo detecta y lo carga de la forma tradicional.
+
+
+6. SOFTWARE Y VERSIONES
+------------------------------------------------------------------
+
+  - WABT (wat2wasm) 1.0.39, para compilar el .wat.
+  - Python 3.13 (http.server) o Node.js 24 (npx serve), para servir
+    la página en local.
+  - Navegador con soporte de WebAssembly y módulos ES: Chrome, Edge,
+    Firefox o Safari actuales.
+  - No usa bibliotecas ni frameworks: HTML, CSS, JavaScript y
+    WebAssembly estándar.

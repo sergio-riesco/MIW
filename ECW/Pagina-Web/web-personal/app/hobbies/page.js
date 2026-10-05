@@ -26,7 +26,7 @@ export default function HobbiesPage() {
             <article className={styles.card}>
               <div className={styles.cover}>
                 <Image
-                  src={hobby.cover || "/covers/videogames/placeholder.svg"}
+                  src={hobby.cover || "/covers/placeholder.svg"}
                   alt=""
                   fill
                   sizes="(max-width: 640px) 100vw, 22rem"

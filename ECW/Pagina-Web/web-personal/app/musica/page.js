@@ -30,7 +30,7 @@ export default function MusicPage() {
                 {category.bands.slice(0, 4).map((band, index) => (
                   <Image
                     key={band.id}
-                    src={band.cover || "/covers/videogames/placeholder.svg"}
+                    src={band.cover || "/covers/placeholder.svg"}
                     alt=""
                     width={40}
                     height={40}
