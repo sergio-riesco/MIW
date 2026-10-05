@@ -67,7 +67,7 @@ export default function Home() {
         <h1>Sergio Riesco Collar</h1>
         <p className="lead">
           Vivo en Gijón. Estudio el Grado en Ingeniería Informática de Software y
-          el Máster en Ingeniería Web, ambos en la Universidad de Oviedo.
+          el Máster Universitario en Ingeniería Web, ambos en la Universidad de Oviedo.
         </p>
       </header>
 
