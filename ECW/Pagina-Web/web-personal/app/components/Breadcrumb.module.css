@@ -39,5 +39,5 @@
 }
 
 .separator {
-  color: var(--border);
+  color: var(--muted);
 }

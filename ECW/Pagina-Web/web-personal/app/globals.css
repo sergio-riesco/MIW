@@ -5,53 +5,53 @@
 
 :root,
 :root[data-theme="light"] {
-  --background: #fdfdfb;
-  --surface: #f4f4f1;
-  --text: #1b1d1c;
+  --background: #ffffff;
+  --surface: #f0f1ee;
+  --text: #0f1211;
   --white: #ffffff;
-  --muted: #5b615f;
-  --accent: #1f5f5b;
-  --current: #b23a2b;
-  --current-badge: #b23a2b;
-  --current-glow: rgb(178 58 43 / 0.14);
-  --favorite: #f0c75e;
-  --on-favorite: #1b1d1c;
+  --muted: #3d4341;
+  --accent: #0f4a44;
+  --current: #8e2618;
+  --current-badge: #8e2618;
+  --current-glow: rgb(142 38 24 / 0.16);
+  --favorite: #f2c94c;
+  --on-favorite: #0f1211;
   --shadow-color: rgb(27 29 28 / 0.12);
-  --border: #dcdedb;
+  --border: #858b88;
 }
 
 :root[data-theme="dark"] {
-  --background: #141817;
-  --surface: #1e2725;
-  --text: #edf1ec;
+  --background: #0b0f0e;
+  --surface: #18201e;
+  --text: #f6f8f5;
   --white: #ffffff;
-  --muted: #a8b3ae;
-  --accent: #7fc9bd;
-  --current: #ef806f;
-  --current-badge: #c95745;
-  --current-glow: rgb(239 128 111 / 0.18);
-  --favorite: #f0c75e;
-  --on-favorite: #1b1d1c;
+  --muted: #ccd5d0;
+  --accent: #a6e6da;
+  --current: #ffa595;
+  --current-badge: #962f20;
+  --current-glow: rgb(255 165 149 / 0.2);
+  --favorite: #f2c94c;
+  --on-favorite: #0f1211;
   --shadow-color: rgb(0 0 0 / 0.3);
-  --border: #33403c;
+  --border: #6b7a75;
 }
 
 /* Sin data-theme (p. ej. con JS desactivado) manda el sistema */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme]) {
-    --background: #141817;
-    --surface: #1e2725;
-    --text: #edf1ec;
+    --background: #0b0f0e;
+    --surface: #18201e;
+    --text: #f6f8f5;
     --white: #ffffff;
-    --muted: #a8b3ae;
-    --accent: #7fc9bd;
-    --current: #ef806f;
-    --current-badge: #ad4834;
-    --current-glow: rgb(239 128 111 / 0.18);
-    --favorite: #f0c75e;
-    --on-favorite: #1b1d1c;
+    --muted: #ccd5d0;
+    --accent: #a6e6da;
+    --current: #ffa595;
+    --current-badge: #962f20;
+    --current-glow: rgb(255 165 149 / 0.2);
+    --favorite: #f2c94c;
+    --on-favorite: #0f1211;
     --shadow-color: rgb(0 0 0 / 0.3);
-    --border: #33403c;
+    --border: #6b7a75;
   }
 }
 
