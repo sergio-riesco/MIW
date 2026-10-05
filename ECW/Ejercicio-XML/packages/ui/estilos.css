@@ -1,0 +1,448 @@
+/* Estilos de la interfaz web de VXML Doctor. */
+
+:root {
+  --tinta: #1c2733;
+  --tenue: #5b6b7b;
+  --linea: #e2e8f0;
+  --accent: #0f766e;
+  --accent-fondo: #ecfdf5;
+  --aviso: #b45309;
+  --error: #b91c1c;
+  --fondo-codigo: #0f172a;
+  --texto-codigo: #e2e8f0;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Segoe UI", system-ui, sans-serif;
+  color: var(--tinta);
+  max-width: 1060px;
+  margin: 0 auto;
+  padding: 1.5rem 1.25rem 4rem;
+  line-height: 1.5;
+}
+
+header {
+  border-bottom: 2px solid var(--accent);
+  padding-bottom: .75rem;
+  margin-bottom: 1.5rem;
+}
+
+header h1 {
+  margin: 0;
+  font-size: 1.45rem;
+}
+
+header p {
+  margin: .15rem 0 0;
+  color: var(--tenue);
+  font-size: .92rem;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 340px 1fr;
+  gap: 1.25rem;
+  align-items: start;
+}
+
+@media (max-width: 860px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.panel {
+  border: 1px solid var(--linea);
+  border-radius: 10px;
+  padding: 1rem 1.1rem;
+}
+
+.panel h2 {
+  margin: 0 0 .75rem;
+  font-size: 1.02rem;
+}
+
+label,
+legend {
+  display: block;
+  font-size: .85rem;
+  font-weight: 600;
+  margin: .8rem 0 .3rem;
+}
+
+fieldset {
+  border: 0;
+  margin: 0;
+  padding: 0;
+  min-width: 0;
+}
+
+legend {
+  padding: 0;
+}
+
+textarea {
+  width: 100%;
+  min-height: 240px;
+  font-family: Consolas, "Cascadia Mono", monospace;
+  font-size: .8rem;
+  border: 1px solid var(--linea);
+  border-radius: 8px;
+  padding: .55rem;
+  resize: vertical;
+  tab-size: 2;
+  color: var(--tinta);
+  background: #fbfcfe;
+}
+
+select,
+input[type="file"] {
+  width: 100%;
+  padding: .4rem .5rem;
+  border: 1px solid var(--linea);
+  border-radius: 8px;
+  font-size: .88rem;
+  background: #fff;
+}
+
+.fila-botones {
+  display: flex;
+  gap: .6rem;
+  margin-top: .9rem;
+  flex-wrap: wrap;
+}
+
+button {
+  border: 1px solid var(--accent);
+  background: var(--accent);
+  color: #fff;
+  padding: .5rem .9rem;
+  border-radius: 8px;
+  font-size: .92rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+button.secundario {
+  background: #fff;
+  color: var(--accent);
+}
+
+button:disabled {
+  opacity: .45;
+  cursor: not-allowed;
+}
+
+.motor {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: .4rem;
+}
+
+.motor label {
+  display: flex;
+  align-items: center;
+  gap: .35rem;
+  border: 1px solid var(--linea);
+  border-radius: 8px;
+  padding: .4rem .5rem;
+  margin: 0;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.motor input {
+  accent-color: var(--accent);
+}
+
+.motor label.sel {
+  border-color: var(--accent);
+  background: var(--accent-fondo);
+}
+
+.estado {
+  font-size: .85rem;
+  color: var(--tenue);
+  margin-top: .6rem;
+  min-height: 1.2em;
+}
+
+.resumen {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(104px, 1fr));
+  gap: .5rem;
+}
+
+.chip {
+  border: 1px solid var(--linea);
+  border-radius: 8px;
+  padding: .45rem .6rem;
+  font-size: .8rem;
+}
+
+.chip b {
+  display: block;
+  font-size: 1.05rem;
+  color: var(--accent);
+}
+
+.chip .grafo {
+  color: var(--aviso);
+}
+
+h3 {
+  font-size: .94rem;
+  margin: 1.1rem 0 .45rem;
+}
+
+h3 .contador {
+  display: inline-block;
+  margin-left: .3rem;
+  padding: 0 .4rem;
+  border-radius: 999px;
+  background: var(--accent-fondo);
+  color: var(--accent);
+  font-size: .74rem;
+  font-weight: 700;
+  vertical-align: .1em;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: .82rem;
+}
+
+th,
+td {
+  padding: .38rem .5rem;
+  border-bottom: 1px solid var(--linea);
+  text-align: left;
+  vertical-align: top;
+}
+
+th {
+  background: #f6f8fa;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* Tabla de formularios: cabecera fija y scroll si hay muchos. */
+.tabla-scroll {
+  max-height: 340px;
+  overflow: auto;
+  border: 1px solid var(--linea);
+  border-radius: 8px;
+}
+
+.tabla-scroll table {
+  font-size: .8rem;
+}
+
+.tabla-scroll thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  box-shadow: inset 0 -1px 0 var(--linea);
+}
+
+.tabla-scroll tr:last-child td {
+  border-bottom: 0;
+}
+
+.tabla-scroll tbody tr:nth-child(even) {
+  background: #fafbfd;
+}
+
+td.num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  color: var(--tenue);
+}
+
+.nowrap {
+  white-space: nowrap;
+}
+
+td.mono,
+.nota code {
+  font-family: Consolas, "Cascadia Mono", monospace;
+}
+
+.marca {
+  display: inline-block;
+  padding: 0 .45rem;
+  border-radius: 999px;
+  white-space: nowrap;
+  font-size: .72rem;
+  font-weight: 700;
+  border: 1px solid;
+}
+
+.marca-si {
+  color: #047857;
+  background: #ecfdf5;
+  border-color: #a7f3d0;
+}
+
+.marca-no {
+  color: var(--error);
+  background: #fef2f2;
+  border-color: #fecaca;
+}
+
+/* Diagnósticos: filtros por gravedad, regla con nombre tecnico y severidad como marca. */
+.filtros {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .35rem;
+  margin: 0 0 .5rem;
+}
+
+button.filtro {
+  background: #fff;
+  color: var(--tinta);
+  border: 1px solid var(--linea);
+  padding: .18rem .55rem;
+  border-radius: 999px;
+  font-size: .76rem;
+  font-weight: 600;
+}
+
+button.filtro b {
+  color: var(--tenue);
+  font-variant-numeric: tabular-nums;
+}
+
+button.filtro:hover:not(:disabled) {
+  border-color: var(--accent);
+}
+
+button.filtro.sel {
+  border-color: var(--accent);
+  background: var(--accent-fondo);
+  color: var(--accent);
+}
+
+button.filtro.sel b {
+  color: var(--accent);
+}
+
+button.filtro:disabled {
+  opacity: .4;
+}
+
+.tabla-diag td:first-child {
+  font-weight: 700;
+  color: var(--tinta);
+}
+
+.tabla-diag td:first-child .sub {
+  display: block;
+  font-weight: 400;
+  font-size: .7rem;
+  color: var(--tenue);
+  margin-top: .1rem;
+  letter-spacing: -.01em;
+}
+
+.tabla-diag td:last-child {
+  min-width: 16rem;
+}
+
+.tabla-diag .marca {
+  text-transform: uppercase;
+  letter-spacing: .03em;
+}
+
+.marca.sev-error {
+  color: var(--error);
+  background: #fef2f2;
+  border-color: #fecaca;
+}
+
+.marca.sev-warning {
+  color: var(--aviso);
+  background: #fffbeb;
+  border-color: #fde68a;
+}
+
+.marca.sev-info {
+  color: var(--tenue);
+  background: #f6f8fa;
+  border-color: var(--linea);
+}
+
+/* Sin seleccionar, cada boton de filtro conserva el color de su gravedad. */
+button.filtro.sev-error:not(.sel) {
+  color: var(--error);
+  border-color: #fecaca;
+  background: #fef2f2;
+}
+
+button.filtro.sev-warning:not(.sel) {
+  color: var(--aviso);
+  border-color: #fde68a;
+  background: #fffbeb;
+}
+
+button.filtro.sev-info:not(.sel) {
+  color: var(--tenue);
+  background: #f6f8fa;
+}
+
+button.filtro.sev-error:not(.sel) b,
+button.filtro.sev-warning:not(.sel) b {
+  color: inherit;
+}
+
+pre {
+  background: var(--fondo-codigo);
+  color: var(--texto-codigo);
+  padding: .8rem .9rem;
+  border-radius: 8px;
+  font-size: .74rem;
+  overflow: auto;
+  max-height: 420px;
+  font-family: Consolas, "Cascadia Mono", monospace;
+  tab-size: 2;
+}
+
+.vacio {
+  color: var(--tenue);
+  font-style: italic;
+  font-size: .88rem;
+}
+
+.comp-igual {
+  color: #047857;
+  font-weight: 700;
+}
+
+.comp-error {
+  color: var(--error);
+  font-weight: 700;
+}
+
+.nota {
+  font-size: .8rem;
+  color: var(--tenue);
+  margin-top: .7rem;
+}
+
+footer {
+  margin-top: 2.5rem;
+  border-top: 1px solid var(--linea);
+  padding-top: .75rem;
+  color: var(--tenue);
+  font-size: .8rem;
+}
+
+.oculto {
+  display: none;
+}

@@ -628,14 +628,6 @@ impl<'a> Analizador<'a> {
         }
     }
 
-    #[inline]
-    fn valor_atr(&self, ei: usize, a: usize) -> String {
-        let a0 = self.ev.a0[ei] as usize;
-        let ini = self.ev.a_pos[a0 + a] as usize;
-        let fin = ini + self.ev.a_len[a0 + a] as usize;
-        resolver_entidades(&self.doc[ini..fin])
-    }
-
     /// Empuja un diagnostico resolviendo el catalogo incrustado.
     fn empuja(&mut self, regla: &'static str, ev: EvPos, elemento: &str, detalle: &str) {
         let r = regla_por_nombre(regla).expect("regla desconocida en el catalogo");
