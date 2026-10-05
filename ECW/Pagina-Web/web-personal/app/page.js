@@ -6,7 +6,7 @@ import styles from "./page.module.css";
 export const metadata = {
   title: "Sobre mí",
   description:
-    "Presentación de Sergio Riesco Collar, estudiante de Ingeniería Informática de Software y del Máster en Ingeniería Web de la Universidad de Oviedo.",
+    "Presentación de Sergio Riesco Collar, estudiante de Ingeniería Informática de Software y del Máster Universitario en Ingeniería Web de la Universidad de Oviedo.",
 };
 
 const facts = [
@@ -18,7 +18,7 @@ const facts = [
   },
   {
     label: "Actualmente",
-    value: "Estudiando el Máster en Ingeniería Web",
+    value: "Estudiando el Máster Universitario en Ingeniería Web",
     detail: "Universidad de Oviedo",
   },
 ];
