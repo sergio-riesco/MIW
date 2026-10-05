@@ -5,12 +5,12 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:noNamespaceSchemaLocation="../esquema/sitio.xsd">
   <perfil foto="sergio.jpg">
-    <resumen>Vivo en Gijón. Estudio el Grado en Ingeniería Informática de Software y el Máster en Ingeniería Web, ambos en la Universidad de Oviedo.</resumen>
+    <resumen>Vivo en Gijón. Estudio el Grado en Ingeniería Informática de Software y el Máster Universitario en Ingeniería Web, ambos en la Universidad de Oviedo.</resumen>
     <parrafo>Me interesa aprender, construir cosas y entender la tecnología que hay detrás de las que usamos cada día.</parrafo>
     <parrafo>Este sitio reúne las cuatro partes que mejor me definen: la música, los videojuegos, las series y mis aficiones.</parrafo>
     <dato etiqueta="Vivo en">Gijón, Asturias</dato>
     <dato etiqueta="Estudios" detalle="Universidad de Oviedo (en curso)">Grado en Ingeniería Informática de Software</dato>
-    <dato etiqueta="Actualmente" detalle="Universidad de Oviedo">Estudiando el Máster en Ingeniería Web</dato>
+    <dato etiqueta="Actualmente" detalle="Universidad de Oviedo">Estudiando el Máster Universitario en Ingeniería Web</dato>
     <contacto etiqueta="Correo" enlace="mailto:sergioriescocollar@gmail.com">sergioriescocollar@gmail.com</contacto>
     <contacto etiqueta="GitHub" enlace="https://github.com/sergio-riesco">github.com/sergio-riesco</contacto>
   </perfil>
