@@ -4,15 +4,22 @@
   ;; Memoria
   ;; ------------------------------------------------------------
 
-  ;; Consigue 256 páginas de memoria de Web Assembly.
-  ;; Una página = 64 KiB.
-  (memory (export "memory") 256)
+  ;; Memoria lineal exportada a JavaScript.
+  ;; Una página = 64 KiB, así que 48 páginas son 3 MiB.
+  ;;
+  ;; La imagen más grande que usa la demo (640 x 576) ocupa
+  ;; 640 * 576 * 4 bytes = 1,4 MiB de entrada y otro tanto de
+  ;; salida, y cabe de sobra. Si llega una imagen mayor,
+  ;; JavaScript amplía la memoria con memory.grow().
+  (memory (export "memory") 48)
 
 
   ;; ------------------------------------------------------------
-  ;; Consigue un color de la paleta
+  ;; Devuelve un color de la paleta como 0xRRGGBB
   ;; ------------------------------------------------------------
 
+  ;; Paleta de la Game Boy, de más oscuro a más claro:
+  ;;
   ;; index 0 = #0F380F
   ;; index 1 = #306230
   ;; index 2 = #8BAC0F
@@ -61,7 +68,10 @@
 
 
   ;; ------------------------------------------------------------
-  ;; Encuentra el color de GameBoy más cercano
+  ;; Índice del color de la paleta más cercano a (r, g, b)
+  ;;
+  ;; Usa la distancia euclídea al cuadrado. No hace falta la raíz
+  ;; cuadrada: solo se comparan distancias entre sí.
   ;; ------------------------------------------------------------
 
   (func $nearest (param $r i32) (param $g i32) (param $b i32) (result i32)
@@ -69,7 +79,7 @@
     ;; Contador
     (local $i i32)
 
-    ;; Color actual 
+    ;; Color de la paleta que se está probando
     (local $color i32)
 
     ;; Componentes de color de la paleta
@@ -110,7 +120,7 @@
 
       (loop $colors
 
-        ;; Consigue color de la paleta.
+        ;; Color de la paleta número $i.
         (local.set $color
           (call $palette
             (local.get $i)
@@ -121,7 +131,7 @@
         ;;
         ;; 0xRRGGBB
         ;;  ^^^^^^
-        ;;  shift a la derecha 16 bits -> 0x0000RR
+        ;;  desplazar 16 bits a la derecha -> 0x0000RR
         ;;
         (local.set $pr
           (i32.shr_u
@@ -130,7 +140,7 @@
           )
         )
 
-        ;; Extrae verde (shift a la derecha 8 bits).
+        ;; Extrae el verde (desplazar 8 bits y quedarse con 1 byte).
         (local.set $pg
           (i32.and
             (i32.shr_u
@@ -141,7 +151,7 @@
           )
         )
 
-        ;; Extract azul.
+        ;; Extrae el azul (quedarse con el último byte).
         (local.set $pb
           (i32.and
             (local.get $color)
@@ -207,7 +217,7 @@
         )
 
 
-        ;; Si este color es más cercano, guárdalo 
+        ;; Si este color está más cerca, se guarda.
         (if
           (i32.lt_u
             (local.get $distance)
@@ -236,7 +246,7 @@
         )
 
 
-        ;; Para después de 4 colores.
+        ;; Termina después de probar los 4 colores.
         (br_if $done
           (i32.ge_u
             (local.get $i)
@@ -244,7 +254,7 @@
           )
         )
 
-        ;; Continuar loop.
+        ;; Siguiente color.
         (br $colors)
       )
     )
@@ -258,25 +268,27 @@
   ;; Procesar imagen
   ;; ------------------------------------------------------------
 
-  ;; src   = dirección de los pixels RGBA del input
-  ;; dst   = dirección de los pixels RGBA del output
-  ;; count = numero de pixeles
+  ;; Función exportada. Recibe direcciones de la memoria lineal:
   ;;
-  ;; Input:
+  ;; src   = dirección de los píxeles RGBA de entrada
+  ;; dst   = dirección de los píxeles RGBA de salida
+  ;; count = número de píxeles (ancho * alto)
   ;;
-  ;; R G B A
-  ;; R G B A
-  ;; R G B A
-  ;; ...
-  ;;
-  ;; Output:
+  ;; Entrada:
   ;;
   ;; R G B A
   ;; R G B A
   ;; R G B A
   ;; ...
   ;;
-  ;; Alfa (A) se preserva.
+  ;; Salida (mismo formato, con los colores de la paleta):
+  ;;
+  ;; R G B A
+  ;; R G B A
+  ;; R G B A
+  ;; ...
+  ;;
+  ;; El canal alfa (A) se copia sin cambios.
 
   (func (export "process")
     (param $src i32)
@@ -303,12 +315,20 @@
 
     (block $done
 
+      ;; El bucle comprueba la condición al final, así que sin esta
+      ;; comprobación procesaría un píxel aunque count fuera 0.
+      (br_if $done
+        (i32.eqz
+          (local.get $count)
+        )
+      )
+
       (loop $pixels
 
         ;; ------------------------------------------------------
-        ;; Calcula dirección input
+        ;; Dirección del píxel de entrada
         ;;
-        ;; Cada pixel ocupa 4 bytes
+        ;; Cada píxel ocupa 4 bytes: src + i * 4 (i << 2)
         ;; ------------------------------------------------------
 
         (local.set $input
@@ -326,7 +346,7 @@
 
 
         ;; ------------------------------------------------------
-        ;; Calcula la dirección de output
+        ;; Dirección del píxel de salida: dst + i * 4
         ;; ------------------------------------------------------
 
         (local.set $output
@@ -344,7 +364,7 @@
 
 
         ;; ------------------------------------------------------
-        ;; Read RGBA
+        ;; Lee R, G, B y A
         ;; ------------------------------------------------------
 
         (local.set $r
@@ -382,7 +402,7 @@
 
 
         ;; ------------------------------------------------------
-        ;; Find nearest Game Boy color
+        ;; Busca el color de la Game Boy más cercano
         ;; ------------------------------------------------------
 
         (local.set $index
@@ -397,7 +417,7 @@
         )
 
 
-        ;; Get actual RGB value.
+        ;; Convierte el índice en su color 0xRRGGBB.
         (local.set $color
 
           (call $palette
@@ -407,7 +427,7 @@
 
 
         ;; ------------------------------------------------------
-        ;; Write red
+        ;; Escribe el rojo
         ;; ------------------------------------------------------
 
         (i32.store8
@@ -422,7 +442,7 @@
 
 
         ;; ------------------------------------------------------
-        ;; Write green
+        ;; Escribe el verde
         ;; ------------------------------------------------------
 
         (i32.store8
@@ -445,7 +465,7 @@
 
 
         ;; ------------------------------------------------------
-        ;; Write blue
+        ;; Escribe el azul
         ;; ------------------------------------------------------
 
         (i32.store8
@@ -463,7 +483,7 @@
 
 
         ;; ------------------------------------------------------
-        ;; Preserve alpha
+        ;; Copia el alfa tal cual
         ;; ------------------------------------------------------
 
         (i32.store8
@@ -478,7 +498,7 @@
 
 
         ;; ------------------------------------------------------
-        ;; Next pixel
+        ;; Siguiente píxel
         ;; ------------------------------------------------------
 
         (local.set $i
@@ -490,7 +510,7 @@
         )
 
 
-        ;; Have we processed every pixel?
+        ;; ¿Se han procesado ya todos los píxeles?
         (br_if $done
 
           (i32.ge_u
@@ -500,7 +520,7 @@
         )
 
 
-        ;; Process next pixel.
+        ;; Si no, se repite el bucle.
         (br $pixels)
 
       )

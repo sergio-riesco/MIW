@@ -1,0 +1,181 @@
+==================================================================
+ Estándares y Computación Web - Trabajo II
+ Sitio web personal de Sergio Riesco Collar
+==================================================================
+
+URL de despliegue: <completar con la URL donde esté publicado>
+
+
+1. CONTENIDO DEL SITIO
+------------------------------------------------------------------
+
+  /                      Sobre mí: foto, datos personales y contacto.
+  /musica                Grupos favoritos agrupados por género.
+  /musica/<genero>       Página de cada género musical, con un
+                         fragmento de audio de cada álbum.
+  /videojuegos           Videojuegos favoritos y el que estoy jugando.
+                         Al pulsar una portada se abre su tráiler.
+  /series                Series favoritas y la que estoy viendo, con
+                         su tráiler en vídeo. Al pulsar la portada de
+                         las demás se abre su tráiler.
+  /hobbies               Aficiones: videojuegos, skate y pizzas.
+
+Todas las páginas comparten cabecera, navegación principal, migas de
+pan y un botón para cambiar entre modo claro y oscuro.
+
+
+2. TECNOLOGÍAS Y JUSTIFICACIÓN
+------------------------------------------------------------------
+
+  - Next.js 16 (App Router) con React 19.
+      Permite escribir la cabecera, la navegación y las tarjetas una
+      sola vez como componentes y reutilizarlas en todas las páginas.
+      Las páginas se generan en el servidor, así que el navegador
+      recibe HTML completo: el sitio se puede leer sin JavaScript y
+      los buscadores lo indexan sin problema.
+
+  - Datos separados del diseño (app/data/*.js).
+      Las listas de música, videojuegos, series y aficiones son arrays
+      de objetos. Añadir un elemento es copiar un objeto, sin tocar el
+      HTML de la página.
+
+  - next/image para las imágenes.
+      Genera automáticamente versiones más ligeras (WebP) y del tamaño
+      justo para cada pantalla, reserva el espacio de la imagen para
+      que la página no salte al cargar y retrasa la carga de las que
+      no se ven todavía.
+
+  - Vídeo y audio con las etiquetas nativas de HTML5.
+      Los tráileres usan <video> y los fragmentos de los álbumes
+      <audio>, con los controles del navegador, que ya son accesibles
+      por teclado. Todos los archivos multimedia son locales (carpeta
+      public/media). No se descarga nada hasta que se pulsa
+      reproducir, y hay un enlace de descarga como alternativa.
+
+  - Ventana del tráiler con <dialog> nativo
+      (app/components/TrailerDialog.js). showModal() bloquea el resto
+      de la página, lleva el foco a la ventana, se cierra con Escape,
+      con el botón o pulsando fuera, y devuelve el foco a la portada.
+
+  - CSS puro con CSS Modules.
+      Cada página tiene su hoja de estilos (*.module.css) y Next.js
+      renombra las clases para que no choquen entre páginas. Los
+      colores son variables CSS en app/globals.css, una tabla para el
+      modo claro y otra para el oscuro.
+
+  - Sin bibliotecas externas de interfaz ni recursos de terceros.
+      El JavaScript propio es el botón de tema
+      (app/components/ThemeToggle.js) y la ventana de los tráileres. La preferencia se guarda en
+      localStorage y, si no hay ninguna, se respeta la del sistema.
+
+  - ESLint con la configuración de Next.js (core-web-vitals) para
+      detectar errores y malas prácticas.
+
+
+3. ESTÁNDARES Y ACCESIBILIDAD
+------------------------------------------------------------------
+
+  - HTML semántico (header, nav, main, section, article, figure) y
+    encabezados en orden.
+  - Idioma declarado (lang="es") y metadatos (título y descripción)
+    en cada página.
+  - Enlace "Saltar al contenido principal", navegación por teclado y
+    foco visible.
+  - Texto alternativo en todas las imágenes.
+  - Diseño adaptable a móviles.
+  - Modo claro y oscuro con contraste suficiente y color-scheme
+    correcto.
+
+
+4. ESTRUCTURA DEL PROYECTO
+------------------------------------------------------------------
+
+  app/                     Código del sitio (App Router de Next.js).
+    layout.js              Plantilla común: cabecera, menú y tema.
+    globals.css            Estilos y colores globales.
+    icon.svg               Icono de la pestaña.
+    page.js                Página de inicio (Sobre mí).
+    musica/, videojuegos/,
+    series/, hobbies/      Una carpeta por página, con su page.js y su
+                           hoja de estilos.
+    musica/[category]/     Página de cada género, generada a partir
+                           de los datos.
+    components/            Componentes reutilizables (migas de pan,
+                           botón de tema, ventana del tráiler).
+    data/                  Contenido de las listas.
+
+  public/                  Archivos que se sirven tal cual.
+    sergio.jpg             Foto personal.
+    covers/                Portadas e imágenes de cada sección.
+    covers/placeholder.svg Imagen por defecto si falta una portada.
+    media/videos/          Tráileres en MP4, en videojuegos/ y series/.
+    media/audios/          Fragmentos de unos 30 s de cada álbum (MP3).
+
+  package.json             Dependencias y scripts.
+  next.config.mjs          Configuración de Next.js.
+  eslint.config.mjs        Configuración de ESLint.
+  leeme.txt                Este archivo.
+
+No se entregan las carpetas node_modules/ ni .next/: se generan con
+"npm install" y "npm run build".
+
+
+5. DESPLIEGUE
+------------------------------------------------------------------
+
+Requisitos: Node.js 20.9 o superior y npm.
+
+5.1. Desarrollo en local
+
+    npm install
+    npm run dev
+
+  y abrir http://localhost:3000
+
+5.2. Comprobaciones
+
+    npm run lint
+    npm run build
+
+5.3. Producción
+
+    npm install
+    npm run build
+    npm start
+
+  sirve el sitio en http://localhost:3000. También se puede publicar
+  en Vercel importando el repositorio: detecta Next.js y ejecuta la
+  compilación automáticamente.
+
+
+6. AÑADIR CONTENIDO
+------------------------------------------------------------------
+
+  Videojuegos (app/data/videogames.js), música (app/data/music.js),
+  series (app/data/series.js) y aficiones (app/data/hobbies.js):
+
+    1. Copiar un objeto del array y cambiar sus datos.
+    2. Guardar la imagen en la carpeta correspondiente de
+       public/covers y poner su ruta en "cover".
+    3. Si no se indica "cover", se muestra public/covers/placeholder.svg.
+
+  Tráiler de un videojuego o una serie: guardar el MP4 (H.264 + AAC)
+  en public/media/videos/videojuegos o public/media/videos/series y
+  poner su ruta en el campo "trailer". Para que empiece a reproducirse antes de descargarse
+  entero, conviene mover el índice al principio del archivo:
+
+    ffmpeg -i original.mp4 -c copy -movflags +faststart public/media/videos/series/serie.mp4
+
+  Fragmento de un álbum: guardar el fragmento en MP3 en
+  public/media/audios y, en app/data/music.js, añadir al grupo
+  snippet: { src: "/media/audios/<id>.mp3", track: "<canción>" }.
+
+
+7. SOFTWARE Y VERSIONES
+------------------------------------------------------------------
+
+  - Node.js 24.21 y npm (probado; sirve cualquier Node.js >= 20.9).
+  - Next.js 16.3.6
+  - React y React DOM 19.2.8
+  - ESLint 9 con eslint-config-next 16.3.6
+  - FFmpeg, para preparar los vídeos (opcional).

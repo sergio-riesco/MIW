@@ -18,9 +18,7 @@
 // Paleta de 4 colores de Game Boy
 // ------------------------------------------------------------
 //
-// Ojo con el orden: aquí es del más oscuro al más claro, igual que en
-// el .wat. (La paleta de filtroGB.js va al revés, pero como esa copia
-// no la usa nadie, da igual.)
+// Del más oscuro al más claro, en el mismo orden que en el .wat.
 
 export function paletteJS(index) {
     if (index === 0) return 0x0f380f; // #0F380F, el más oscuro

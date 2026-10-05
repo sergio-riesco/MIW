@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Breadcrumb from "../components/Breadcrumb";
+import TrailerDialog from "../components/TrailerDialog";
 import { series } from "../data/series";
 import styles from "./series.module.css";
 
@@ -39,14 +40,30 @@ export default function SeriesPage() {
 
           <article className={styles.featured}>
             <div className={styles.featuredCover}>
-              <Image
-                src={currentSeries.cover || "/covers/videogames/placeholder.svg"}
-                alt=""
-                fill
-                sizes="(max-width: 640px) 100vw, 30rem"
-                priority
-                unoptimized={currentSeries.cover?.endsWith(".svg")}
-              />
+              {currentSeries.trailer ? (
+                // Con preload="none" el vídeo no se descarga hasta que se
+                // pulsa reproducir; mientras tanto se ve la portada.
+                <video
+                  controls
+                  preload="none"
+                  poster={currentSeries.cover}
+                  aria-label={`Tráiler de ${currentSeries.title}`}
+                >
+                  <source src={currentSeries.trailer} type="video/mp4" />
+                  <a href={currentSeries.trailer}>
+                    Descargar el tráiler de {currentSeries.title}
+                  </a>
+                </video>
+              ) : (
+                <Image
+                  src={currentSeries.cover || "/covers/placeholder.svg"}
+                  alt=""
+                  fill
+                  sizes="(max-width: 640px) 100vw, 30rem"
+                  priority
+                  unoptimized={currentSeries.cover?.endsWith(".svg")}
+                />
+              )}
             </div>
 
             <div className={styles.featuredInfo}>
@@ -61,6 +78,7 @@ export default function SeriesPage() {
 
       <section aria-labelledby="mis-series">
         <h2 id="mis-series">Mis series</h2>
+        <p className={styles.gridHint}>Pulsa una portada para ver su tráiler.</p>
 
         <ul className={styles.grid}>
           {rest.map((show) => (
@@ -68,7 +86,7 @@ export default function SeriesPage() {
               <article className={styles.card}>
                 <div className={styles.cover}>
                   <Image
-                    src={show.cover || "/covers/videogames/placeholder.svg"}
+                    src={show.cover || "/covers/placeholder.svg"}
                     alt=""
                     fill
                     sizes="(max-width: 640px) 100vw, 17rem"
@@ -78,6 +96,9 @@ export default function SeriesPage() {
                     <span className={`${styles.badge} ${styles.badgeFavorite}`}>
                       ★ Favorita
                     </span>
+                  )}
+                  {show.trailer && (
+                    <TrailerDialog title={show.title} src={show.trailer} />
                   )}
                 </div>
 

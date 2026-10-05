@@ -1,0 +1,174 @@
+/* ================================================================
+   Estilos de la demo del filtro Game Boy (WebAssembly vs JavaScript)
+   ================================================================ */
+
+body {
+    font-family: system-ui, -apple-system, sans-serif;
+    margin: 2rem;
+    background-color: #f8fafc;
+    color: #0f172a;
+}
+
+main {
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+code {
+    font-family: ui-monospace, monospace;
+}
+
+/* ------------------------------------------------------------
+   Controles
+   ------------------------------------------------------------ */
+
+.controls {
+    display: flex;
+    gap: 1.5rem;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    margin-bottom: 0.5rem;
+}
+
+.controls label {
+    display: block;
+    margin-bottom: 0.35rem;
+    font-weight: 600;
+}
+
+.controls select,
+.controls input {
+    font: inherit;
+}
+
+.hint {
+    color: #475569;
+    font-size: 0.9rem;
+    margin-top: 0.75rem;
+}
+
+/* ------------------------------------------------------------
+   Los tres canvas
+   ------------------------------------------------------------ */
+
+.canvas-container {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-top: 1rem;
+}
+
+.card {
+    margin: 0;
+    background: white;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    border: 1px solid #e2e8f0;
+
+    /* En pantallas estrechas las tarjetas bajan de una en una, así
+       que el canvas no tiene que encogerse. */
+    flex: 1 1 320px;
+    min-width: 240px;
+}
+
+.card figcaption {
+    font-weight: 700;
+    font-size: 1.1rem;
+    margin-bottom: 0.75rem;
+}
+
+canvas {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    border: 1px solid #cbd5e1;
+    background: #000;
+    border-radius: 0.25rem;
+
+    /* Al ampliar la imagen se ven los píxeles, como en la consola. */
+    image-rendering: pixelated;
+}
+
+.tag {
+    display: inline-block;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    padding: 0.1rem 0.45rem;
+    border-radius: 999px;
+    vertical-align: middle;
+    margin-left: 0.4rem;
+}
+
+.tag-wasm { background: #ede9fe; color: #5b21b6; }
+.tag-js { background: #fef9c3; color: #854d0e; }
+
+/* Resultado de comparar las dos salidas */
+.ok { color: #15803d; }
+.error { color: #b91c1c; }
+
+/* ------------------------------------------------------------
+   Tabla de tiempos
+   ------------------------------------------------------------ */
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 0.75rem;
+    font-size: 0.9rem;
+    background: white;
+}
+
+caption {
+    text-align: left;
+    font-weight: 600;
+    padding-bottom: 0.4rem;
+}
+
+th, td {
+    text-align: right;
+    padding: 0.4rem 0.6rem;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+th:first-child, td:first-child {
+    text-align: left;
+}
+
+thead th {
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #475569;
+}
+
+tbody tr:last-child td {
+    border-bottom: none;
+}
+
+td.win {
+    font-weight: 700;
+    color: #15803d;
+}
+
+/* ------------------------------------------------------------
+   Código fuente del .wat
+   ------------------------------------------------------------ */
+
+#contenido {
+    white-space: pre-wrap;
+    background: #1e293b;
+    color: #38bdf8;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    margin-top: 1rem;
+    font-size: 0.85rem;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+@media (max-width: 600px) {
+    body {
+        margin: 1rem;
+    }
+}

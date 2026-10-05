@@ -3,8 +3,8 @@
 // ================================================================
 
 // Objetivo: que cada implementación se mida durante más o menos este
-// tiempo. Es lo que hace falta para que el resultado no dependa de la
-// resolución del reloj.
+// tiempo. Así el resultado no depende de la resolución del reloj
+// (performance.now() puede redondear a 0,1 ms o más).
 const TARGET_MS = 60;
 
 // Tope de pasadas por implementación, por si una vuelta es lentísima.
@@ -13,10 +13,10 @@ const MAX_ITERATIONS = 2000;
 /**
  * Estima cuántas veces hay que repetir `fn` para llenar TARGET_MS.
  *
- * Calibrar por separado es importante: el filtro en WASM es con
- * diferencia más rápido que en JavaScript, así que con un número de
- * pasadas fijo la versión de WASM se mide en menos que un tic del reloj
- * y el resultado sale inventado.
+ * Cada implementación se calibra por separado, porque no tienen por
+ * qué tardar lo mismo. Con un número de pasadas fijo, la más rápida
+ * podría medirse en menos de un tic del reloj y el resultado no
+ * valdría.
  */
 function calibrate(fn) {
     fn(); // calentamiento, para no pagar la compilación en la medición
@@ -67,9 +67,9 @@ export function compare(entries) {
         };
     });
 
-    // La primera entrada es la referencia (WASM). Para cada otra se
-    // calcula cuántas veces más tarda que ella, que es la ventaja que
-    // se muestra en la tabla.
+    // La primera entrada es la referencia (WASM). Para cada fila se
+    // calcula cuántas veces tarda lo que la referencia: más de 1 es
+    // más lenta y menos de 1 es más rápida.
     const base = rows[0];
 
     for (const row of rows) {
