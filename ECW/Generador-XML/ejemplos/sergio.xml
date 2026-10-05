@@ -22,16 +22,38 @@
              fragmento="media/audios/pink-floyd.mp3" cancion="Money"/>
       <grupo nombre="King Crimson" album="In the Court of the Crimson King (1969)" imagen="covers/music/king-crimson.png"
              fragmento="media/audios/king-crimson.mp3" cancion="21st Century Schizoid Man"/>
-      <grupo nombre="The Alan Parsons Project" album="Tales of Mystery and Imagination (1976)" imagen="covers/music/alan-parsons-project.png"
-             fragmento="media/audios/alan-parsons-project.mp3" cancion="(The System of) Doctor Tarr and Professor Fether"/>
+      <grupo nombre="The Alan Parsons Project" album="Eye in the Sky (1982)" imagen="covers/music/alan-parsons-project.png"
+             fragmento="media/audios/alan-parsons-project.mp3" cancion="Eye in the Sky"/>
     </categoria>
     <categoria nombre="Pop Rock">
       <grupo nombre="Electric Light Orchestra" album="Out of the Blue (1977)" imagen="covers/music/electric-light-orchestra.png"
              fragmento="media/audios/electric-light-orchestra.mp3" cancion="Mr. Blue Sky"/>
+      <grupo nombre="Queen" album="A Night at the Opera (1975)" imagen="covers/music/queen.png"
+             fragmento="media/audios/queen.mp3" cancion="Bohemian Rhapsody"/>
     </categoria>
     <categoria nombre="Yacht Rock">
       <grupo nombre="Blue Öyster Cult" album="Agents of Fortune (1976)" imagen="covers/music/blue-oyster-cult.png"
              fragmento="media/audios/blue-oyster-cult.mp3" cancion="(Don't Fear) The Reaper"/>
+      <grupo nombre="Steely Dan" album="Can't Buy a Thrill (1972)" imagen="covers/music/steely-dan.png"
+             fragmento="media/audios/steely-dan.mp3" cancion="Do It Again"/>
+    </categoria>
+    <categoria nombre="Alternative Metal">
+      <grupo nombre="System of a Down" album="Toxicity (2001)" imagen="covers/music/system-of-a-down.png"
+             fragmento="media/audios/system-of-a-down.mp3" cancion="Chop Suey!"/>
+      <grupo nombre="Rage Against the Machine" album="Rage Against the Machine (1992)" imagen="covers/music/rage-against-the-machine.png"
+             fragmento="media/audios/rage-against-the-machine.mp3" cancion="Killing in the Name"/>
+    </categoria>
+    <categoria nombre="Hip Hop">
+      <grupo nombre="Joey Valence &amp; Brae" album="No Hands (2024)" imagen="covers/music/joey-valence-and-brae.png"
+             fragmento="media/audios/joey-valence-and-brae.mp3" cancion="No Hands"/>
+      <grupo nombre="Kendrick Lamar" album="Alright (2015)" imagen="covers/music/kendrick-lamar.png"
+             fragmento="media/audios/kendrick-lamar.mp3" cancion="Alright"/>
+    </categoria>
+    <categoria nombre="Indie Pop">
+      <grupo nombre="The Marias" album="Submarine (2024)" imagen="covers/music/the-marias.png"
+             fragmento="media/audios/the-marias.mp3" cancion="Sienna"/>
+      <grupo nombre="Crumb" album="Jinx (2019)" imagen="covers/music/crumb.png"
+             fragmento="media/audios/crumb.mp3" cancion="Ghostride"/>
     </categoria>
   </musica>
 
@@ -67,9 +89,21 @@
 
   <aficiones titulo="Mis aficiones" introduccion="Tres cosas a las que dedico parte de mi tiempo libre."
              descripcion="Skate, pizzas y videojuegos.">
-    <aficion titulo="Videojuegos" imagen="covers/hobbies/videojuegos.png"
-             enlace="videojuegos.html" texto-enlace="Ver mi lista de videojuegos">Es una de mis aficiones. Si quieres, puedes ver mi lista completa en la página de videojuegos.</aficion>
-    <aficion titulo="Skate" imagen="covers/hobbies/skate.png">Me gusta hacer skate sobre todo para dar paseos, no para hacer trucos.</aficion>
-    <aficion titulo="Pizzas" imagen="covers/hobbies/pizzas.png">Hacer pizzas es otra de las cosas que más me gustan.</aficion>
+    <aficion titulo="Videojuegos" imagen="covers/hobbies/videojuegos.png" tono="morado" enlace="videojuegos.html" texto-enlace="Ver mi lista de videojuegos">
+      <texto>Es una de mis aficiones. Si quieres, puedes ver mi lista completa en la página de videojuegos.</texto>
+      <dato etiqueta="Jugando ahora">Big Walk</dato>
+      <dato etiqueta="Mi favorito">The Legend of Zelda: Breath of the Wild</dato>
+      <dato etiqueta="En mi lista">6 juegos</dato>
+    </aficion>
+    <aficion titulo="Skate" imagen="covers/hobbies/skate.png" tono="verde">
+      <texto>Me gusta hacer skate sobre todo para dar paseos, no para hacer trucos.</texto>
+      <dato etiqueta="Mi ruta">De casa, en El Natahoyo, hasta La Lloca del Rinconín (Gijón)</dato>
+      <dato etiqueta="Patino desde">Los 10 años, más o menos</dato>
+      <dato etiqueta="Cómo aprendí">Solo, después de muchas caídas</dato>
+    </aficion>
+    <aficion titulo="Pizzas" imagen="covers/hobbies/pizzas.png" tono="rojo">
+      <texto>Hacer pizzas es otra de las cosas que más me gustan.</texto>
+      <dato etiqueta="Mi pizza estrella">La carbonara</dato>
+    </aficion>
   </aficiones>
 </sitio>

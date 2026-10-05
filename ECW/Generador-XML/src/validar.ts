@@ -1,7 +1,7 @@
 // Comprueba el formulario antes de crear el XML: los campos #REQUIRED del DTD
 // y los tipos del XSD (año e idioma). El navegador no sabe validar contra un
 // XSD sin librerías, así que lo hago a mano.
-import type { Sitio } from './model.js';
+import { leerDatos, type Sitio } from './model.js';
 
 // xs:language: es, en, es-ES...
 const IDIOMA = /^[a-zA-Z]{1,8}(-[a-zA-Z0-9]{1,8})*$/;
@@ -36,7 +36,13 @@ export function validarSitio(s: Sitio): string[] {
       errores.push(`El año de ${nombre} («${e.anio}») no es un año válido (por ejemplo 2019).`);
     }
   });
-  s.aficiones.forEach((a, i) => { if (vacio(a.titulo)) falta(`el título de la afición ${i + 1}`); });
+  s.aficiones.forEach((a, i) => {
+    if (vacio(a.titulo)) falta(`el título de la afición ${i + 1}`);
+    // cada dato necesita su etiqueta (#REQUIRED en <dato>)
+    for (const d of leerDatos(a.datos)) {
+      if (vacio(d.etiqueta)) errores.push(`En «${a.titulo || `afición ${i + 1}`}», el dato «${d.valor}» no tiene etiqueta (escríbelo como Etiqueta: valor).`);
+    }
+  });
 
   return errores;
 }

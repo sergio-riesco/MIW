@@ -16,6 +16,10 @@
     <serie titulo="Severance" genero="Sci-Fi" anio="2022" actual="true">Otra descripción.</serie>
   </series>
   <aficiones>
-    <aficion titulo="Fotografía analógica">Revelar carretes en casa.</aficion>
+    <aficion titulo="Fotografía analógica" tono="ambar">
+      <texto>Revelar carretes en casa.</texto>
+      <dato etiqueta="Cámara">Pentax K1000</dato>
+      <dato etiqueta="Carrete favorito">Kodak Portra 400</dato>
+    </aficion>
   </aficiones>
 </sitio>

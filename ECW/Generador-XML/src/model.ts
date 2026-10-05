@@ -18,7 +18,22 @@ export interface Serie {
   actual: boolean; favorita: boolean;
 }
 
-export interface Aficion { titulo: string; texto: string; imagen: string; enlace: string; textoEnlace: string }
+// datos: uno por línea, "Etiqueta: valor" (se convierten en <dato>)
+export interface Aficion {
+  titulo: string; texto: string; imagen: string; tono: string; datos: string;
+  enlace: string; textoEnlace: string;
+}
+
+// los colores que admite el atributo tono del DTD
+export const TONOS = ['verde', 'rojo', 'morado', 'azul', 'ambar'] as const;
+
+// "Mi ruta: de casa al Rinconín" -> { etiqueta, valor }. Sin ":" la etiqueta queda vacía.
+export function leerDatos(texto: string): { etiqueta: string; valor: string }[] {
+  return texto.split('\n').map(l => l.trim()).filter(Boolean).map(l => {
+    const i = l.indexOf(':');
+    return i < 0 ? { etiqueta: '', valor: l } : { etiqueta: l.slice(0, i).trim(), valor: l.slice(i + 1).trim() };
+  });
+}
 
 /** Lo que comparten las cuatro secciones. */
 export interface Seccion { titulo: string; introduccion: string; descripcion: string }

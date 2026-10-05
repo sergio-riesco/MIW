@@ -1,5 +1,5 @@
 // Interfaz: formulario -> XML -> sitio (wasm) -> ZIP.
-import { sitioVacio } from './model.js';
+import { sitioVacio, TONOS } from './model.js';
 import { aXml, deXml } from './xml.js';
 import { iniciarWasm, crearZip, descargar } from './glue.js';
 import { validarSitio } from './validar.js';
@@ -30,6 +30,13 @@ function entrada(item, c, carpeta) {
         const i = crear('input', { type: 'checkbox', checked: Boolean(reg[c.k]) });
         i.onchange = () => (reg[c.k] = i.checked);
         label.append(i, c.et);
+        return label;
+    }
+    if (c.tipo === 'tono') {
+        const s = crear('select', {}, crear('option', { value: '', textContent: 'Sin color' }), ...TONOS.map(t => crear('option', { value: t, textContent: t })));
+        s.value = String(reg[c.k] ?? '');
+        s.onchange = () => (reg[c.k] = s.value);
+        label.append(c.et, s);
         return label;
     }
     if (c.tipo === 'imagen' || c.tipo === 'video' || c.tipo === 'audio') {
@@ -104,8 +111,10 @@ function pintarFormulario() {
         C('actual', 'Viendo ahora', 'check'), C('favorita', 'Favorita', 'check'),
     ], () => ({ titulo: '', genero: '', anio: '', descripcion: '', imagen: '', trailer: '', actual: false, favorita: false })), lista('Aficiones', 'hobbies', sitio.aficiones, [
         O('titulo', 'Afición'), C('texto', 'Texto', 'area'), C('imagen', 'Imagen', 'imagen'),
+        C('tono', 'Color de la tarjeta', 'tono'),
+        C('datos', 'Datos, uno por línea (Etiqueta: valor)', 'area'),
         C('enlace', 'Enlace (opcional)'), C('textoEnlace', 'Texto del enlace'),
-    ], () => ({ titulo: '', texto: '', imagen: '', enlace: '', textoEnlace: '' })));
+    ], () => ({ titulo: '', texto: '', imagen: '', tono: '', datos: '', enlace: '', textoEnlace: '' })));
 }
 // --- XML -> sitio (WebAssembly) ---
 const xmlArea = () => $('xml');

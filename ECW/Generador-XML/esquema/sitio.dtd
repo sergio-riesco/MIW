@@ -117,17 +117,23 @@
   actual     (true|false)  "false"
   favorita   (true|false)  "false">
 
-<!-- Aficiones: hobbies.html. enlace y texto-enlace añaden un enlace
-     opcional debajo del texto. -->
+<!-- Aficiones: hobbies.html, una tarjeta por afición (en zigzag).
+     <texto> es la descripción y cada <dato> un detalle con su etiqueta
+     ("Mi ruta", "Patino desde"...); es el mismo <dato> del perfil.
+     tono es el color de la tarjeta. enlace y texto-enlace añaden un
+     enlace debajo. -->
 <!ELEMENT aficiones (aficion+)>
 <!ATTLIST aficiones
   titulo        CDATA  #IMPLIED
   introduccion  CDATA  #IMPLIED
   descripcion   CDATA  #IMPLIED>
 
-<!ELEMENT aficion (#PCDATA)>
+<!ELEMENT aficion (texto, dato*)>
 <!ATTLIST aficion
   titulo        CDATA  #REQUIRED
   imagen        CDATA  #IMPLIED
+  tono          (verde|rojo|morado|azul|ambar)  #IMPLIED
   enlace        CDATA  #IMPLIED
   texto-enlace  CDATA  #IMPLIED>
+
+<!ELEMENT texto (#PCDATA)>

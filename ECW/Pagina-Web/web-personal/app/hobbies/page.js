@@ -2,12 +2,26 @@ import Image from "next/image";
 import Link from "next/link";
 import Breadcrumb from "../components/Breadcrumb";
 import { hobbies } from "../data/hobbies";
+import { videogames } from "../data/videogames";
 import styles from "./hobbies.module.css";
 
 export const metadata = {
   title: "Hobbies",
   description: "Mis aficiones: videojuegos, skate y hacer pizzas.",
 };
+
+// Los datos de videojuegos salen de la lista de la página de videojuegos,
+// así no hay que repetirlos aquí.
+function detallesVideojuegos() {
+  const actual = videogames.find((game) => game.current);
+  const favorito = videogames.find((game) => game.favorite);
+
+  return [
+    actual && { label: "Jugando ahora", value: actual.title },
+    favorito && { label: "Mi favorito", value: favorito.title },
+    { label: "En mi lista", value: `${videogames.length} juegos` },
+  ].filter(Boolean);
+}
 
 export default function HobbiesPage() {
   return (
@@ -21,34 +35,49 @@ export default function HobbiesPage() {
       </header>
 
       <ul className={styles.list}>
-        {hobbies.map((hobby, index) => (
-          <li key={hobby.id}>
-            <article className={styles.card}>
-              <div className={styles.cover}>
-                <Image
-                  src={hobby.cover || "/covers/placeholder.svg"}
-                  alt=""
-                  fill
-                  sizes="(max-width: 640px) 100vw, 22rem"
-                  // la primera se ve sin hacer scroll
-                  priority={index === 0}
-                  unoptimized={hobby.cover?.endsWith(".svg")}
-                />
-              </div>
+        {hobbies.map((hobby, index) => {
+          const details = hobby.id === "videojuegos" ? detallesVideojuegos() : hobby.details;
 
-              <div className={styles.info}>
-                <h2>{hobby.title}</h2>
-                <p>{hobby.text}</p>
+          return (
+            <li key={hobby.id}>
+              <article className={`${styles.card} ${styles[hobby.tone] ?? ""}`}>
+                <div className={styles.cover}>
+                  <Image
+                    src={hobby.cover || "/covers/placeholder.svg"}
+                    alt=""
+                    fill
+                    sizes="(max-width: 736px) 100vw, 26rem"
+                    // la primera se ve sin hacer scroll
+                    priority={index === 0}
+                    unoptimized={hobby.cover?.endsWith(".svg")}
+                  />
+                </div>
 
-                {hobby.link && (
-                  <Link className={styles.link} href={hobby.link.href}>
-                    {hobby.link.label}
-                  </Link>
-                )}
-              </div>
-            </article>
-          </li>
-        ))}
+                <div className={styles.info}>
+                  <h2>{hobby.title}</h2>
+                  <p>{hobby.text}</p>
+
+                  {details?.length > 0 && (
+                    <dl className={styles.details}>
+                      {details.map((detail) => (
+                        <div key={detail.label}>
+                          <dt>{detail.label}</dt>
+                          <dd>{detail.value}</dd>
+                        </div>
+                      ))}
+                    </dl>
+                  )}
+
+                  {hobby.link && (
+                    <Link className={styles.link} href={hobby.link.href}>
+                      {hobby.link.label}
+                    </Link>
+                  )}
+                </div>
+              </article>
+            </li>
+          );
+        })}
       </ul>
     </main>
   );

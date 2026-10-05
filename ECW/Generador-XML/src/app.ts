@@ -1,5 +1,5 @@
 // Interfaz: formulario -> XML -> sitio (wasm) -> ZIP.
-import { sitioVacio, type Sitio, type Par } from './model.js';
+import { sitioVacio, TONOS, type Sitio, type Par } from './model.js';
 import { aXml, deXml } from './xml.js';
 import { iniciarWasm, crearZip, descargar } from './glue.js';
 import { validarSitio } from './validar.js';
@@ -24,7 +24,7 @@ let sitio: Sitio = sitioVacio();
 // --- Formulario ---
 
 // tipos de campo; imagen, video y audio son de subir archivo
-type Tipo = 'text' | 'area' | 'check' | 'imagen' | 'video' | 'audio';
+type Tipo = 'text' | 'area' | 'check' | 'tono' | 'imagen' | 'video' | 'audio';
 // oblig = #REQUIRED en el DTD (lleva *)
 interface Campo<T> { k: keyof T & string; et: string; tipo?: Tipo; oblig?: boolean }
 
@@ -42,6 +42,16 @@ function entrada<T>(item: T, c: Campo<T>, carpeta: string): HTMLElement {
     const i = crear('input', { type: 'checkbox', checked: Boolean(reg[c.k]) });
     i.onchange = () => (reg[c.k] = i.checked);
     label.append(i, c.et);
+    return label;
+  }
+
+  if (c.tipo === 'tono') {
+    const s = crear('select', {},
+      crear('option', { value: '', textContent: 'Sin color' }),
+      ...TONOS.map(t => crear('option', { value: t, textContent: t })));
+    s.value = String(reg[c.k] ?? '');
+    s.onchange = () => (reg[c.k] = s.value);
+    label.append(c.et, s);
     return label;
   }
 
@@ -132,8 +142,10 @@ function pintarFormulario() {
     ], () => ({ titulo: '', genero: '', anio: '', descripcion: '', imagen: '', trailer: '', actual: false, favorita: false })),
     lista('Aficiones', 'hobbies', sitio.aficiones, [
       O('titulo', 'Afición'), C('texto', 'Texto', 'area'), C('imagen', 'Imagen', 'imagen'),
+      C('tono', 'Color de la tarjeta', 'tono'),
+      C('datos', 'Datos, uno por línea (Etiqueta: valor)', 'area'),
       C('enlace', 'Enlace (opcional)'), C('textoEnlace', 'Texto del enlace'),
-    ], () => ({ titulo: '', texto: '', imagen: '', enlace: '', textoEnlace: '' })),
+    ], () => ({ titulo: '', texto: '', imagen: '', tono: '', datos: '', enlace: '', textoEnlace: '' })),
   );
 }
 

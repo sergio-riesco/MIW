@@ -184,39 +184,6 @@ h3 {
     font-size: .88rem
 }
 
-.filas {
-    margin: 0;
-    padding: 0;
-    list-style: none
-}
-
-.fila {
-    display: grid;
-    grid-template-columns: 20rem 1fr;
-    gap: 1.5rem 2rem;
-    align-items: center;
-    padding-block: 1.5rem;
-    border-top: 1px solid var(--bd)
-}
-
-.foto-fila {
-    width: 100%;
-    aspect-ratio: 4/3;
-    object-fit: cover;
-    border: 1px solid var(--bd);
-    border-radius: .6rem;
-    background: var(--sf)
-}
-
-.fila h2 {
-    margin: 0 0 .35rem
-}
-
-.fila p {
-    margin: 0;
-    color: var(--mu)
-}
-
 footer {
     border-top: 1px solid var(--bd);
     background: var(--sf);
@@ -668,7 +635,6 @@ footer {
 @media(max-width:46rem) {
 
     .perfil,
-    .fila,
     .destacada {
         grid-template-columns: 1fr
     }
@@ -864,13 +830,6 @@ address {
     text-align: center
 }
 
-/* enlace de una afición */
-.enlace-fila {
-    display: inline-block;
-    margin-top: .6rem;
-    font-weight: 700
-}
-
 @media(prefers-reduced-motion:reduce) {
     .cover-img {
         transition: none
@@ -878,6 +837,180 @@ address {
 
     .juego:hover .cover-img,
     .serie:hover .cover-img {
+        transform: none
+    }
+}
+
+/* Aficiones: tarjetas en zigzag, cada una con su color (tono) */
+.tono-verde { --tono: #1f5b2c }
+.tono-rojo { --tono: #8f2a12 }
+.tono-morado { --tono: #5a2d91 }
+.tono-azul { --tono: #1d4a85 }
+.tono-ambar { --tono: #6b4100 }
+
+@media(prefers-color-scheme:dark) {
+    :root:not([data-theme="light"]) .tono-verde { --tono: #8fe0a0 }
+    :root:not([data-theme="light"]) .tono-rojo { --tono: #ffab94 }
+    :root:not([data-theme="light"]) .tono-morado { --tono: #d2b8ff }
+    :root:not([data-theme="light"]) .tono-azul { --tono: #a9c8ff }
+    :root:not([data-theme="light"]) .tono-ambar { --tono: #f5c26b }
+}
+
+:root[data-theme="dark"] .tono-verde { --tono: #8fe0a0 }
+:root[data-theme="dark"] .tono-rojo { --tono: #ffab94 }
+:root[data-theme="dark"] .tono-morado { --tono: #d2b8ff }
+:root[data-theme="dark"] .tono-azul { --tono: #a9c8ff }
+:root[data-theme="dark"] .tono-ambar { --tono: #f5c26b }
+
+.aficiones {
+    display: grid;
+    margin: 0;
+    padding: 0;
+    gap: 2.5rem;
+    list-style: none
+}
+
+.aficion {
+    display: grid;
+    grid-template-columns: 26rem 1fr;
+    gap: 1.5rem 2.5rem;
+    align-items: center;
+    padding: 1.5rem;
+    border: 1px solid var(--bd);
+    border-left: .4rem solid var(--tono, var(--ac));
+    border-radius: .75rem;
+    background: var(--sf);
+    box-shadow: 0 .35rem 1.1rem var(--sh)
+}
+
+/* zigzag: en las pares la imagen va a la derecha */
+.aficiones li:nth-child(even) .aficion {
+    grid-template-columns: 1fr 26rem;
+    border-left: 1px solid var(--bd);
+    border-right: .4rem solid var(--tono, var(--ac))
+}
+
+.aficiones li:nth-child(even) .foto-aficion {
+    order: 2
+}
+
+.foto-aficion {
+    overflow: hidden;
+    aspect-ratio: 4/3;
+    border-radius: .5rem;
+    background: var(--bg)
+}
+
+.foto-aficion img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform .2s ease
+}
+
+.aficion:hover .foto-aficion img {
+    transform: scale(1.04)
+}
+
+.aficion h2 {
+    margin: 0 0 .4rem;
+    color: var(--tono, var(--tx));
+    font-size: 1.5rem
+}
+
+.aficion p {
+    margin: 0;
+    max-width: 40rem;
+    color: var(--mu)
+}
+
+.datos-aficion {
+    display: grid;
+    margin: 1.1rem 0 0;
+    gap: .6rem;
+    max-width: none
+}
+
+.datos-aficion div {
+    display: grid;
+    grid-template-columns: 9rem 1fr;
+    gap: .75rem;
+    align-items: baseline
+}
+
+.datos-aficion dt {
+    color: var(--tono, var(--ac));
+    font-size: .78rem
+}
+
+.datos-aficion dd {
+    color: var(--tx)
+}
+
+.enlace-aficion {
+    display: inline-block;
+    margin-top: 1.1rem;
+    color: var(--tono, var(--ac));
+    font-weight: 700;
+    text-decoration: none
+}
+
+.enlace-aficion::after {
+    content: " →"
+}
+
+.enlace-aficion:hover {
+    text-decoration: underline
+}
+
+/* aparecen al llegar con el scroll (solo donde hay animation-timeline) */
+@keyframes aparecer {
+    from {
+        opacity: 0;
+        transform: translateY(1.5rem)
+    }
+
+    to {
+        opacity: 1;
+        transform: none
+    }
+}
+
+@supports (animation-timeline: view()) {
+    @media(prefers-reduced-motion:no-preference) {
+        .aficion {
+            animation: aparecer linear both;
+            animation-timeline: view();
+            animation-range: entry 0% entry 60%
+        }
+    }
+}
+
+@media(max-width:46rem) {
+    .aficion,
+    .aficiones li:nth-child(even) .aficion {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+        padding: 1rem
+    }
+
+    .aficiones li:nth-child(even) .foto-aficion {
+        order: 0
+    }
+
+    .datos-aficion div {
+        grid-template-columns: 1fr;
+        gap: .1rem
+    }
+}
+
+@media(prefers-reduced-motion:reduce) {
+    .foto-aficion img {
+        transition: none
+    }
+
+    .aficion:hover .foto-aficion img {
         transform: none
     }
 }

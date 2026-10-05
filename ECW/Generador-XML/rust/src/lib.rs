@@ -370,22 +370,40 @@ fn pagina_series(s: Node) -> Pagina {
     p
 }
 
-/// hobbies.html
+/// hobbies.html: tarjetas en zigzag con su color, sus datos y un enlace opcional.
 fn pagina_aficiones(h: Node) -> Pagina {
-    let filas: String = hijos(h, "aficion").enumerate().map(|(i, a)| {
+    let tarjetas: String = hijos(h, "aficion").enumerate().map(|(i, a)| {
+        let texto_aficion = hijos(a, "texto").next().map(texto).unwrap_or("");
+
+        let datos: String = hijos(a, "dato").map(|d| format!(
+            "<div><dt>{}</dt><dd>{}</dd></div>",
+            esc(at(d, "etiqueta")), esc(texto(d))
+        )).collect();
+        let datos = if datos.is_empty() { datos } else { format!("<dl class=\"datos-aficion\">{datos}</dl>") };
+
         let enlace = at(a, "enlace");
         let enlace = if enlace.is_empty() || !enlace_seguro(enlace) {
             String::new()
         } else {
             let t = if at(a, "texto-enlace").is_empty() { "Ver más" } else { at(a, "texto-enlace") };
-            format!("<a class=\"enlace-fila\" href=\"{}\">{}</a>", esc(enlace), esc(t))
+            format!("<a class=\"enlace-aficion\" href=\"{}\">{}</a>", esc(enlace), esc(t))
         };
+
+        // el tono viene de una lista cerrada en el DTD, pero por si acaso
+        // solo se aceptan letras
+        let tono = at(a, "tono");
+        let clase = if !tono.is_empty() && tono.chars().all(|c| c.is_ascii_lowercase()) {
+            format!(" tono-{tono}")
+        } else {
+            String::new()
+        };
+
         format!(
-            "<li><article class=\"fila\">{}<div><h2>{}</h2><p>{}</p>{enlace}</div></article></li>",
-            img(at(a, "imagen"), "foto-fila", i > 0), esc(at(a, "titulo")), esc(texto(a))
+            "<li><article class=\"aficion{clase}\"><div class=\"foto-aficion\">{}</div><div><h2>{}</h2>{}{datos}{enlace}</div></article></li>",
+            img(at(a, "imagen"), "img-aficion", i > 0), esc(at(a, "titulo")), parrafo("texto-aficion", texto_aficion)
         )
     }).collect();
-    pagina("hobbies.html", "Hobbies", at(h, "titulo"), at(h, "introduccion"), format!("<ul class=\"filas\">{filas}</ul>"))
+    pagina("hobbies.html", "Hobbies", at(h, "titulo"), at(h, "introduccion"), format!("<ul class=\"aficiones\">{tarjetas}</ul>"))
 }
 
 // --- Plantilla común ---

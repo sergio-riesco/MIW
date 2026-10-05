@@ -1,45 +1,92 @@
-/* Aficiones: una por fila, imagen a la izquierda */
+/* Aficiones: tarjetas en zigzag, cada una con su color */
+
+/* Color de cada afición (todos con contraste 7:1 o más sobre el fondo) */
+.skate {
+  --hobby: #1f5b2c;
+}
+
+.pizza {
+  --hobby: #8f2a12;
+}
+
+.juegos {
+  --hobby: #5a2d91;
+}
+
+:global([data-theme="dark"]) .skate {
+  --hobby: #8fe0a0;
+}
+
+:global([data-theme="dark"]) .pizza {
+  --hobby: #ffab94;
+}
+
+:global([data-theme="dark"]) .juegos {
+  --hobby: #d2b8ff;
+}
+
+@media (prefers-color-scheme: dark) {
+  :global(:root:not([data-theme])) .skate {
+    --hobby: #8fe0a0;
+  }
+
+  :global(:root:not([data-theme])) .pizza {
+    --hobby: #ffab94;
+  }
+
+  :global(:root:not([data-theme])) .juegos {
+    --hobby: #d2b8ff;
+  }
+}
 
 .list {
   display: grid;
   margin: 0;
   padding: 0;
-  gap: 1.5rem;
+  gap: 2.5rem;
   list-style: none;
-}
-
-/* líneas entre filas */
-.list li + li {
-  margin-top: 0.25rem;
-  padding-top: 1.5rem;
-  border-top: 1px solid var(--border);
 }
 
 .card {
   display: grid;
-  grid-template-columns: 22rem 1fr;
-  gap: 1.5rem 2rem;
+  grid-template-columns: 26rem 1fr;
+  gap: 1.5rem 2.5rem;
   align-items: center;
+  padding: 1.5rem;
+  border: 1px solid var(--border);
+  border-left: 0.4rem solid var(--hobby, var(--accent));
+  border-radius: 0.75rem;
+  background: var(--surface);
+  box-shadow: 0 0.35rem 1.1rem var(--shadow-color);
+}
+
+/* zigzag: en las pares la imagen va a la derecha */
+.list li:nth-child(even) .card {
+  grid-template-columns: 1fr 26rem;
+  border-left-width: 1px;
+  border-left-color: var(--border);
+  border-right: 0.4rem solid var(--hobby, var(--accent));
+}
+
+.list li:nth-child(even) .cover {
+  order: 2;
 }
 
 .cover {
   position: relative;
   overflow: hidden;
   aspect-ratio: 4 / 3;
-  border: 1px solid var(--border);
-  border-radius: 0.6rem;
-  background: var(--surface);
-  box-shadow: 0 0.25rem 0.8rem var(--shadow-color);
-  transition: border-color 150ms ease, box-shadow 150ms ease;
+  border-radius: 0.5rem;
+  background: var(--background);
 }
 
 .cover img {
   object-fit: cover;
+  transition: transform 200ms ease;
 }
 
-.card:hover .cover {
-  border-color: var(--accent);
-  box-shadow: 0 0.4rem 1.2rem var(--shadow-color);
+.card:hover .cover img {
+  transform: scale(1.04);
 }
 
 .info {
@@ -47,8 +94,9 @@
 }
 
 .info h2 {
-  margin: 0 0 0.35rem;
-  font-size: 1.3rem;
+  margin: 0 0 0.4rem;
+  color: var(--hobby, var(--text));
+  font-size: 1.5rem;
 }
 
 .info p {
@@ -57,10 +105,38 @@
   color: var(--muted);
 }
 
+/* datos de cada afición */
+.details {
+  display: grid;
+  margin: 1.1rem 0 0;
+  gap: 0.6rem;
+}
+
+.details div {
+  display: grid;
+  grid-template-columns: 9rem 1fr;
+  gap: 0.75rem;
+  align-items: baseline;
+}
+
+.details dt {
+  color: var(--hobby, var(--accent));
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.details dd {
+  margin: 0;
+  color: var(--text);
+}
+
 .link {
   display: inline-block;
-  margin-top: 0.85rem;
-  font-size: 0.9rem;
+  margin-top: 1.1rem;
+  color: var(--hobby, var(--accent));
+  font-size: 0.95rem;
   font-weight: 700;
   text-decoration: none;
 }
@@ -73,26 +149,60 @@
   text-decoration: underline;
 }
 
-@media (max-width: 46rem) {
-  .card {
-    grid-template-columns: 1fr;
-    gap: 1rem;
+/* Las tarjetas aparecen al llegar a ellas con el scroll. Solo en navegadores
+   que soportan animation-timeline; en el resto se ven directamente. */
+@keyframes aparecer {
+  from {
+    opacity: 0;
+    transform: translateY(1.5rem);
   }
 
-  /* que en móvil no ocupe media pantalla */
-  .cover {
-    max-width: 20rem;
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .card {
+      animation: aparecer linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 60%;
+    }
+  }
+}
+
+@media (max-width: 46rem) {
+  .card,
+  .list li:nth-child(even) .card {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    padding: 1rem;
+  }
+
+  .list li:nth-child(even) .cover {
+    order: 0;
+  }
+
+  .details div {
+    grid-template-columns: 1fr;
+    gap: 0.1rem;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .cover {
+  .cover img {
     transition: none;
+  }
+
+  .card:hover .cover img {
+    transform: none;
   }
 }
 
 @media print {
-  .cover {
+  .card {
     box-shadow: none;
   }
 

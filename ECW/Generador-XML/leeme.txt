@@ -54,7 +54,9 @@ esquema/sitio.dtd define el lenguaje. Un documento tiene esta forma:
       <serie titulo genero anio imagen trailer actual favorita>texto</serie>+
     </series>?
     <aficiones ...>                                 -> hobbies.html
-      <aficion titulo imagen enlace texto-enlace>texto</aficion>+
+      <aficion titulo imagen tono enlace texto-enlace>
+        <texto/> <dato etiqueta=""/>*
+      </aficion>+
     </aficiones>?
   </sitio>
 
@@ -62,6 +64,12 @@ Cada sección es opcional: solo se genera su página y su entrada del
 menú si está en el documento. Los atributos booleanos (actual,
 favorito, favorita) valen true o false. Las rutas de imágenes, vídeos y
 audios son relativas a la carpeta del sitio generado.
+
+Cada afición es una tarjeta (en hobbies.html van en zigzag) con su
+texto y unos datos opcionales; <dato> es el mismo elemento que en el
+perfil. tono elige el color de la tarjeta de una lista cerrada (verde,
+rojo, morado, azul o ambar); todos tienen un contraste de al menos 7:1
+en modo claro y oscuro.
 
 2.2. sitio.xsd: generado a partir del DTD
 
@@ -129,6 +137,8 @@ validar contra un XSD sin bibliotecas externas:
     juego, serie y afición.
   - Tipos del XSD: el año de una serie tiene que ser un año (xs:gYear)
     y el idioma un código de idioma (xs:language).
+  - Los datos de una afición se escriben uno por línea como
+    "Etiqueta: valor"; una línea sin etiqueta es un error.
 
 Si algo falla, no se crea el XML y se muestra la lista de errores. La
 comprobación también se hace sobre el XML del cuadro de texto, por si
@@ -143,8 +153,9 @@ ejemplos (npm run generar): ejemplos/<nombre>.xml -> sitios/<nombre>/.
 4. SITIOS GENERADOS
 ------------------------------------------------------------------
 
-  ejemplos/sergio.xml -> sitios/sergio/   Mi sitio personal: 8 páginas,
-                                          con fotos, tráileres y audios.
+  ejemplos/sergio.xml -> sitios/sergio/   Mi sitio personal: 11 páginas,
+                                          con fotos, tráileres, audios y
+                                          las aficiones con sus datos.
   ejemplos/lucia.xml  -> sitios/lucia/    Persona inventada: música con
                                           tres géneros y videojuegos,
                                           sin imágenes (usa la imagen por

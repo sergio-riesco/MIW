@@ -1,4 +1,4 @@
-import { sitioVacio, type ClaveSeccion, type Sitio } from './model.js';
+import { leerDatos, sitioVacio, type ClaveSeccion, type Sitio } from './model.js';
 
 const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
@@ -62,9 +62,12 @@ export function aXml(s: Sitio): string {
   }
   if (s.aficiones.length) {
     o.push(`  <aficiones${sec('aficiones')}>`);
-    s.aficiones.forEach(a => o.push(nodo('aficion', {
-      titulo: a.titulo, imagen: a.imagen, enlace: a.enlace, 'texto-enlace': a.textoEnlace,
-    }, a.texto)));
+    for (const a of s.aficiones) {
+      o.push(`    <aficion${attrs({ titulo: a.titulo, imagen: a.imagen, tono: a.tono, enlace: a.enlace, 'texto-enlace': a.textoEnlace })}>`);
+      o.push(`      <texto>${esc(a.texto)}</texto>`);
+      for (const d of leerDatos(a.datos)) o.push(nodo('dato', { etiqueta: d.etiqueta }, d.valor, '      '));
+      o.push('    </aficion>');
+    }
     o.push('  </aficiones>');
   }
   o.push('</sitio>');
@@ -112,7 +115,9 @@ export function deXml(xml: string): Sitio {
     trailer: a(e, 'trailer'), actual: b(e, 'actual'), favorita: b(e, 'favorita'),
   }));
   s.aficiones = hs(hs(r, 'aficiones')[0], 'aficion').map(e => ({
-    titulo: a(e, 'titulo'), texto: t(e), imagen: a(e, 'imagen'), enlace: a(e, 'enlace'), textoEnlace: a(e, 'texto-enlace'),
+    titulo: a(e, 'titulo'), texto: t(hs(e, 'texto')[0]), imagen: a(e, 'imagen'), tono: a(e, 'tono'),
+    datos: hs(e, 'dato').map(d => `${a(d, 'etiqueta')}: ${t(d)}`).join('\n'),
+    enlace: a(e, 'enlace'), textoEnlace: a(e, 'texto-enlace'),
   }));
   for (const k of ['musica', 'videojuegos', 'series', 'aficiones'] as const) {
     const e = hs(r, k)[0];

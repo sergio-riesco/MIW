@@ -192,15 +192,28 @@
 
   <xs:element name="aficion">
     <xs:complexType>
-      <xs:simpleContent>
-        <xs:extension base="xs:string">
-          <xs:attribute name="titulo" type="xs:string" use="required"/>
-          <xs:attribute name="imagen" type="xs:anyURI"/>
-          <xs:attribute name="enlace" type="xs:anyURI"/>
-          <xs:attribute name="texto-enlace" type="xs:string"/>
-        </xs:extension>
-      </xs:simpleContent>
+      <xs:sequence>
+        <xs:element ref="texto"/>
+        <xs:element ref="dato" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+      <xs:attribute name="titulo" type="xs:string" use="required"/>
+      <xs:attribute name="imagen" type="xs:anyURI"/>
+      <xs:attribute name="tono">
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:enumeration value="verde"/>
+            <xs:enumeration value="rojo"/>
+            <xs:enumeration value="morado"/>
+            <xs:enumeration value="azul"/>
+            <xs:enumeration value="ambar"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="enlace" type="xs:anyURI"/>
+      <xs:attribute name="texto-enlace" type="xs:string"/>
     </xs:complexType>
   </xs:element>
+
+  <xs:element name="texto" type="xs:string"/>
 
 </xs:schema>
