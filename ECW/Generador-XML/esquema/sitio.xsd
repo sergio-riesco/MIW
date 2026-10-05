@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  sitio.xsd - XML Schema del lenguaje de sitios web personales.
+
+  GENERADO por tools/dtd-a-xsd.mjs a partir de sitio.dtd: no editar a mano.
+  Para cambiar el lenguaje, editar sitio.dtd y ejecutar "npm run xsd".
+-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+
+  <xs:element name="sitio">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="perfil"/>
+        <xs:element ref="musica" minOccurs="0"/>
+        <xs:element ref="videojuegos" minOccurs="0"/>
+        <xs:element ref="series" minOccurs="0"/>
+        <xs:element ref="aficiones" minOccurs="0"/>
+      </xs:sequence>
+      <xs:attribute name="autor" type="xs:string" use="required"/>
+      <xs:attribute name="idioma" type="xs:language" default="es"/>
+      <xs:attribute name="pie" type="xs:string"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="perfil">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="resumen" minOccurs="0"/>
+        <xs:element ref="parrafo" minOccurs="0" maxOccurs="unbounded"/>
+        <xs:element ref="dato" minOccurs="0" maxOccurs="unbounded"/>
+        <xs:element ref="contacto" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+      <xs:attribute name="foto" type="xs:anyURI"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="resumen" type="xs:string"/>
+
+  <xs:element name="parrafo" type="xs:string"/>
+
+  <xs:element name="dato">
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="xs:string">
+          <xs:attribute name="etiqueta" type="xs:string" use="required"/>
+          <xs:attribute name="detalle" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="contacto">
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="xs:string">
+          <xs:attribute name="etiqueta" type="xs:string" use="required"/>
+          <xs:attribute name="enlace" type="xs:anyURI" use="required"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="musica">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="categoria" maxOccurs="unbounded"/>
+      </xs:sequence>
+      <xs:attribute name="titulo" type="xs:string"/>
+      <xs:attribute name="introduccion" type="xs:string"/>
+      <xs:attribute name="descripcion" type="xs:string"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="categoria">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="grupo" maxOccurs="unbounded"/>
+      </xs:sequence>
+      <xs:attribute name="nombre" type="xs:string" use="required"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="grupo">
+    <xs:complexType>
+      <xs:attribute name="nombre" type="xs:string" use="required"/>
+      <xs:attribute name="album" type="xs:string"/>
+      <xs:attribute name="imagen" type="xs:anyURI"/>
+      <xs:attribute name="fragmento" type="xs:anyURI"/>
+      <xs:attribute name="cancion" type="xs:string"/>
+      <xs:attribute name="favorito" default="false">
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:enumeration value="true"/>
+            <xs:enumeration value="false"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="videojuegos">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="juego" maxOccurs="unbounded"/>
+      </xs:sequence>
+      <xs:attribute name="titulo" type="xs:string"/>
+      <xs:attribute name="introduccion" type="xs:string"/>
+      <xs:attribute name="descripcion" type="xs:string"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="juego">
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="xs:string">
+          <xs:attribute name="titulo" type="xs:string" use="required"/>
+          <xs:attribute name="genero" type="xs:string"/>
+          <xs:attribute name="imagen" type="xs:anyURI"/>
+          <xs:attribute name="trailer" type="xs:anyURI"/>
+          <xs:attribute name="actual" default="false">
+            <xs:simpleType>
+              <xs:restriction base="xs:string">
+                <xs:enumeration value="true"/>
+                <xs:enumeration value="false"/>
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:attribute>
+          <xs:attribute name="favorito" default="false">
+            <xs:simpleType>
+              <xs:restriction base="xs:string">
+                <xs:enumeration value="true"/>
+                <xs:enumeration value="false"/>
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:attribute>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="series">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="serie" maxOccurs="unbounded"/>
+      </xs:sequence>
+      <xs:attribute name="titulo" type="xs:string"/>
+      <xs:attribute name="introduccion" type="xs:string"/>
+      <xs:attribute name="descripcion" type="xs:string"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="serie">
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="xs:string">
+          <xs:attribute name="titulo" type="xs:string" use="required"/>
+          <xs:attribute name="genero" type="xs:string"/>
+          <xs:attribute name="anio" type="xs:gYear"/>
+          <xs:attribute name="imagen" type="xs:anyURI"/>
+          <xs:attribute name="trailer" type="xs:anyURI"/>
+          <xs:attribute name="actual" default="false">
+            <xs:simpleType>
+              <xs:restriction base="xs:string">
+                <xs:enumeration value="true"/>
+                <xs:enumeration value="false"/>
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:attribute>
+          <xs:attribute name="favorita" default="false">
+            <xs:simpleType>
+              <xs:restriction base="xs:string">
+                <xs:enumeration value="true"/>
+                <xs:enumeration value="false"/>
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:attribute>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="aficiones">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="aficion" maxOccurs="unbounded"/>
+      </xs:sequence>
+      <xs:attribute name="titulo" type="xs:string"/>
+      <xs:attribute name="introduccion" type="xs:string"/>
+      <xs:attribute name="descripcion" type="xs:string"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="aficion">
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="xs:string">
+          <xs:attribute name="titulo" type="xs:string" use="required"/>
+          <xs:attribute name="imagen" type="xs:anyURI"/>
+          <xs:attribute name="enlace" type="xs:anyURI"/>
+          <xs:attribute name="texto-enlace" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+</xs:schema>

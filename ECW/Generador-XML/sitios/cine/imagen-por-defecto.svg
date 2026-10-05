@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400">
+  <!-- Imagen por defecto: se usa cuando un elemento no indica la suya. -->
+  <rect width="400" height="400" fill="#e8eae7"/>
+  <circle cx="200" cy="200" r="110" fill="#1f5f5b" opacity="0.12"/>
+  <rect x="140" y="155" width="120" height="90" rx="8" fill="none" stroke="#1f5f5b" stroke-width="10"/>
+  <circle cx="175" cy="185" r="12" fill="#1f5f5b"/>
+  <path d="M150 238l35-35 25 25 20-20 25 30" fill="none" stroke="#1f5f5b" stroke-width="10" stroke-linejoin="round"/>
+</svg>

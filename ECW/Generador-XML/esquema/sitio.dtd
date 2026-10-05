@@ -1,0 +1,133 @@
+<!--
+  sitio.dtd - Lenguaje XML para describir un sitio web personal.
+
+  Es la definición de partida del lenguaje. A partir de este DTD se genera
+  el XML Schema (sitio.xsd) con tools/dtd-a-xsd.mjs (npm run xsd).
+
+  Un documento empieza así:
+
+    <?xml version="1.0" encoding="UTF-8"?>
+    <!DOCTYPE sitio SYSTEM "../esquema/sitio.dtd">
+    <sitio autor="Nombre" idioma="es"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:noNamespaceSchemaLocation="../esquema/sitio.xsd">
+
+  Las rutas de imágenes, vídeos y audios son relativas a la carpeta del
+  sitio generado (por ejemplo covers/series/lanterns.png).
+-->
+
+<!-- ================================================================
+     Raíz: un perfil (página de inicio) y, opcionalmente, las secciones.
+     Cada sección presente genera su página y su entrada en el menú.
+     ================================================================ -->
+<!ELEMENT sitio (perfil, musica?, videojuegos?, series?, aficiones?)>
+<!ATTLIST sitio
+  autor      CDATA  #REQUIRED
+  idioma     CDATA  "es"
+  pie        CDATA  #IMPLIED
+  xmlns:xsi  CDATA  #FIXED "http://www.w3.org/2001/XMLSchema-instance"
+  xsi:noNamespaceSchemaLocation  CDATA  #IMPLIED>
+
+<!-- ================================================================
+     Perfil: genera index.html ("Sobre mí").
+     ================================================================ -->
+<!ELEMENT perfil (resumen?, parrafo*, dato*, contacto*)>
+<!ATTLIST perfil
+  foto       CDATA  #IMPLIED>
+
+<!-- Frase que aparece bajo el nombre. -->
+<!ELEMENT resumen (#PCDATA)>
+
+<!-- Párrafos de la presentación. -->
+<!ELEMENT parrafo (#PCDATA)>
+
+<!-- Dato personal de la lista "En resumen" (Vivo en, Estudios...). -->
+<!ELEMENT dato (#PCDATA)>
+<!ATTLIST dato
+  etiqueta   CDATA  #REQUIRED
+  detalle    CDATA  #IMPLIED>
+
+<!-- Forma de contacto: correo, GitHub, web... -->
+<!ELEMENT contacto (#PCDATA)>
+<!ATTLIST contacto
+  etiqueta   CDATA  #REQUIRED
+  enlace     CDATA  #REQUIRED>
+
+<!-- ================================================================
+     Atributos comunes a las cuatro secciones:
+       titulo        título de la página (por defecto, el de la sección)
+       introduccion  texto bajo el título de su página
+       descripcion   texto de la sección en "Mis secciones" del inicio
+     ================================================================ -->
+
+<!-- Música: musica.html y una página por categoría (género). -->
+<!ELEMENT musica (categoria+)>
+<!ATTLIST musica
+  titulo        CDATA  #IMPLIED
+  introduccion  CDATA  #IMPLIED
+  descripcion   CDATA  #IMPLIED>
+
+<!ELEMENT categoria (grupo+)>
+<!ATTLIST categoria
+  nombre     CDATA  #REQUIRED>
+
+<!-- Grupo o artista. fragmento es un audio corto del álbum y cancion
+     el título de la canción de la que sale. -->
+<!ELEMENT grupo EMPTY>
+<!ATTLIST grupo
+  nombre     CDATA  #REQUIRED
+  album      CDATA  #IMPLIED
+  imagen     CDATA  #IMPLIED
+  fragmento  CDATA  #IMPLIED
+  cancion    CDATA  #IMPLIED
+  favorito   (true|false)  "false">
+
+<!-- Videojuegos: videojuegos.html. El texto del elemento es la
+     descripción. trailer es un vídeo que se abre al pulsar la portada. -->
+<!ELEMENT videojuegos (juego+)>
+<!ATTLIST videojuegos
+  titulo        CDATA  #IMPLIED
+  introduccion  CDATA  #IMPLIED
+  descripcion   CDATA  #IMPLIED>
+
+<!ELEMENT juego (#PCDATA)>
+<!ATTLIST juego
+  titulo     CDATA  #REQUIRED
+  genero     CDATA  #IMPLIED
+  imagen     CDATA  #IMPLIED
+  trailer    CDATA  #IMPLIED
+  actual     (true|false)  "false"
+  favorito   (true|false)  "false">
+
+<!-- Series: series.html. La serie actual se muestra destacada, con su
+     tráiler en la página; las demás lo abren al pulsar la portada. -->
+<!ELEMENT series (serie+)>
+<!ATTLIST series
+  titulo        CDATA  #IMPLIED
+  introduccion  CDATA  #IMPLIED
+  descripcion   CDATA  #IMPLIED>
+
+<!ELEMENT serie (#PCDATA)>
+<!ATTLIST serie
+  titulo     CDATA  #REQUIRED
+  genero     CDATA  #IMPLIED
+  anio       CDATA  #IMPLIED
+  imagen     CDATA  #IMPLIED
+  trailer    CDATA  #IMPLIED
+  actual     (true|false)  "false"
+  favorita   (true|false)  "false">
+
+<!-- Aficiones: hobbies.html. enlace y texto-enlace añaden un enlace
+     opcional debajo del texto. -->
+<!ELEMENT aficiones (aficion+)>
+<!ATTLIST aficiones
+  titulo        CDATA  #IMPLIED
+  introduccion  CDATA  #IMPLIED
+  descripcion   CDATA  #IMPLIED>
+
+<!ELEMENT aficion (#PCDATA)>
+<!ATTLIST aficion
+  titulo        CDATA  #REQUIRED
+  imagen        CDATA  #IMPLIED
+  enlace        CDATA  #IMPLIED
+  texto-enlace  CDATA  #IMPLIED>

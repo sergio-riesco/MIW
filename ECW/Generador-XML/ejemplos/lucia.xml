@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sitio SYSTEM "../esquema/sitio.dtd">
+<!-- Sitio de prueba de una persona inventada: música y videojuegos con
+     varias categorías, sin series y sin imágenes ni multimedia. -->
+<sitio autor="Lucía Fernández" idioma="es" pie="Oviedo, Asturias"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="../esquema/sitio.xsd">
+  <perfil>
+    <resumen>Profesora de música en un instituto de Oviedo y jugadora de juegos de mesa y de consola.</resumen>
+    <parrafo>Toco el piano desde los seis años y doy clase de lenguaje musical.</parrafo>
+    <dato etiqueta="Vivo en">Oviedo, Asturias</dato>
+    <dato etiqueta="Trabajo" detalle="Desde 2019">Profesora de música</dato>
+    <contacto etiqueta="Correo" enlace="mailto:lucia@example.org">lucia@example.org</contacto>
+  </perfil>
+  <musica titulo="Lo que escucho" introduccion="Sobre todo clásica y jazz, pero no solo.">
+    <categoria nombre="Clásica">
+      <grupo nombre="Johann Sebastian Bach" album="Variaciones Goldberg" favorito="true"/>
+      <grupo nombre="Claude Debussy" album="Suite bergamasque"/>
+    </categoria>
+    <categoria nombre="Jazz">
+      <grupo nombre="Bill Evans" album="Waltz for Debby (1962)"/>
+      <grupo nombre="Miles Davis" album="Kind of Blue (1959)"/>
+    </categoria>
+    <categoria nombre="Música española">
+      <grupo nombre="Rosalía" album="El mal querer (2018)"/>
+    </categoria>
+  </musica>
+  <videojuegos introduccion="Juegos tranquilos para desconectar.">
+    <juego titulo="Stardew Valley" genero="Simulación" actual="true">Mi granja va por el tercer año.</juego>
+    <juego titulo="Celeste" genero="Plataformas" favorito="true">Difícil y precioso.</juego>
+    <juego titulo="Tetris Effect" genero="Puzles">Para relajarse con buena música.</juego>
+  </videojuegos>
+</sitio>

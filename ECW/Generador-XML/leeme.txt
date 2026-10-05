@@ -1,0 +1,235 @@
+==================================================================
+ Estándares y Computación Web - Trabajo IV
+ XML como modelo para construir sitios web
+==================================================================
+
+URL de despliegue: <completar con la URL donde esté publicado>
+
+
+1. QUÉ ES
+------------------------------------------------------------------
+
+Un lenguaje XML para describir sitios web personales y una aplicación
+que, a partir de un documento en ese lenguaje, genera el sitio completo
+(páginas HTML, hoja de estilos, JavaScript e imagen por defecto).
+
+  documento .xml  --(generador Rust -> WebAssembly)-->  sitio HTML + CSS
+        |
+        +-- validado contra sitio.dtd y sitio.xsd
+
+El sitio generado reproduce el sitio web personal del Trabajo II: las
+mismas páginas, el mismo diseño, el modo claro y oscuro, los tráileres
+que se abren en una ventana y los fragmentos de audio de los álbumes.
+
+Se usan los tres lenguajes que permite el enunciado:
+
+  - WebAssembly (Rust): el generador, que convierte el XML en el sitio.
+  - TypeScript: la interfaz web (formulario <-> XML, vista previa).
+  - JavaScript: carga del WebAssembly, creación del ZIP, herramientas de
+    consola (DTD -> XSD, generación de los sitios, servidor).
+
+
+2. EL LENGUAJE
+------------------------------------------------------------------
+
+2.1. sitio.dtd: la definición de partida
+
+esquema/sitio.dtd define el lenguaje. Un documento tiene esta forma:
+
+  <sitio autor="" idioma="es" pie="">
+    <perfil foto="">                       -> index.html (Sobre mí)
+      <resumen/> <parrafo/>*
+      <dato etiqueta="" detalle=""/>*
+      <contacto etiqueta="" enlace=""/>*
+    </perfil>
+    <musica titulo introduccion descripcion>       -> musica.html
+      <categoria nombre="">                         -> musica-<genero>.html
+        <grupo nombre album imagen fragmento cancion favorito/>+
+      </categoria>+
+    </musica>?
+    <videojuegos ...>                               -> videojuegos.html
+      <juego titulo genero imagen trailer actual favorito>texto</juego>+
+    </videojuegos>?
+    <series ...>                                    -> series.html
+      <serie titulo genero anio imagen trailer actual favorita>texto</serie>+
+    </series>?
+    <aficiones ...>                                 -> hobbies.html
+      <aficion titulo imagen enlace texto-enlace>texto</aficion>+
+    </aficiones>?
+  </sitio>
+
+Cada sección es opcional: solo se genera su página y su entrada del
+menú si está en el documento. Los atributos booleanos (actual,
+favorito, favorita) valen true o false. Las rutas de imágenes, vídeos y
+audios son relativas a la carpeta del sitio generado.
+
+2.2. sitio.xsd: generado a partir del DTD
+
+esquema/sitio.xsd no se escribe a mano: lo genera tools/dtd-a-xsd.mjs
+leyendo el DTD (npm run xsd). La conversión es:
+
+  <!ELEMENT x (a, b?, c*)>   ->  xs:sequence con minOccurs/maxOccurs
+  <!ELEMENT x (#PCDATA)>     ->  texto (xs:simpleContent si tiene atributos)
+  <!ELEMENT x EMPTY>         ->  tipo complejo solo con atributos
+  #REQUIRED / #IMPLIED       ->  use="required" / opcional
+  (true|false) "false"       ->  xs:enumeration con default="false"
+
+Lo que el XSD añade al DTD son los tipos de datos, que un DTD no puede
+expresar. Al convertir, cada atributo recibe un tipo según su nombre:
+
+  anio                                       xs:gYear
+  idioma                                     xs:language
+  foto, imagen, trailer, fragmento, enlace   xs:anyURI
+
+Por ejemplo, anio="dos mil" es válido según el DTD (es texto) pero el
+XSD lo rechaza porque no es un año.
+
+2.3. Validación
+
+tools/Validar.java valida los documentos contra el DTD y contra el XSD
+usando solo la biblioteca estándar de Java (npm run validar). Los tres
+ejemplos son válidos contra los dos, y también lo son los XML que
+genera el formulario de la interfaz.
+
+
+3. LA APLICACIÓN
+------------------------------------------------------------------
+
+3.1. Generador (Rust -> WebAssembly), rust/src/lib.rs
+
+Lee el XML con roxmltree y escribe cada página. Exporta una función,
+generar(xml), que devuelve las rutas y el contenido de los archivos.
+La hoja de estilos (plantilla.css), el JavaScript de los sitios
+(sitio.js) y la imagen por defecto van incluidos en el .wasm. Todo el
+texto del XML se escapa al pasarlo a HTML y no se aceptan enlaces
+javascript:.
+
+Las páginas generadas tienen HTML semántico, enlace para saltar al
+contenido, menú con la página actual marcada, migas de pan, botón de
+modo claro y oscuro, y textos alternativos en las imágenes.
+
+3.2. Interfaz web (TypeScript), app/ y src/
+
+  1. Se rellena un formulario o se carga un XML (hay tres ejemplos).
+  2. El formulario se convierte en XML y el XML en formulario.
+  3. "Generar sitio" ejecuta el WebAssembly en el navegador y muestra la
+     vista previa de cada página.
+  4. "Descargar ZIP" descarga el sitio con sus imágenes, vídeos y
+     audios, junto con sitio.xml, sitio.dtd y sitio.xsd.
+
+Las imágenes, vídeos y audios se pueden subir desde el formulario.
+
+Antes de crear el XML o generar el sitio, la interfaz comprueba lo que
+exigen el DTD y el XSD (src/validar.ts), porque el navegador no puede
+validar contra un XSD sin bibliotecas externas:
+
+  - Campos obligatorios (#REQUIRED en el DTD), marcados con * en el
+    formulario: nombre del autor, etiqueta de cada dato, etiqueta y
+    enlace de cada contacto, nombre de cada grupo y título de cada
+    juego, serie y afición.
+  - Tipos del XSD: el año de una serie tiene que ser un año (xs:gYear)
+    y el idioma un código de idioma (xs:language).
+
+Si algo falla, no se crea el XML y se muestra la lista de errores. La
+comprobación también se hace sobre el XML del cuadro de texto, por si
+se ha editado a mano.
+
+3.3. Generación desde la consola, tools/generar.mjs
+
+Usa el mismo .wasm que la interfaz para generar los sitios de todos los
+ejemplos (npm run generar): ejemplos/<nombre>.xml -> sitios/<nombre>/.
+
+
+4. SITIOS GENERADOS
+------------------------------------------------------------------
+
+  ejemplos/sergio.xml -> sitios/sergio/   Mi sitio personal: 8 páginas,
+                                          con fotos, tráileres y audios.
+  ejemplos/lucia.xml  -> sitios/lucia/    Persona inventada: música con
+                                          tres géneros y videojuegos,
+                                          sin imágenes (usa la imagen por
+                                          defecto).
+  ejemplos/cine.xml   -> sitios/cine/     Sitio en inglés con solo
+                                          algunas secciones y caracteres
+                                          especiales (&, <, comillas).
+
+Cada carpeta de sitios/ contiene el HTML y el CSS generados (y las
+imágenes, vídeos y audios en el caso de sitios/sergio/).
+
+
+5. ESTRUCTURA DEL PROYECTO
+------------------------------------------------------------------
+
+  esquema/sitio.dtd     Definición del lenguaje.
+  esquema/sitio.xsd     XML Schema generado a partir del DTD.
+  ejemplos/             Documentos de ejemplo.
+  sitios/               Sitios generados a partir de los ejemplos.
+  rust/                 Generador en Rust (src/lib.rs, plantilla.css,
+                        sitio.js, imagen-por-defecto.svg).
+  src/                  Interfaz en TypeScript (app.ts, model.ts,
+                        xml.ts, validar.ts) y glue.js (carga del
+                        .wasm y ZIP).
+  app/                  Interfaz web: index.html y estilos.css; js/ es
+                        el TypeScript compilado y pkg/ el .wasm
+                        compilado.
+  tools/                dtd-a-xsd.mjs, Validar.java, generar.mjs y
+                        serve.mjs.
+  package.json          Scripts y dependencias.
+  tsconfig.json         Configuración de TypeScript.
+  leeme.txt             Este archivo.
+
+No se entregan node_modules/ ni rust/target/.
+
+
+6. DESPLIEGUE
+------------------------------------------------------------------
+
+El .wasm (app/pkg) y el TypeScript (app/js) ya van compilados, así que
+para usar la aplicación basta con servir la carpeta por HTTP (los
+módulos y el .wasm no se cargan desde file://):
+
+    npm run serve
+
+  y abrir http://localhost:5174/ (la interfaz) o
+  http://localhost:5174/sitios/sergio/ (un sitio generado).
+
+Para publicarla, se sube la carpeta a un servidor de archivos
+estáticos que envíe el .wasm como application/wasm. Los sitios de
+sitios/ son HTML y CSS estáticos y se pueden publicar por separado.
+
+Para volver a compilar y generar todo:
+
+    npm install          instala TypeScript
+    npm run xsd          genera esquema/sitio.xsd a partir del DTD
+    npm run build        xsd + WebAssembly (wasm-pack) + TypeScript
+    npm run validar      valida los ejemplos contra el DTD y el XSD
+    npm run generar      genera sitios/ a partir de ejemplos/
+    npm run todo         build + validar + generar
+
+
+7. SOFTWARE Y VERSIONES
+------------------------------------------------------------------
+
+  - Node.js 24.21 (sirve desde la 18).
+  - TypeScript 5.9.3.
+  - Rust 1.98.1 con el destino wasm32-unknown-unknown y wasm-pack.
+    Bibliotecas de Rust: roxmltree 0.20 (lectura del XML) y
+    wasm-bindgen 0.2 (interfaz con JavaScript).
+  - Java 11 o superior (probado con Java 23) para la validación. No
+    necesita bibliotecas externas.
+  - La interfaz no usa bibliotecas: el ZIP se crea a mano (glue.js).
+
+
+8. USO DE INTELIGENCIA ARTIFICIAL
+------------------------------------------------------------------
+
+Se han usado herramientas de IA en el diseño del lenguaje, la
+implementación y la documentación. Como no siempre aciertan, todo se ha
+comprobado:
+
+  - Los ejemplos y los XML que produce el formulario se validan contra
+    el DTD y el XSD con un validador independiente (JAXP de Java).
+  - Se ha comprobado que el validador rechaza documentos incorrectos
+    (atributo obligatorio que falta, booleano o año no válidos).
+  - Los sitios generados se han probado en el navegador: páginas,
+    imágenes, tráileres y fragmentos de audio.

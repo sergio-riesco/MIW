@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sitio SYSTEM "../esquema/sitio.dtd">
+<!-- Mi sitio web personal (Trabajo II), descrito en el lenguaje. -->
+<sitio autor="Sergio Riesco Collar" idioma="es" pie="Gijón, Asturias"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="../esquema/sitio.xsd">
+  <perfil foto="sergio.jpg">
+    <resumen>Vivo en Gijón. Estudio el Grado en Ingeniería Informática de Software y el Máster en Ingeniería Web, ambos en la Universidad de Oviedo.</resumen>
+    <parrafo>Me interesa aprender, construir cosas y entender la tecnología que hay detrás de las que usamos cada día.</parrafo>
+    <parrafo>Este sitio reúne las cuatro partes que mejor me definen: la música, los videojuegos, las series y mis aficiones.</parrafo>
+    <dato etiqueta="Vivo en">Gijón, Asturias</dato>
+    <dato etiqueta="Estudios" detalle="Universidad de Oviedo (en curso)">Grado en Ingeniería Informática de Software</dato>
+    <dato etiqueta="Actualmente" detalle="Universidad de Oviedo">Estudiando el Máster en Ingeniería Web</dato>
+    <contacto etiqueta="Correo" enlace="mailto:sergioriescocollar@gmail.com">sergioriescocollar@gmail.com</contacto>
+    <contacto etiqueta="GitHub" enlace="https://github.com/sergio-riesco">github.com/sergio-riesco</contacto>
+  </perfil>
+
+  <musica introduccion="Escucho todo tipo de música pero en especial me gusta el rock. Aquí están mis grupos y artistas, agrupados por género junto a sus álbumes más famosos."
+          descripcion="Mis grupos y artistas favoritos, organizados por género.">
+    <categoria nombre="Rock progresivo">
+      <grupo nombre="Pink Floyd" album="The Dark Side of the Moon (1973)" imagen="covers/music/pink-floyd.png"
+             fragmento="media/audios/pink-floyd.mp3" cancion="Money"/>
+      <grupo nombre="King Crimson" album="In the Court of the Crimson King (1969)" imagen="covers/music/king-crimson.png"
+             fragmento="media/audios/king-crimson.mp3" cancion="21st Century Schizoid Man"/>
+      <grupo nombre="The Alan Parsons Project" album="Tales of Mystery and Imagination (1976)" imagen="covers/music/alan-parsons-project.png"
+             fragmento="media/audios/alan-parsons-project.mp3" cancion="(The System of) Doctor Tarr and Professor Fether"/>
+    </categoria>
+    <categoria nombre="Pop Rock">
+      <grupo nombre="Electric Light Orchestra" album="Out of the Blue (1977)" imagen="covers/music/electric-light-orchestra.png"
+             fragmento="media/audios/electric-light-orchestra.mp3" cancion="Mr. Blue Sky"/>
+    </categoria>
+    <categoria nombre="Yacht Rock">
+      <grupo nombre="Blue Öyster Cult" album="Agents of Fortune (1976)" imagen="covers/music/blue-oyster-cult.png"
+             fragmento="media/audios/blue-oyster-cult.mp3" cancion="(Don't Fear) The Reaper"/>
+    </categoria>
+  </musica>
+
+  <videojuegos introduccion="Ahora mismo estoy jugando a Big Walk con amigos. En esta lista puedes ver algunos de mis videojuegos favoritos."
+               descripcion="DOOM, Zelda, Outer Wilds y el que estoy jugando ahora mismo.">
+    <juego titulo="Big Walk" genero="Cooperativo | Puzles" imagen="covers/videogames/big-walk.png"
+           trailer="media/videos/videojuegos/big-walk.mp4" actual="true">Está siendo mi videojuego favorito del año.</juego>
+    <juego titulo="The Legend of Zelda: Breath of the Wild" genero="Aventura" imagen="covers/videogames/botw.png"
+           trailer="media/videos/videojuegos/breath-of-the-wild.mp4" favorito="true">Mi videojuego favorito, tiene la mejor exploración de cualquier mundo abierto.</juego>
+    <juego titulo="Outer Wilds" genero="Exploración" imagen="covers/videogames/outer-wilds.png"
+           trailer="media/videos/videojuegos/outer-wilds.mp4">Me gustan sus secretos y su universo.</juego>
+    <juego titulo="DOOM Eternal" genero="FPS" imagen="covers/videogames/doom-eternal.png"
+           trailer="media/videos/videojuegos/doom-eternal.mp4">Me flipa.</juego>
+    <juego titulo="Dark Souls" genero="RPG" imagen="covers/videogames/dark-souls.png"
+           trailer="media/videos/videojuegos/dark-souls.mp4">La primera vez que lo jugué lo odie, pero después me enamoré.</juego>
+    <juego titulo="Helldivers II" genero="TPS" imagen="covers/videogames/helldivers-ii.jpg"
+           trailer="media/videos/videojuegos/helldivers-ii.mp4">Te hace sentir como que estás en una película de acción.</juego>
+  </videojuegos>
+
+  <series introduccion="Estas son las series que más me gustan y la que estoy viendo ahora mismo."
+          descripcion="The Boys, Invincible, Breaking Bad y la que estoy viendo.">
+    <serie titulo="Breaking Bad" genero="Thriller" anio="2008" imagen="covers/series/breaking-bad.png"
+           trailer="media/videos/series/breaking-bad.mp4" favorita="true">Es probablemente la serie más perfecta que han hecho jamás.</serie>
+    <serie titulo="The Boys" genero="Súperhéroes" anio="2019" imagen="covers/series/the-boys.png"
+           trailer="media/videos/series/the-boys.mp4">Vigilantes con poderes que no respetan la moral. Lo que empieza como una crítica de superheroes acaba siendo una crítica de la sociedad.</serie>
+    <serie titulo="Invincible" genero="Súperhéroes" anio="2021" imagen="covers/series/invincible.png"
+           trailer="media/videos/series/invincible.mp4">Brutal, merece la pena verla sin saber nada antes.</serie>
+    <serie titulo="Better Call Saul" genero="Thriller" anio="2015" imagen="covers/series/better-call-saul.png"
+           trailer="media/videos/series/better-call-saul.mp4">Precuela de Breaking Bad. Llega más lejos de lo que esperabas y funciona muy bien.</serie>
+    <serie titulo="Lanterns" genero="Misterio - Super Héroes" anio="2026" imagen="covers/series/lanterns.png"
+           trailer="media/videos/series/lanterns.mp4" actual="true">La que estoy viendo ahora mismo.</serie>
+  </series>
+
+  <aficiones titulo="Mis aficiones" introduccion="Tres cosas a las que dedico parte de mi tiempo libre."
+             descripcion="Skate, pizzas y videojuegos.">
+    <aficion titulo="Videojuegos" imagen="covers/hobbies/videojuegos.png"
+             enlace="videojuegos.html" texto-enlace="Ver mi lista de videojuegos">Es una de mis aficiones. Si quieres, puedes ver mi lista completa en la página de videojuegos.</aficion>
+    <aficion titulo="Skate" imagen="covers/hobbies/skate.png">Me gusta hacer skate sobre todo para dar paseos, no para hacer trucos.</aficion>
+    <aficion titulo="Pizzas" imagen="covers/hobbies/pizzas.png">Hacer pizzas es otra de las cosas que más me gustan.</aficion>
+  </aficiones>
+</sitio>

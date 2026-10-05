@@ -1,0 +1,20 @@
+{
+  "name": "generador-sitios-xml",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Generador de sitios web personales a partir de un lenguaje XML (DTD + XML Schema), con el generador en Rust compilado a WebAssembly y la interfaz en TypeScript",
+  "scripts": {
+    "xsd": "node tools/dtd-a-xsd.mjs",
+    "validar": "java -Dstdout.encoding=UTF-8 tools/Validar.java",
+    "build:wasm": "wasm-pack build rust --release --target web --out-dir ../app/pkg --out-name generador_wasm --no-pack && node -e \"require('fs').rmSync('app/pkg/.gitignore', {force: true})\"",
+    "build:ts": "tsc -p tsconfig.json",
+    "build": "npm run xsd && npm run build:wasm && npm run build:ts",
+    "generar": "node tools/generar.mjs",
+    "serve": "node tools/serve.mjs",
+    "todo": "npm run build && npm run validar && npm run generar"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3"
+  }
+}
