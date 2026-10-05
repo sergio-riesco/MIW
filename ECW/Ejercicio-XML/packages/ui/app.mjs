@@ -45,17 +45,18 @@ const texto = $("texto"), estado = $("estado"), cuerpo = $("cuerpo"),
 
 // --- Selector de documento ---
 try {
-  const r = await fetch("/api/corpus");
+  // corpus/lista.json lo genera npm run corpus (tools/lista-corpus.mjs)
+  const r = await fetch(new URL("../../corpus/lista.json", import.meta.url));
   if (r.ok) {
     const { ficheros } = await r.json();
     for (const f of ficheros) {
       const op = document.createElement("option");
-      op.value = f.ruta;
+      op.value = new URL("../../" + f.ruta, import.meta.url).href;
       op.textContent = `${f.nombre}  (${(f.bytes / 1024).toFixed(1)} KiB)`;
       origen.appendChild(op);
     }
   }
-} catch { /* sin API no pasa nada: sigue el pegado manual */ }
+} catch { /* sin la lista se puede seguir subiendo o pegando un documento */ }
 
 let bytesActuales = null; // Uint8Array del documento que se esta analizando
 

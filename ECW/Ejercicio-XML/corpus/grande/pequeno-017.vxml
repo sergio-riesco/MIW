@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Documento generado por corpus/generar-corpus.mjs. Semilla 135624 -->
+<vxml xmlns="http://www.w3.org/2001/vxml" version="2.1" xml:lang="es-ES">
+  <form id="reserva_980">
+    <block>
+      <prompt>
+        Le quedan dos intentos.
+        <break time="300ms"/>
+      </prompt>
+      <field name="dni" type="string">
+        <grammar type="application/srgs+xml" src="dni.grxml"/>
+        <prompt>Puede repetir la informacion?</prompt>
+        <filled>
+          <if cond="dni != ''">
+            <audio src="ok_dni.wav">Correcto.</audio>
+          </if>
+          <goto next="#facturacion_379"/>
+        </filled>
+        <nomatch>
+          No le he entendido.
+        </nomatch>
+      </field>
+      <field name="telefono" type="string">
+        <grammar type="application/srgs+xml" src="telefono.grxml"/>
+        <prompt>Espere un momento, por favor.</prompt>
+        <filled>
+          <if cond="telefono != ''">
+            <audio src="ok_telefono.wav">Correcto.</audio>
+          </if>
+          <goto next="#facturacion_379"/>
+        </filled>
+        <nomatch>
+          Repita, por favor.
+          <reprompt/>
+        </nomatch>
+      </field>
+      <field name="codigoPostal" type="number">
+        <grammar type="application/srgs+xml" src="codigoPostal.grxml"/>
+        <prompt>A que hora prefiere pasar?</prompt>
+        <filled>
+          <if cond="codigoPostal != ''">
+            <audio src="ok_codigoPostal.wav">Correcto.</audio>
+          </if>
+          <goto next="#facturacion_379"/>
+        </filled>
+        <nomatch>
+          No le he entendido.
+        </nomatch>
+      </field>
+      <goto next="#reserva_980"/>
+    </block>
+  </form>
+  <form id="facturacion_379">
+    <block>
+      <prompt>
+        Le quedan dos intentos.
+        <break time="300ms"/>
+      </prompt>
+      <field name="importe" type="number">
+        <grammar type="application/srgs+xml" src="importe.grxml"/>
+        <prompt>Diga su numero de identidad.</prompt>
+        <filled>
+          <if cond="importe != ''">
+            <audio src="ok_importe.wav">Correcto.</audio>
+          </if>
+          <goto next="#cancelacion_859"/>
+        </filled>
+        <nomatch>
+          Repita, por favor.
+          <reprompt/>
+        </nomatch>
+      </field>
+      <field name="fecha" type="boolean">
+        <grammar type="application/srgs+xml" src="fecha.grxml"/>
+        <filled>
+          <goto next="#cancelacion_859"/>
+        </filled>
+      </field>
+      <goto next="#form_que_no_existe"/>
+    </block>
+  </form>
+  <form id="cancelacion_859">
+    <block>
+      <prompt>
+        EUR 12,50 Puede repetir la informacion?
+        <break time="300ms"/>
+      </prompt>
+      <field name="correo" type="boolean">
+        <grammar type="application/srgs+xml" src="correo.grxml"/>
+        <prompt>Indique el codigo postal.</prompt>
+        <filled>
+          <if cond="correo != ''">
+            <audio src="ok_correo.wav">Correcto.</audio>
+          </if>
+          <goto next="#reclamo_548"/>
+        </filled>
+        <nomatch>
+          Repita, por favor.
+          <reprompt/>
+        </nomatch>
+      </field>
+      <field name="direccion" type="digits">
+        <grammar type="application/srgs+xml" src="direccion.grxml"/>
+        <filled>
+          <goto next="#reclamo_548"/>
+        </filled>
+      </field>
+      <goto next="#reclamo_548"/>
+    </block>
+  </form>
+  <form id="reclamo_548">
+    <block>
+      <prompt>
+        Gracias por su llamada.
+        <break time="300ms"/>
+      </prompt>
+      <field name="provincia" type="digits">
+        <grammar type="application/srgs+xml" src="provincia.grxml"/>
+        <filled>
+          <goto next="#soporte_477"/>
+        </filled>
+      </field>
+      <field name="referencia" type="digits">
+        <grammar type="application/srgs+xml" src="referencia.grxml"/>
+        <prompt>Elija una de las opciones.</prompt>
+        <filled>
+          <if cond="referencia != ''">
+            <audio src="ok_referencia.wav">Correcto.</audio>
+          </if>
+          <goto next="#soporte_477"/>
+        </filled>
+        <nomatch>
+          No le he entendido.
+        </nomatch>
+      </field>
+      <goto next="#soporte_477"/>
+      <exit/>
+    </block>
+  </form>
+  <form id="soporte_477">
+    <block>
+      <prompt>
+        Gracias por su llamada.
+        <break time="300ms"/>
+      </prompt>
+      <field name="motivo" type="digits">
+        <grammar type="application/srgs+xml" src="motivo.grxml"/>
+        <filled>
+          <goto next="#domicilio_150"/>
+        </filled>
+      </field>
+      <goto next="#domicilio_150"/>
+    </block>
+  </form>
+  <form id="domicilio_150">
+    <block>
+      <prompt>
+        Diga su numero de identidad.
+        <break time="300ms"/>
+      </prompt>
+      <field name="telefono" type="boolean">
+        <grammar type="application/srgs+xml" src="telefono.grxml"/>
+        <prompt>Confirme los datos, por favor.</prompt>
+        <filled>
+          <if cond="telefono != ''">
+            <audio src="ok_telefono.wav">Correcto.</audio>
+          </if>
+          <goto next="#domicilio_150"/>
+        </filled>
+        <nomatch>
+          Repita, por favor.
+          <reprompt/>
+        </nomatch>
+      </field>
+      <goto next="#domicilio_150"/>
+      <exit/>
+    </block>
+  </form>
+</vxml>

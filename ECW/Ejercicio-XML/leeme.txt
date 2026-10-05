@@ -200,15 +200,19 @@ packages/bench/informe.html. Los números cambian según la máquina.
                          navegador.
   packages/bench/        Banco de pruebas, resultados.json e
                          informe.html.
-  corpus/                5 casos escritos a mano y el generador del
-                         corpus grande (generar-corpus.mjs).
+  corpus/                5 casos escritos a mano, el generador del
+                         corpus grande (generar-corpus.mjs), el corpus
+                         generado (grande/) y lista.json, la lista de
+                         documentos que usa la interfaz.
   tools/                 Generación de reglas Rust, compilación del
-                         WASM, test de equivalencia y servidor web.
+                         WASM, lista del corpus, test de equivalencia
+                         y servidor web.
+  index.html             Lleva a la interfaz (packages/ui/).
   package.json           Scripts y dependencias.
   leeme.txt              Este archivo.
 
-No se entregan node_modules/, packages/impl-wasm/target/ ni
-corpus/grande/: se regeneran con los comandos del apartado 9.
+No se entregan node_modules/ ni packages/impl-wasm/target/: se
+regeneran con los comandos del apartado 9.
 
 
 9. DESPLIEGUE
@@ -222,9 +226,9 @@ Requisitos:
 El .wasm y el TypeScript compilado ya se entregan hechos, así que para
 usar la aplicación basta con:
 
-    npm install          instala TypeScript (única dependencia)
-    npm run corpus       genera corpus/grande (determinista)
     npm run serve        interfaz web en http://localhost:5173
+
+(o cualquier otro servidor de archivos estáticos sobre la carpeta).
 
 En la interfaz se elige un documento del corpus, se sube o se pega
 uno, se elige el motor (JS, TS o WASM) y se pulsa "Analizar". "Comparar
@@ -233,6 +237,9 @@ idénticos. Todo se ejecuta en el navegador.
 
 Otros comandos:
 
+    npm install          instala TypeScript (única dependencia)
+    npm run corpus       vuelve a generar corpus/grande (siempre sale
+                         igual) y corpus/lista.json
     npm run build        regenera reglas_gen.rs, compila TypeScript y
                          compila el WASM con cargo
     npm test             test de equivalencia byte a byte de los tres
@@ -241,10 +248,12 @@ Otros comandos:
     npm run bench:html   genera informe.html a partir de los resultados
     npm run todo         corpus + build + test + bench
 
-Para publicarla en un servidor basta con servir la carpeta como
-archivos estáticos, con el .wasm como application/wasm, y que la raíz
-abra packages/ui/index.html (es lo que hace tools/serve.mjs). Sin
-corpus/grande la interfaz sigue funcionando con los 5 casos manuales.
+Publicación: la interfaz es estática y todas sus rutas son relativas,
+así que basta con subir la carpeta a cualquier hosting de archivos
+estáticos que envíe el .wasm como application/wasm. Está desplegada en
+GitHub Pages (Settings > Pages del repositorio, rama main); el
+index.html de la raíz del proyecto lleva a packages/ui/. La lista de
+documentos sale de corpus/lista.json, sin necesidad de servidor.
 
 
 10. SOFTWARE Y VERSIONES

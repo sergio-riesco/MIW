@@ -4,8 +4,6 @@ node_modules/
 # Builds y artefactos
 packages/impl-wasm/target/
 
-# Corpus grande (5,6 MiB): se regenera con `npm run corpus` (determinista)
-corpus/grande/
 
 # Registros
 *.log

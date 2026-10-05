@@ -1,0 +1,58 @@
+[
+  {
+    "nombre": "pequeno",
+    "docs": 40,
+    "forms": 6,
+    "camposMin": 1,
+    "camposMax": 3,
+    "semilla": 1001,
+    "desc": "Dialogos pequenos, carga tipica de un IVR real.",
+    "defectos": 0.15,
+    "simbolos": true,
+    "lang": true,
+    "listaCiclos": 1,
+    "bytes": 249960
+  },
+  {
+    "nombre": "mediano",
+    "docs": 20,
+    "forms": 40,
+    "camposMin": 2,
+    "camposMax": 6,
+    "semilla": 2002,
+    "desc": "Dialogos medianos, el perfil mas cercano a produccion.",
+    "defectos": 0.15,
+    "simbolos": true,
+    "lang": true,
+    "listaCiclos": 1,
+    "bytes": 1447012
+  },
+  {
+    "nombre": "grande",
+    "docs": 4,
+    "forms": 200,
+    "camposMin": 3,
+    "camposMax": 8,
+    "semilla": 3003,
+    "desc": "Documentos muy grandes, para medir throughput.",
+    "defectos": 0.15,
+    "simbolos": true,
+    "lang": true,
+    "listaCiclos": 1,
+    "bytes": 1955987
+  },
+  {
+    "nombre": "masivo",
+    "docs": 2,
+    "forms": 600,
+    "camposMin": 2,
+    "camposMax": 6,
+    "semilla": 4004,
+    "desc": "Pocos documentos pero enormes: caso limite de la memoria.",
+    "defectos": 0.15,
+    "simbolos": true,
+    "lang": true,
+    "listaCiclos": 1,
+    "bytes": 2197236
+  }
+]

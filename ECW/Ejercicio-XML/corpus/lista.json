@@ -1,0 +1,359 @@
+{
+  "ficheros": [
+    {
+      "nombre": "caso-01-reserva.vxml",
+      "ruta": "corpus/caso-01-reserva.vxml",
+      "bytes": 3383
+    },
+    {
+      "nombre": "caso-02-soporte.vxml",
+      "ruta": "corpus/caso-02-soporte.vxml",
+      "bytes": 2352
+    },
+    {
+      "nombre": "caso-03-bucles.vxml",
+      "ruta": "corpus/caso-03-bucles.vxml",
+      "bytes": 1748
+    },
+    {
+      "nombre": "caso-04-acentos.vxml",
+      "ruta": "corpus/caso-04-acentos.vxml",
+      "bytes": 1206
+    },
+    {
+      "nombre": "caso-05-reglas.vxml",
+      "ruta": "corpus/caso-05-reglas.vxml",
+      "bytes": 1182
+    },
+    {
+      "nombre": "grande-000.vxml",
+      "ruta": "corpus/grande/grande-000.vxml",
+      "bytes": 481102
+    },
+    {
+      "nombre": "grande-001.vxml",
+      "ruta": "corpus/grande/grande-001.vxml",
+      "bytes": 494891
+    },
+    {
+      "nombre": "grande-002.vxml",
+      "ruta": "corpus/grande/grande-002.vxml",
+      "bytes": 492838
+    },
+    {
+      "nombre": "grande-003.vxml",
+      "ruta": "corpus/grande/grande-003.vxml",
+      "bytes": 487156
+    },
+    {
+      "nombre": "masivo-000.vxml",
+      "ruta": "corpus/grande/masivo-000.vxml",
+      "bytes": 1080833
+    },
+    {
+      "nombre": "masivo-001.vxml",
+      "ruta": "corpus/grande/masivo-001.vxml",
+      "bytes": 1116403
+    },
+    {
+      "nombre": "mediano-000.vxml",
+      "ruta": "corpus/grande/mediano-000.vxml",
+      "bytes": 66912
+    },
+    {
+      "nombre": "mediano-001.vxml",
+      "ruta": "corpus/grande/mediano-001.vxml",
+      "bytes": 71897
+    },
+    {
+      "nombre": "mediano-002.vxml",
+      "ruta": "corpus/grande/mediano-002.vxml",
+      "bytes": 71068
+    },
+    {
+      "nombre": "mediano-003.vxml",
+      "ruta": "corpus/grande/mediano-003.vxml",
+      "bytes": 79399
+    },
+    {
+      "nombre": "mediano-004.vxml",
+      "ruta": "corpus/grande/mediano-004.vxml",
+      "bytes": 70949
+    },
+    {
+      "nombre": "mediano-005.vxml",
+      "ruta": "corpus/grande/mediano-005.vxml",
+      "bytes": 72544
+    },
+    {
+      "nombre": "mediano-006.vxml",
+      "ruta": "corpus/grande/mediano-006.vxml",
+      "bytes": 74772
+    },
+    {
+      "nombre": "mediano-007.vxml",
+      "ruta": "corpus/grande/mediano-007.vxml",
+      "bytes": 74879
+    },
+    {
+      "nombre": "mediano-008.vxml",
+      "ruta": "corpus/grande/mediano-008.vxml",
+      "bytes": 71930
+    },
+    {
+      "nombre": "mediano-009.vxml",
+      "ruta": "corpus/grande/mediano-009.vxml",
+      "bytes": 71024
+    },
+    {
+      "nombre": "mediano-010.vxml",
+      "ruta": "corpus/grande/mediano-010.vxml",
+      "bytes": 78646
+    },
+    {
+      "nombre": "mediano-011.vxml",
+      "ruta": "corpus/grande/mediano-011.vxml",
+      "bytes": 71904
+    },
+    {
+      "nombre": "mediano-012.vxml",
+      "ruta": "corpus/grande/mediano-012.vxml",
+      "bytes": 73730
+    },
+    {
+      "nombre": "mediano-013.vxml",
+      "ruta": "corpus/grande/mediano-013.vxml",
+      "bytes": 70886
+    },
+    {
+      "nombre": "mediano-014.vxml",
+      "ruta": "corpus/grande/mediano-014.vxml",
+      "bytes": 73476
+    },
+    {
+      "nombre": "mediano-015.vxml",
+      "ruta": "corpus/grande/mediano-015.vxml",
+      "bytes": 61796
+    },
+    {
+      "nombre": "mediano-016.vxml",
+      "ruta": "corpus/grande/mediano-016.vxml",
+      "bytes": 72570
+    },
+    {
+      "nombre": "mediano-017.vxml",
+      "ruta": "corpus/grande/mediano-017.vxml",
+      "bytes": 76373
+    },
+    {
+      "nombre": "mediano-018.vxml",
+      "ruta": "corpus/grande/mediano-018.vxml",
+      "bytes": 74555
+    },
+    {
+      "nombre": "mediano-019.vxml",
+      "ruta": "corpus/grande/mediano-019.vxml",
+      "bytes": 67702
+    },
+    {
+      "nombre": "pequeno-000.vxml",
+      "ruta": "corpus/grande/pequeno-000.vxml",
+      "bytes": 6301
+    },
+    {
+      "nombre": "pequeno-001.vxml",
+      "ruta": "corpus/grande/pequeno-001.vxml",
+      "bytes": 6290
+    },
+    {
+      "nombre": "pequeno-002.vxml",
+      "ruta": "corpus/grande/pequeno-002.vxml",
+      "bytes": 6861
+    },
+    {
+      "nombre": "pequeno-003.vxml",
+      "ruta": "corpus/grande/pequeno-003.vxml",
+      "bytes": 7804
+    },
+    {
+      "nombre": "pequeno-004.vxml",
+      "ruta": "corpus/grande/pequeno-004.vxml",
+      "bytes": 6075
+    },
+    {
+      "nombre": "pequeno-005.vxml",
+      "ruta": "corpus/grande/pequeno-005.vxml",
+      "bytes": 6114
+    },
+    {
+      "nombre": "pequeno-006.vxml",
+      "ruta": "corpus/grande/pequeno-006.vxml",
+      "bytes": 7372
+    },
+    {
+      "nombre": "pequeno-007.vxml",
+      "ruta": "corpus/grande/pequeno-007.vxml",
+      "bytes": 5110
+    },
+    {
+      "nombre": "pequeno-008.vxml",
+      "ruta": "corpus/grande/pequeno-008.vxml",
+      "bytes": 5762
+    },
+    {
+      "nombre": "pequeno-009.vxml",
+      "ruta": "corpus/grande/pequeno-009.vxml",
+      "bytes": 5324
+    },
+    {
+      "nombre": "pequeno-010.vxml",
+      "ruta": "corpus/grande/pequeno-010.vxml",
+      "bytes": 6038
+    },
+    {
+      "nombre": "pequeno-011.vxml",
+      "ruta": "corpus/grande/pequeno-011.vxml",
+      "bytes": 6851
+    },
+    {
+      "nombre": "pequeno-012.vxml",
+      "ruta": "corpus/grande/pequeno-012.vxml",
+      "bytes": 6491
+    },
+    {
+      "nombre": "pequeno-013.vxml",
+      "ruta": "corpus/grande/pequeno-013.vxml",
+      "bytes": 6487
+    },
+    {
+      "nombre": "pequeno-014.vxml",
+      "ruta": "corpus/grande/pequeno-014.vxml",
+      "bytes": 5125
+    },
+    {
+      "nombre": "pequeno-015.vxml",
+      "ruta": "corpus/grande/pequeno-015.vxml",
+      "bytes": 6743
+    },
+    {
+      "nombre": "pequeno-016.vxml",
+      "ruta": "corpus/grande/pequeno-016.vxml",
+      "bytes": 6471
+    },
+    {
+      "nombre": "pequeno-017.vxml",
+      "ruta": "corpus/grande/pequeno-017.vxml",
+      "bytes": 5318
+    },
+    {
+      "nombre": "pequeno-018.vxml",
+      "ruta": "corpus/grande/pequeno-018.vxml",
+      "bytes": 6728
+    },
+    {
+      "nombre": "pequeno-019.vxml",
+      "ruta": "corpus/grande/pequeno-019.vxml",
+      "bytes": 5927
+    },
+    {
+      "nombre": "pequeno-020.vxml",
+      "ruta": "corpus/grande/pequeno-020.vxml",
+      "bytes": 6486
+    },
+    {
+      "nombre": "pequeno-021.vxml",
+      "ruta": "corpus/grande/pequeno-021.vxml",
+      "bytes": 7496
+    },
+    {
+      "nombre": "pequeno-022.vxml",
+      "ruta": "corpus/grande/pequeno-022.vxml",
+      "bytes": 4664
+    },
+    {
+      "nombre": "pequeno-023.vxml",
+      "ruta": "corpus/grande/pequeno-023.vxml",
+      "bytes": 6965
+    },
+    {
+      "nombre": "pequeno-024.vxml",
+      "ruta": "corpus/grande/pequeno-024.vxml",
+      "bytes": 5383
+    },
+    {
+      "nombre": "pequeno-025.vxml",
+      "ruta": "corpus/grande/pequeno-025.vxml",
+      "bytes": 6492
+    },
+    {
+      "nombre": "pequeno-026.vxml",
+      "ruta": "corpus/grande/pequeno-026.vxml",
+      "bytes": 6601
+    },
+    {
+      "nombre": "pequeno-027.vxml",
+      "ruta": "corpus/grande/pequeno-027.vxml",
+      "bytes": 5603
+    },
+    {
+      "nombre": "pequeno-028.vxml",
+      "ruta": "corpus/grande/pequeno-028.vxml",
+      "bytes": 7806
+    },
+    {
+      "nombre": "pequeno-029.vxml",
+      "ruta": "corpus/grande/pequeno-029.vxml",
+      "bytes": 5418
+    },
+    {
+      "nombre": "pequeno-030.vxml",
+      "ruta": "corpus/grande/pequeno-030.vxml",
+      "bytes": 6250
+    },
+    {
+      "nombre": "pequeno-031.vxml",
+      "ruta": "corpus/grande/pequeno-031.vxml",
+      "bytes": 7869
+    },
+    {
+      "nombre": "pequeno-032.vxml",
+      "ruta": "corpus/grande/pequeno-032.vxml",
+      "bytes": 4687
+    },
+    {
+      "nombre": "pequeno-033.vxml",
+      "ruta": "corpus/grande/pequeno-033.vxml",
+      "bytes": 6244
+    },
+    {
+      "nombre": "pequeno-034.vxml",
+      "ruta": "corpus/grande/pequeno-034.vxml",
+      "bytes": 6453
+    },
+    {
+      "nombre": "pequeno-035.vxml",
+      "ruta": "corpus/grande/pequeno-035.vxml",
+      "bytes": 6005
+    },
+    {
+      "nombre": "pequeno-036.vxml",
+      "ruta": "corpus/grande/pequeno-036.vxml",
+      "bytes": 6186
+    },
+    {
+      "nombre": "pequeno-037.vxml",
+      "ruta": "corpus/grande/pequeno-037.vxml",
+      "bytes": 5370
+    },
+    {
+      "nombre": "pequeno-038.vxml",
+      "ruta": "corpus/grande/pequeno-038.vxml",
+      "bytes": 7195
+    },
+    {
+      "nombre": "pequeno-039.vxml",
+      "ruta": "corpus/grande/pequeno-039.vxml",
+      "bytes": 5595
+    }
+  ]
+}

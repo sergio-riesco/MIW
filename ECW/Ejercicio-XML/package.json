@@ -5,7 +5,7 @@
   "type": "module",
   "description": "VXML Doctor: analizador estatico de VoiceXML en JavaScript, TypeScript y WebAssembly (Rust)",
   "scripts": {
-    "corpus": "node corpus/generar-corpus.mjs",
+    "corpus": "node corpus/generar-corpus.mjs && node tools/lista-corpus.mjs",
     "gen:reglas": "node tools/gen-reglas.mjs",
     "build:ts": "tsc -p packages/impl-ts/tsconfig.json",
     "build:wasm": "node tools/build-wasm.mjs",

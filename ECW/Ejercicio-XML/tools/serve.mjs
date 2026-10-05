@@ -1,13 +1,13 @@
 // serve.mjs -- servidor estatico para la interfaz web.
-//   /            -> packages/ui/index.html
-//   /api/corpus  -> lista de ficheros .vxml del corpus (JSON)
+// Sirve la carpeta tal cual, como lo haria GitHub Pages: / abre index.html,
+// que lleva a packages/ui/.
 //
 // Uso: node tools/serve.mjs [puerto]
 // Si el puerto esta ocupado (o Windows lo tiene reservado, que da EACCES en
 // lugar de EADDRINUSE) prueba con el siguiente.
 
 import { createServer } from "node:http";
-import { readFile, stat } from "node:fs/promises";
+import { readFile } from "node:fs/promises";
 import { join, dirname, extname, normalize, sep } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
@@ -34,22 +34,6 @@ const MIME = {
   ".txt": "text/plain; charset=utf-8",
 };
 
-// ficheros .vxml del corpus con su ruta y tamano
-async function listaCorpus(raiz) {
-  const { readdir } = await import("node:fs/promises");
-  const salida = [];
-  for (const dir of ["corpus", "corpus/grande"]) {
-    // corpus/grande no existe hasta ejecutar `npm run corpus`.
-    const nombres = await readdir(join(raiz, dir)).catch(() => []);
-    for (const f of nombres.filter((x) => x.endsWith(".vxml")).sort()) {
-      const ruta = dir + "/" + f;
-      const s = await stat(join(raiz, ruta));
-      salida.push({ nombre: f, ruta, bytes: s.size });
-    }
-  }
-  return salida;
-}
-
 async function enviar(raiz, res, rutaRel) {
   const ruta = normalize(join(raiz, rutaRel));
   if (!ruta.startsWith(raiz + sep) && ruta !== raiz) {
@@ -68,29 +52,13 @@ async function enviar(raiz, res, rutaRel) {
   }
 }
 
-/**
- * Crea el servidor estatico para una raiz concreta (sin ponerse a escuchar).
- * @param {string} raizProyecto raiz del proyecto servida por HTTP
- */
+// crea el servidor (sin ponerlo a escuchar)
 export function crearServidor(raizProyecto) {
   return createServer(async (req, res) => {
     const url = new URL(req.url, "http://localhost");
     let ruta = decodeURIComponent(url.pathname);
 
-    if (ruta === "/") ruta = "/packages/ui/index.html";
-
-    if (ruta === "/api/corpus") {
-      const ficheros = await listaCorpus(raizProyecto);
-      const bytes = ficheros.reduce((a, f) => a + f.bytes, 0);
-      res.writeHead(200, { "Content-Type": "application/json; charset=utf-8", "Cache-Control": "no-store" });
-      res.end(JSON.stringify({ ficheros, bytes, total: ficheros.length }));
-      return;
-    }
-
-    if (ruta.startsWith("/api/")) {
-      res.writeHead(404, { "Content-Type": "application/json; charset=utf-8" }).end(JSON.stringify({ error: "desconocida" }));
-      return;
-    }
+    if (ruta.endsWith("/")) ruta += "index.html";
 
     await enviar(raizProyecto, res, ruta.slice(1));
     console.log(new Date().toISOString().slice(11, 19), req.method, req.url);
