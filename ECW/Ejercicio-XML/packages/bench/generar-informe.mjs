@@ -1,12 +1,9 @@
 /**
  * generar-informe.mjs -- Convierte resultados.json en un informe legible.
  * -----------------------------------------------------------------------------
- * Lee packages/bench/resultados.json (producido por bench.mjs) y genera:
- *
- *   - packages/bench/informe.html  informe HTML autocontenido (sin dependencias
- *     externas, apto para imprimir).
- *   - docs/benchmark.md            la misma tabla en Markdown para la memoria
- *     academica.
+ * Lee packages/bench/resultados.json (producido por bench.mjs) y genera
+ * packages/bench/informe.html, un informe HTML autocontenido (sin
+ * dependencias externas, apto para imprimir).
  * -----------------------------------------------------------------------------
  */
 import { readFileSync, writeFileSync } from "node:fs";
@@ -27,45 +24,14 @@ const med = (p) => p.medianaMs;
 
 // El mas rapido como referencia para la columna "x veces mas lento".
 const masRapido = Math.min(...MOTORES.map((m) => med(r.porImplementacion[m.id])));
+// Y el mas lento como 100 % de las barras del resumen.
+const masLento = Math.max(...MOTORES.map((m) => med(r.porImplementacion[m.id])));
 const ratio = (ms) => (ms / masRapido).toFixed(2) + "×";
 
-// ---------------------------------------------------------------------------
-// Markdown
-// ---------------------------------------------------------------------------
 const fecha = new Date(r.fecha).toLocaleString("es-ES", { dateStyle: "long", timeStyle: "short" });
 
-let md = `# Resultados del banco de pruebas — VXML Doctor
-
-**Fecha:** ${fecha}  
-**Entorno:** Node ${r.entorno.node} · ${r.entorno.plataforma}/${r.entorno.arquitectura} · ${r.entorno.cpu} · ${r.entorno.nucleos} núcleos · ${r.entorno.memoriaGb} GiB RAM  
-**Corpus:** ${r.corpus.ficheros} documentos, ${(r.corpus.bytes / 1024 ** 2).toFixed(2)} MiB, ${r.corpus.pasadas} pasadas medidas por motor (gc() entre pasadas, mediana).
-
-## Resumen
-
-| Implementación | Mediana (ms) | Mínimo | Máximo | MiB/s | vs. más rápido | Arranque (ms) | Primer análisis (ms) |
-|---|---|---:|---:|---:|---:|---:|---:|---:|
-`;
-for (const m of MOTORES) {
-  const p = r.porImplementacion[m.id];
-  md += `| ${m.nombre} | ${fmt(med(p))} | ${fmt(p.minMs)} | ${fmt(p.maxMs)} | ${fmt(p.mibS)} | ${ratio(med(p))} | ${fmt(r.arranque[m.id], 2)} | ${fmt(r.primer[m.id], 2)} |\n`;
-}
-
-md += `
-## Mediana por documento (ms)
-
-Ordenados de mayor a menor tamaño.
-
-| Documento | Bytes | JS | TS | WASM |
-|---|---:|---:|---:|---:|
-`;
-const ficheros = Object.entries(r.porFichero)
-  .sort((a, b) => b[1].bytes - a[1].bytes);
-for (const [f, d] of ficheros) {
-  md += `| ${f} | ${d.bytes} | ${fmt(d.js)} | ${fmt(d.ts)} | ${fmt(d.wasm)} |\n`;
-}
-
-writeFileSync(join(aqui, "..", "..", "docs", "benchmark.md"), md);
-console.log("docs/benchmark.md escrito.");
+// Documentos de mayor a menor tamano.
+const ficheros = Object.entries(r.porFichero).sort((a, b) => b[1].bytes - a[1].bytes);
 
 // ---------------------------------------------------------------------------
 // HTML autocontenido
@@ -79,7 +45,7 @@ const filasResumen = MOTORES.map((m) => {
   const p = r.porImplementacion[m.id];
   return `<tr>
     <td class="nombre">${m.nombre}</td>
-    <td><div class="celda-barra">${bar(med(p), r.porImplementacion.wasm.medianaMs * 1.15)}<span>${fmt(med(p))} ms</span></div></td>
+    <td><div class="celda-barra">${bar(med(p), masLento)}<span>${fmt(med(p))} ms</span></div></td>
     <td>${fmt(p.minMs)}</td>
     <td>${fmt(p.maxMs)}</td>
     <td class="fuerte">${fmt(p.mibS)}</td>

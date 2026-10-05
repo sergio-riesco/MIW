@@ -636,7 +636,7 @@ function tarjan(adyac, n, filtro) {
         }
         if (bajo[v] === idx[v]) {
             const comp = [];
-            for (;;) {
+            for (; ;) {
                 const w = pilaT.pop();
                 enPila[w] = 0;
                 comp.push(w);

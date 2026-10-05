@@ -126,9 +126,9 @@ async function analizar() {
     const json = m.analizar(obtenerTexto(), nombreActual(), obtenerBytes());
     const ms = performance.now() - t0;
     pintarInforme(JSON.parse(json), ms, m.nombre);
-    estado.textContent = `${m.nombre} · ${ms.toFixed(2)} ms · JSON canónico de ${json.length} bytes.`;
+    estado.textContent = `${m.nombre} · ${ms.toFixed(2)} ms · JSON canónico de ${new TextEncoder().encode(json).length} bytes.`;
   } catch (e) {
-    cuerpo.innerHTML = `<p class="vacio">Error: ${String(e.message || e)}</p>`;
+    cuerpo.innerHTML = `<p class="vacio">Error: ${escHTML(String(e.message || e))}</p>`;
     estado.textContent = "Falló el análisis.";
   }
 }

@@ -2,7 +2,7 @@
  * serve.mjs -- Servidor estatico de desarrollo para la interfaz web.
  * -----------------------------------------------------------------------------
  * Sirve la raiz del proyecto con tipos MIME correctos (.mjs, .wasm, .vxml…)
- * y dos rutas auxiliares:
+ * y dos rutas especiales:
  *
  *   GET /            -> packages/ui/index.html
  *   GET /api/corpus  -> JSON con los ficheros *.vxml del corpus
@@ -34,7 +34,6 @@ const MIME = {
   ".vxml": "application/voicexml+xml; charset=utf-8",
   ".xml": "application/xml; charset=utf-8",
   ".css": "text/css; charset=utf-8",
-  ".md": "text/markdown; charset=utf-8",
   ".svg": "image/svg+xml",
   ".png": "image/png",
   ".ico": "image/x-icon",
@@ -46,7 +45,9 @@ async function listaCorpus(raiz) {
   const { readdir } = await import("node:fs/promises");
   const salida = [];
   for (const dir of ["corpus", "corpus/grande"]) {
-    for (const f of (await readdir(join(raiz, dir))).filter((x) => x.endsWith(".vxml")).sort()) {
+    // corpus/grande no existe hasta ejecutar `npm run corpus`.
+    const nombres = await readdir(join(raiz, dir)).catch(() => []);
+    for (const f of nombres.filter((x) => x.endsWith(".vxml")).sort()) {
       const ruta = dir + "/" + f;
       const s = await stat(join(raiz, ruta));
       salida.push({ nombre: f, ruta, bytes: s.size });
@@ -78,27 +79,11 @@ async function enviar(raiz, res, rutaRel) {
  * @param {string} raizProyecto raiz del proyecto servida por HTTP
  */
 export function crearServidor(raizProyecto) {
-  // Verdicto de la prueba e2e: la pagina lo entrega por POST y el runner
-  // (tools/e2e-ui.mjs) lo lee por GET. Solo tiene sentido durante una prueba.
-  let e2eResultado = "";
   return createServer(async (req, res) => {
     const url = new URL(req.url, "http://localhost");
     let ruta = decodeURIComponent(url.pathname);
 
     if (ruta === "/") ruta = "/packages/ui/index.html";
-
-    if (ruta === "/api/e2e-resultado") {
-      if (req.method === "POST") {
-        let cuerpo = "";
-        for await (const c of req) cuerpo += c;
-        e2eResultado = cuerpo;
-        res.writeHead(204).end();
-      } else {
-        res.writeHead(200, { "Content-Type": "text/plain; charset=utf-8", "Cache-Control": "no-store" });
-        res.end(e2eResultado);
-      }
-      return;
-    }
 
     if (ruta === "/api/corpus") {
       const ficheros = await listaCorpus(raizProyecto);

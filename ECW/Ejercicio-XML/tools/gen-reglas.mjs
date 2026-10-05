@@ -39,19 +39,19 @@ lineas.push("");
 lineas.push("#[derive(Clone, Copy)]");
 lineas.push("pub struct Regla {");
 lineas.push("  pub id: &'static str,");
-lineas.push("  pub nombre: &'static str,");
 lineas.push("  pub gravedad: &'static str,");
 lineas.push("  pub mensaje: &'static str,");
 lineas.push("}");
 lineas.push("");
 lineas.push("pub const REGLAS: [Regla; NUM_REGLAS] = [");
 for (const r of catalog.reglas) {
-  lineas.push(`  Regla { id: "${escRust(r.id)}", nombre: "${escRust(r.nombre)}",`);
+  lineas.push(`  Regla { id: "${escRust(r.id)}",`);
   lineas.push(`         gravedad: "${escRust(r.gravedad)}", mensaje: "${escRust(r.mensaje)}" },`);
 }
 lineas.push("];");
 lineas.push("");
 lineas.push("/// Busca una regla por su NOMBRE (el identificador interno que usa el motor).");
+lineas.push("/// El nombre solo hace falta para buscar, asi que no se guarda en Regla.");
 lineas.push("pub fn regla_por_nombre(nombre: &str) -> Option<&'static Regla> {");
 lineas.push("  match nombre {");
 for (const r of catalog.reglas) {

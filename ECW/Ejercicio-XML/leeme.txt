@@ -1,0 +1,270 @@
+==================================================================
+ Estándares y Computación Web - Trabajo III
+ Lenguaje derivado de XML: VXML Doctor, analizador de VoiceXML 2.1
+==================================================================
+
+URL de despliegue: <completar con la URL donde esté publicado>
+
+
+1. QUÉ ES
+------------------------------------------------------------------
+
+VXML Doctor es un analizador estático (linter) de documentos
+VoiceXML 2.1, el lenguaje XML del W3C con el que se programan los
+sistemas de respuesta de voz: centralitas automáticas (IVR), banca
+telefónica, reservas por teléfono o asistentes de voz.
+
+Lee un documento .vxml y, sin ejecutarlo, detecta 18 tipos de
+defecto, calcula estadísticas y analiza el grafo de navegación entre
+formularios. El resultado es un informe JSON.
+
+El mismo analizador está implementado tres veces, como pide el
+enunciado:
+
+  - JavaScript
+  - TypeScript
+  - WebAssembly, compilado desde Rust
+
+Las tres versiones emiten el MISMO informe, idéntico byte a byte. Eso
+se comprueba automáticamente sobre 71 documentos, y es lo que permite
+comparar su rendimiento midiendo exactamente el mismo trabajo.
+
+
+2. POR QUÉ VOICEXML
+------------------------------------------------------------------
+
+  - Es un estándar con norma pública (Recomendación W3C VoiceXML
+    2.0/2.1, con SSML 1.0 para la voz), así que cada regla del
+    analizador se apoya en un apartado concreto de la norma.
+
+  - Tiene un modelo de ejecución propio: el intérprete salta entre
+    formularios (<form>, <goto>), lanza manejadores de eventos
+    (<nomatch>, <noinput>, <catch>, <filled>), sintetiza los textos
+    con un motor de voz y evalúa expresiones ECMAScript. Eso permite
+    reglas semánticas y no solo de sintaxis: formularios a los que no
+    se llega nunca, bucles sin salida, campos que nadie usa o textos
+    que el sintetizador lee mal.
+
+  - Los errores tienen un coste real: un salto a un formulario que no
+    existe o un bucle sin salida es una llamada que se queda en
+    silencio. Detectarlos antes de desplegar, y sin necesitar un
+    servidor de voz, tiene utilidad práctica.
+
+  - Cada documento es un único fichero, así que se puede probar todo
+    sin infraestructura externa.
+
+
+3. UTILIDAD DE LA APLICACIÓN
+------------------------------------------------------------------
+
+  - Para quien escribe una aplicación de voz: señala cada defecto con
+    línea y columna exactas antes de ponerla en producción.
+  - Como control de calidad automático: el informe es JSON
+    determinista, así que puede hacer fallar una integración continua
+    si aparecen errores.
+  - En el navegador: la interfaz web ejecuta los tres motores en local,
+    sin enviar el documento a ningún servidor.
+  - Como comparativa de lenguajes: tres estrategias distintas con un
+    criterio de corrección objetivo (el informe tiene que coincidir).
+
+
+4. LAS 18 REGLAS
+------------------------------------------------------------------
+
+  Regla    Gravedad  Qué detecta
+  -------  --------  ----------------------------------------------
+  VXML001  error     <goto> a un formulario que no existe.
+  VXML002  warning   Formulario inaccesible (nadie salta a él y no
+                     es el primero).
+  VXML003  error     Ciclo de <goto> sin salida (bucle infinito).
+  VXML004  error     <field> sin <prompt>.
+  VXML005  warning   <field> cuyo valor no usa nadie.
+  VXML006  warning   <nomatch> que no repite la pregunta ni sale.
+  VXML007  warning   Falta xml:lang en <vxml>.
+  VXML008  error     <goto> sin href, next ni event.
+  VXML009  error     type de <field> que no está en la norma.
+  VXML010  warning   time de <break> que no es un tiempo SSML válido.
+  VXML011  error     <if> o <elseif> sin cond.
+  VXML012  error     Dos formularios con el mismo id.
+  VXML013  warning   <audio> sin src ni expr.
+  VXML014  info      Símbolos que el sintetizador de voz lee mal
+                     (& % # $ / @ | + =).
+  VXML015  info      Expresión con un identificador no declarado.
+  VXML016  info      Formulario de voz sin <nomatch> ni <noinput>.
+  VXML017  error     <goto> al propio formulario (bucle inmediato).
+  VXML018  warning   Falta version en <vxml>.
+
+El catálogo completo (nombre, gravedad, mensaje, apartado de la norma
+y explicación) está en packages/core/reglas.json, que es la única
+fuente de las reglas para las tres implementaciones.
+
+Limitaciones: VXML015 es conservadora y puede marcar variables que
+llegan de fuera del documento; el grafo solo incluye los formularios
+del propio documento (no sigue saltos a otros ficheros).
+
+
+5. EL INFORME Y EL CONTRATO COMÚN
+------------------------------------------------------------------
+
+Para que los tres informes sean idénticos, packages/core/contrato.mjs
+fija lo que tienen que compartir:
+
+  - Columna = 1 + bytes UTF-8 desde el principio de la línea (como
+    grep). JavaScript cuenta en UTF-16 y convierte; Rust cuenta bytes.
+  - Diagnósticos ordenados por (línea, columna, regla, detalle).
+  - JSON canónico: claves en orden fijo y caracteres no ASCII
+    escapados como \uXXXX.
+
+El informe incluye los diagnósticos, la tabla de formularios (id,
+línea, campos y si se puede llegar a él), el grafo de navegación
+(nodos, aristas, ciclos e inalcanzables) y estadísticas del documento.
+
+
+6. DISEÑO ADAPTADO A CADA LENGUAJE
+------------------------------------------------------------------
+
+Las tres versiones hacen el mismo análisis, pero cada una está escrita
+como mejor encaja en su lenguaje:
+
+  JavaScript (packages/impl-js) - versión de referencia
+    Un escáner de una sola pasada sobre el texto con charCodeAt, sin
+    construir árbol DOM. Produce una lista plana de eventos, y los
+    nombres de elementos y atributos se comparan por su hash FNV-1a
+    en vez de como cadenas. El tamaño de cada subárbol se obtiene con
+    contadores que se restan al cerrar el elemento.
+
+  TypeScript (packages/impl-ts)
+    El escáner construye un árbol de nodos con tipos estáticos: Nodo es
+    una unión discriminada (texto | elemento) y Informe, Diagnostico y
+    Catalogo son interfaces, así que el compilador comprueba que cada
+    regla usa los campos correctos. Las reglas recorren el árbol y
+    eligen qué hacer con un switch sobre el nombre del elemento. Se
+    compila con tsc a JavaScript (packages/impl-ts/lib).
+
+  WebAssembly / Rust (packages/impl-wasm)
+    Trabaja directamente sobre los bytes UTF-8, sin convertir a texto.
+    Los eventos se guardan como estructura de arrays (un Vec por
+    campo) en lugar de un objeto por etiqueta, y los nombres son
+    rangos del documento que solo se copian si un diagnóstico los
+    necesita. Como Rust no puede leer el JSON de reglas en tiempo de
+    ejecución, tools/gen-reglas.mjs lo convierte en constantes Rust
+    (src/reglas_gen.rs). Se compila a wasm32-unknown-unknown y exporta
+    vxml_analizar, vxml_alloc, vxml_dealloc y la memoria.
+
+Los ciclos del grafo se buscan con el algoritmo de Tarjan en versión
+iterativa en los tres lenguajes, para no depender del tamaño de la
+pila.
+
+
+7. COMPARATIVA DE RENDIMIENTO
+------------------------------------------------------------------
+
+Herramienta: packages/bench/bench.mjs, con Node ejecutado con
+--expose-gc. Analiza todo el corpus generado (66 documentos, 5,58 MiB)
+con cada motor, 9 pasadas por motor con recolección de basura entre
+pasadas, y toma la mediana. Antes de medir comprueba que los tres
+informes coinciden: si no, no publica ningún número.
+
+Resultado (Node 24.21, Windows x64, Intel Core i9-14900KF):
+
+  Implementación      Mediana    MiB/s   Primer análisis
+  ------------------  --------  ------  ---------------
+  JavaScript          129,5 ms    43,1         28,2 ms
+  TypeScript          123,7 ms    45,1         27,6 ms
+  WebAssembly (Rust)   47,5 ms   117,5         11,0 ms
+
+WebAssembly es unas 2,7 veces más rápido que JavaScript. Trabajar
+directamente sobre bytes, sin crear objetos por etiqueta ni pasar por
+el recolector de basura, es lo que marca la diferencia. TypeScript
+rinde como JavaScript, porque al final se ejecuta como JavaScript.
+
+El informe completo, con el tiempo de cada documento, está en
+packages/bench/informe.html. Los números cambian según la máquina.
+
+
+8. ESTRUCTURA DEL PROYECTO
+------------------------------------------------------------------
+
+  packages/core/         Contrato común: reglas.json (catálogo de
+                         reglas) y contrato.mjs (serialización, orden
+                         y columnas).
+  packages/impl-js/      Implementación en JavaScript.
+  packages/impl-ts/      Implementación en TypeScript (*.ts) y su
+                         versión compilada (lib/).
+  packages/impl-wasm/    Implementación en Rust (src/), el .wasm
+                         compilado (lib/) y el envoltorio para Node
+                         (wasm.mjs).
+  packages/ui/           Interfaz web: index.html, estilos.css,
+                         app.mjs y el cargador del .wasm para el
+                         navegador.
+  packages/bench/        Banco de pruebas, resultados.json e
+                         informe.html.
+  corpus/                5 casos escritos a mano y el generador del
+                         corpus grande (generar-corpus.mjs).
+  tools/                 Generación de reglas Rust, compilación del
+                         WASM, test de equivalencia y servidor web.
+  package.json           Scripts y dependencias.
+  leeme.txt              Este archivo.
+
+No se entregan node_modules/, packages/impl-wasm/target/ ni
+corpus/grande/: se regeneran con los comandos del apartado 9.
+
+
+9. DESPLIEGUE
+------------------------------------------------------------------
+
+Requisitos:
+  - Node.js 18 o superior.
+  - Solo para recompilar el WASM: Rust con el destino
+    wasm32-unknown-unknown (rustup target add wasm32-unknown-unknown).
+
+El .wasm y el TypeScript compilado ya se entregan hechos, así que para
+usar la aplicación basta con:
+
+    npm install          instala TypeScript (única dependencia)
+    npm run corpus       genera corpus/grande (determinista)
+    npm run serve        interfaz web en http://localhost:5173
+
+En la interfaz se elige un documento del corpus, se sube o se pega
+uno, se elige el motor (JS, TS o WASM) y se pulsa "Analizar". "Comparar
+los tres" ejecuta los tres motores y comprueba que los informes son
+idénticos. Todo se ejecuta en el navegador.
+
+Otros comandos:
+
+    npm run build        regenera reglas_gen.rs, compila TypeScript y
+                         compila el WASM con cargo
+    npm test             test de equivalencia byte a byte de los tres
+                         motores sobre los 71 documentos
+    npm run bench        banco de pruebas (escribe resultados.json)
+    npm run bench:html   genera informe.html a partir de los resultados
+    npm run todo         corpus + build + test + bench
+
+Para publicarla en un servidor basta con servir la carpeta como
+archivos estáticos, con el .wasm como application/wasm, y que la raíz
+abra packages/ui/index.html (es lo que hace tools/serve.mjs). Sin
+corpus/grande la interfaz sigue funcionando con los 5 casos manuales.
+
+
+10. SOFTWARE Y VERSIONES
+------------------------------------------------------------------
+
+  - Node.js 24.21 (probado; funciona desde la 18).
+  - TypeScript 5.9.3.
+  - Rust 1.98.1 (cargo) con destino wasm32-unknown-unknown.
+  - Sin bibliotecas externas: el escáner XML, el generador del corpus
+    y el servidor están escritos a mano.
+
+
+11. USO DE INTELIGENCIA ARTIFICIAL
+------------------------------------------------------------------
+
+Se han usado herramientas de IA en el diseño de las reglas, la
+implementación, la depuración y la documentación. Como la IA no
+siempre acierta, todo se ha comprobado:
+
+  - La equivalencia entre los tres motores se exige byte a byte con
+    el test diferencial.
+  - Las reglas se han contrastado con la norma del W3C.
+  - El banco de pruebas no publica resultados si los informes no
+    coinciden.
