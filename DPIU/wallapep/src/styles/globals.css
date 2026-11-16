@@ -1,0 +1,997 @@
+/* Identidad propia: violeta de marca, neutros ligeramente violáceos y tipografía Plus Jakarta Sans */
+:root {
+  --wallapep-primary: #5b3fd9;
+  --wallapep-primary-dark: #4a2fc0;
+  --wallapep-primary-deep: #3a2496;
+  --wallapep-primary-soft: #f0ecfd;
+  --wallapep-text: #221f33;
+  --wallapep-muted: #5b5870;
+  --wallapep-bg: #f6f5fa;
+  --wallapep-border: #d1cce0;
+  /* Bordes de controles interactivos (chips, botones de opción): ≥ 3:1 sobre blanco */
+  --wallapep-border-strong: #8f8aa6;
+}
+
+html,
+body {
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+body {
+  color: var(--wallapep-text);
+  background: #ffffff;
+  font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/*
+ * Escala de espaciado única para toda la aplicación (base de 4px):
+ *   4px  -> dentro de una misma línea (icono + texto, precio + título de una card)
+ *   8px  -> entre elementos de un mismo grupo (chips, tags, botones juntos)
+ *   12px -> padding vertical de la cabecera
+ *   16px -> entre bloques de una sección, gutter de todos los grids, padding de cards compactas
+ *   24px -> padding de cards de contenido, entre el título de la página y su contenido
+ *   32px -> entre secciones
+ *   48px -> antes del pie de página
+ * Anchos de página: listados a 1400px, formularios de cuenta a 560px,
+ * formularios de producto y detalles a 800px. Cabecera, contenido y pie comparten el margen lateral.
+ */
+:root {
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-12: 12px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --space-2xl: 48px;
+  --page-max: 1400px;
+  --page-narrow: 560px;
+  --page-medium: 800px;
+  --page-wide: 1080px;
+  --page-gutter: clamp(16px, 4vw, 48px);
+  --radius-card: 12px;
+}
+
+/* ---------- Estructura de página ---------- */
+.app-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  height: auto !important;
+  line-height: normal !important;
+  padding: var(--space-12) 0 !important;
+  background: #fff !important;
+  box-shadow: 0 1px 0 var(--wallapep-border);
+}
+.app-header-inner,
+.app-content,
+.app-footer-inner {
+  width: 100%;
+  max-width: var(--page-max);
+  margin: 0 auto;
+  padding-inline: var(--page-gutter);
+}
+.app-header-inner {
+  padding-inline: var(--page-gutter);
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+.app-content {
+  padding: var(--space-lg) var(--page-gutter) var(--space-2xl);
+}
+.app-footer {
+  padding: var(--space-lg) 0 !important;
+  background: var(--wallapep-bg) !important;
+  color: var(--wallapep-muted) !important;
+  text-align: center;
+}
+.page-narrow {
+  max-width: var(--page-narrow);
+  margin: 0 auto;
+}
+.page-medium {
+  max-width: var(--page-medium);
+  margin: 0 auto;
+}
+
+.page-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-md);
+  margin-bottom: var(--space-lg);
+}
+.page-breadcrumb {
+  margin-bottom: var(--space-lg) !important;
+}
+.section-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: var(--space-sm) var(--space-md);
+  margin-bottom: var(--space-md);
+}
+.section-title-count {
+  font-size: 15px;
+  font-weight: 400;
+}
+.section-title a {
+  color: var(--wallapep-primary-dark);
+  font-weight: 600;
+}
+
+.section {
+  margin-bottom: var(--space-xl);
+}
+.section:last-child {
+  margin-bottom: 0;
+}
+.block {
+  margin-bottom: var(--space-md);
+}
+
+/* ---------- Cards ----------
+ * Dos tipos: de contenido (padding 24) y compactas (padding 16: producto y estadísticas). */
+.ant-card {
+  border-radius: var(--radius-card) !important;
+}
+
+/* Estadísticas: misma altura en toda la fila, valor en una línea y nota siempre reservada */
+.stat-card {
+  height: 100%;
+}
+.stat-card .ant-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  padding: var(--space-md) !important;
+}
+.stat-card-title,
+.stat-card-note {
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 14px;
+  line-height: 22px;
+}
+.stat-card-value {
+  font-size: 24px;
+  line-height: 32px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--wallapep-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Chips de filtro del listado: todos con la misma altura y padding */
+.filter-chip.ant-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  height: 32px;
+  margin: 0;
+  padding: 0 var(--space-md);
+  border: 1px solid var(--wallapep-border-strong);
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+.filter-chip.ant-tag-checkable-checked {
+  border-color: var(--wallapep-primary);
+}
+
+/* Listado de productos: bloque de filtros, barra de resultados y grid */
+.list-filters {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+.list-results {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-sm);
+  min-height: 32px;
+  margin: var(--space-lg) 0 var(--space-md);
+}
+.applied-filter.ant-tag {
+  display: inline-flex;
+  align-items: center;
+  height: 28px;
+  margin: 0;
+  padding: 0 var(--space-sm);
+  font-size: 13px;
+}
+@media (min-width: 768px) {
+  .list-order {
+    text-align: right;
+  }
+}
+
+/* Detalle de transacción: resumen del producto arriba y grupos de datos debajo */
+.transaction-summary {
+  display: grid;
+  grid-template-columns: 96px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-md);
+}
+.transaction-summary-image {
+  width: 96px;
+  height: 96px;
+  object-fit: cover;
+  border-radius: var(--radius-card);
+  background: var(--wallapep-bg);
+}
+.transaction-summary-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-sm);
+  min-width: 0;
+}
+.transaction-summary-info .ant-tag {
+  margin: 0;
+}
+.transaction-summary-price {
+  text-align: right;
+}
+.transaction-price {
+  font-size: 28px;
+  line-height: 36px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.transaction-groups {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+  margin-top: var(--space-lg);
+  padding-top: var(--space-lg);
+  border-top: 1px solid #f0f0f0;
+}
+/* En el layout vertical antd pone etiquetas y valores en filas distintas:
+   poco hueco entre etiqueta y valor (4px) y más entre un dato y el siguiente (16px) */
+.transaction-groups .ant-descriptions-row:nth-child(odd) > .ant-descriptions-item {
+  padding-bottom: var(--space-xs) !important;
+}
+.transaction-groups .ant-descriptions-row:nth-child(even) > .ant-descriptions-item {
+  padding-bottom: var(--space-md) !important;
+}
+.transaction-groups .ant-descriptions-row:last-child > .ant-descriptions-item {
+  padding-bottom: 0 !important;
+}
+.transaction-groups .section-title {
+  margin-bottom: var(--space-sm);
+}
+.transaction-groups .ant-descriptions-item-label {
+  color: var(--wallapep-muted) !important;
+}
+.transaction-groups .section-title .ant-typography {
+  font-size: 16px;
+}
+@media (max-width: 575px) {
+  .transaction-summary {
+    grid-template-columns: 72px minmax(0, 1fr);
+  }
+  .transaction-summary-image {
+    width: 72px;
+    height: 72px;
+  }
+  .transaction-summary-price {
+    grid-column: 1 / -1;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    text-align: left;
+  }
+}
+
+/* Opciones en forma de pastilla (categoría en formularios) separadas por el mismo hueco */
+.pill-group {
+  display: flex !important;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+.pill-group .ant-radio-button-wrapper {
+  border-radius: 10px !important;
+  border-inline-start-width: 1px !important;
+}
+.pill-group .ant-radio-button-wrapper::before {
+  display: none !important;
+}
+
+/* Desplegable de datos opcionales: alineado con los campos de arriba, sin sangría extra */
+.form-collapse > .ant-collapse-item > .ant-collapse-header {
+  padding-inline: 0 !important;
+}
+.form-collapse .ant-collapse-content-box {
+  padding: var(--space-sm) 0 0 !important;
+}
+
+/* Formularios: la última fila no deja hueco extra antes del botón */
+.form-actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  align-items: stretch;
+  text-align: center;
+}
+
+/* Números de tablas alineados en columna */
+.ant-table td {
+  font-variant-numeric: tabular-nums;
+}
+
+::selection {
+  background: rgba(91, 63, 217, 0.22);
+}
+
+/* ---------- Cards de producto ----------
+ * Todas iguales: ocupan la altura de la fila, imagen cuadrada recortada,
+ * texto en una sola línea con "..." y el botón siempre en el mismo sitio. */
+.product-card-wrap,
+.product-card-wrap > .ant-ribbon-wrapper {
+  height: 100%;
+}
+.product-card {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--wallapep-border) !important;
+  box-shadow: none;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+}
+.product-card-sold {
+  opacity: 0.75;
+}
+/* Se resaltan al tener el foco (pauta 3.13) */
+.product-card:hover {
+  transform: translateY(-3px);
+  border-color: #d6cff7 !important;
+  box-shadow: 0 10px 24px -8px rgba(58, 36, 150, 0.25);
+}
+.product-card .ant-card-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  padding: var(--space-md) !important;
+  min-width: 0;
+}
+.product-card-cover {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  border-radius: var(--radius-card) var(--radius-card) 0 0;
+}
+.product-card .product-card-image {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  display: block;
+  background: var(--wallapep-bg);
+}
+.product-card-viewed {
+  position: absolute;
+  top: var(--space-sm);
+  left: var(--space-sm);
+  padding: 0 var(--space-sm);
+  border-radius: 12px;
+  font-size: 12px;
+  color: #fff;
+  background: rgba(34, 31, 51, 0.72);
+}
+/* Una línea por dato: nunca hace saltos de línea */
+.product-card-line {
+  display: block;
+  min-width: 0;
+  white-space: nowrap;
+}
+.product-card-line .ant-typography {
+  display: block;
+  color: var(--wallapep-text);
+}
+.product-card .product-card-price {
+  font-size: 20px;
+  line-height: 28px;
+}
+.product-card-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+.product-card-meta .ant-tag {
+  flex: none;
+  margin: 0;
+}
+.product-card-ellipsis {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.product-card .card-actions {
+  margin-top: auto;
+  padding-top: var(--space-sm);
+}
+
+/* Enlace a usuario: avatar + nombre recortado */
+.user-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  max-width: 100%;
+  min-width: 0;
+  vertical-align: middle;
+}
+
+/* Acciones de la card visibles solo con el foco en pantallas con ratón (pauta 1.13) */
+@media (hover: hover) {
+  .product-card .card-actions {
+    opacity: 0;
+    transition: opacity 0.15s ease;
+  }
+  .product-card:hover .card-actions,
+  .product-card:focus-within .card-actions {
+    opacity: 1;
+  }
+}
+
+/* ---------- Tablas ----------
+ * Las acciones de cada fila (menú "...") solo aparecen al pasar el ratón por la fila,
+ * para no llenar de ruido una lista larga. En pantallas táctiles se ven siempre. */
+@media (hover: hover) {
+  .row-actions {
+    opacity: 0;
+    transition: opacity 0.15s ease;
+  }
+  .ant-table-row:hover .row-actions,
+  .ant-table-row:focus-within .row-actions,
+  .row-actions.ant-dropdown-open {
+    opacity: 1;
+  }
+}
+/* Flecha que indica que la fila lleva al detalle, solo al pasar el ratón */
+.row-chevron {
+  color: var(--wallapep-muted);
+}
+.row-chevron {
+  opacity: 0.45;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+.ant-table-row:hover .row-chevron {
+  opacity: 1;
+  color: var(--wallapep-primary-dark);
+  transform: translateX(2px);
+}
+
+/* Barra de categorías con scroll horizontal en móvil */
+.category-strip {
+  display: flex;
+  scrollbar-width: none;
+  gap: var(--space-sm);
+  overflow-x: auto;
+  padding-bottom: var(--space-xs);
+  scrollbar-width: thin;
+}
+
+/* Iconos redondos de categoría de la home */
+.category-bubble {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-sm);
+  min-width: 88px;
+  padding: var(--space-sm) var(--space-xs);
+  border-radius: var(--radius-card);
+  color: var(--wallapep-text);
+  transition: background 0.15s ease;
+}
+.category-bubble:hover {
+  background: var(--wallapep-primary-soft);
+}
+.category-bubble .category-bubble-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  background: var(--wallapep-primary-soft);
+  color: var(--wallapep-primary-dark);
+}
+
+/* Filas de tabla clicables (pauta 3.1) */
+.clickable-row {
+  cursor: pointer;
+}
+
+/* Elementos que aparecen dinámicamente (pauta 3.4) */
+.fade-in {
+  animation: fadeIn 0.35s ease;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.category-strip::-webkit-scrollbar {
+  display: none;
+}
+/* En escritorio los chips de filtro bajan de línea en vez de hacer scroll horizontal */
+@media (min-width: 768px) {
+  .list-filters .category-strip {
+    flex-wrap: wrap;
+    overflow: visible;
+  }
+}
+
+/* Móvil: cards de contenido con padding de 16 en vez de 24 */
+@media (max-width: 575px) {
+  .ant-card .ant-card-body {
+    padding: var(--space-md) !important;
+  }
+  .ant-card .ant-card-head {
+    padding-inline: var(--space-md) !important;
+  }
+}
+@media (max-width: 575px) {
+  .stat-card-value {
+    font-size: 20px;
+    line-height: 28px;
+  }
+}
+
+/* Bloque gris animado para esqueletos de imágenes */
+.skeleton-block {
+  width: 100%;
+  border-radius: var(--radius-card);
+  background: linear-gradient(90deg, #f0f2f3 25%, #e6eaed 37%, #f0f2f3 63%);
+  background-size: 400% 100%;
+  animation: skeletonShine 1.4s ease infinite;
+}
+@keyframes skeletonShine {
+  from { background-position: 100% 50%; }
+  to { background-position: 0 50%; }
+}
+
+/* Texto secundario de la card (fecha, vendedor) recortado con "..." */
+.product-card-ellipsis,
+.product-card-ellipsis > .ant-typography,
+.product-card-ellipsis .ant-typography {
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Rasgos tipográficos propios: títulos y precios más compactos */
+h1.ant-typography, h2.ant-typography, h3.ant-typography, h4.ant-typography {
+  letter-spacing: -0.02em;
+}
+.product-card .product-card-price,
+.transaction-price,
+.stat-card-value {
+  font-weight: 800 !important;
+  letter-spacing: -0.02em;
+}
+
+/* ================= Mejoras para cumplir todas las pautas ================= */
+
+.page-wide {
+  max-width: var(--page-wide);
+  margin: 0 auto;
+}
+
+/* Fila con el foco más visible (pauta 3.13) y fila recién cambiada resaltada un momento (pauta 3.4) */
+.ant-table-wrapper .ant-table-tbody > tr.ant-table-row:hover > td {
+  background: var(--wallapep-primary-soft) !important;
+}
+@keyframes rowFlash {
+  from { background: #e3dbfd; }
+  to { background: transparent; }
+}
+.ant-table-tbody > tr.row-flash > td {
+  animation: rowFlash 1.6s ease-out;
+}
+
+/* Producto en tablas: miniatura + título + dato secundario (pautas 3.3 y 1.12) */
+.table-product {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-12);
+  min-width: 0;
+  color: inherit;
+}
+.table-thumb {
+  width: 48px;
+  height: 48px;
+  flex: none;
+  object-fit: cover;
+  border-radius: 8px;
+  background: var(--wallapep-bg);
+}
+.table-thumb-small {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+}
+.table-product-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.table-product-sub {
+  font-size: 13px;
+}
+.table-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm) var(--space-md);
+  margin-bottom: var(--space-md);
+}
+.list-end-action {
+  display: flex;
+  justify-content: center;
+  margin-top: var(--space-lg);
+}
+
+/* Fotos del formulario (pautas 4.5 y 3.3) */
+.photos {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+}
+.photos-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(104px, 1fr));
+  gap: var(--space-sm);
+}
+.photo-thumb {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid var(--wallapep-border);
+  background: var(--wallapep-bg);
+}
+.photo-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.photo-thumb-main {
+  border: 2px solid var(--wallapep-primary);
+}
+.photo-main-label {
+  position: absolute;
+  left: 4px;
+  bottom: 4px;
+  padding: 0 6px;
+  border-radius: 6px;
+  font-size: 11px;
+  color: #fff;
+  background: var(--wallapep-primary);
+}
+.photo-actions {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  display: flex;
+  gap: 4px;
+}
+
+/* Editor de la descripción y descripción con formato (pauta 4.15) */
+.rich-toolbar {
+  margin-bottom: var(--space-xs);
+  flex-wrap: wrap;
+}
+.rich-hint {
+  font-size: 12px;
+}
+.rich-text {
+  max-width: 70ch;
+  line-height: 1.6;
+  word-break: break-word;
+}
+.rich-p {
+  margin: 0 0 var(--space-sm);
+}
+.rich-list {
+  margin: 0 0 var(--space-sm);
+  padding-left: 1.4em;
+}
+
+/* Categorías con su color también en el formulario (pauta 3.2) */
+.category-icon { margin-right: 2px; }
+.category-color-purple { color: #722ed1; }
+.category-color-blue { color: #1677ff; }
+.category-color-magenta { color: #eb2f96; }
+.category-color-orange { color: #fa8c16; }
+.category-color-volcano { color: #fa541c; }
+.category-color-gold { color: #d48806; }
+.category-color-green { color: #389e0d; }
+.ant-radio-button-wrapper-checked .category-icon {
+  color: inherit;
+}
+
+.price-suggestion {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Vista previa de la card al vender (pauta 3.26) */
+.form-preview {
+  position: sticky;
+  top: 94px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  max-width: 300px;
+}
+.form-preview-title {
+  font-size: 13px;
+}
+.product-card-preview:hover {
+  transform: none;
+}
+
+/* "Top seller": un elemento destacado entre muchos (pauta 1.14) */
+.product-card-top {
+  position: absolute;
+  top: var(--space-sm);
+  right: var(--space-sm);
+  padding: 0 var(--space-sm);
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #613400;
+  background: #ffd666;
+}
+.category-tag-link {
+  flex: none;
+  display: inline-flex;
+}
+.category-tag-link:hover .ant-tag {
+  text-decoration: underline;
+}
+
+/* Galería del detalle (pauta 3.27) */
+.gallery {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+.gallery-main {
+  background: var(--wallapep-bg);
+  border-radius: var(--radius-card);
+  overflow: hidden;
+  text-align: center;
+}
+.gallery-main .ant-image {
+  display: block;
+}
+.gallery-thumbs {
+  display: flex;
+  gap: var(--space-sm);
+  overflow-x: auto;
+}
+.gallery-thumb {
+  flex: none;
+  width: 72px;
+  height: 72px;
+  padding: 0;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 2px solid transparent;
+  background: var(--wallapep-bg);
+  cursor: pointer;
+}
+.gallery-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.gallery-thumb-active {
+  border-color: var(--wallapep-primary);
+}
+.gallery-thumb:focus-visible {
+  outline: 2px solid var(--wallapep-primary);
+  outline-offset: 2px;
+}
+.detail-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  margin-top: var(--space-lg);
+}
+
+/* Listado: etiquetas de los filtros (pauta 1.2) y sugerencias con su número de resultados (pauta 3.26) */
+.filter-label {
+  display: block;
+  margin-bottom: var(--space-xs);
+  font-size: 13px;
+}
+.suggestion {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-md);
+}
+
+/* Portada: fondo suave en vez de un bloque de color intenso (pauta 1.5) */
+.home-hero {
+  border-radius: var(--radius-card);
+  padding: clamp(24px, 5vw, 48px);
+  background: var(--wallapep-primary-soft);
+  border: 1px solid #e3dbfd;
+}
+.home-search {
+  max-width: 560px;
+}
+.home-hero-points {
+  font-size: 15px;
+  color: var(--wallapep-text);
+}
+.home-hero-points .anticon {
+  color: var(--wallapep-primary);
+}
+.category-empty {
+  margin: 0;
+  padding: var(--space-md) 0;
+}
+
+/* Logo: marca la portada como página actual (pauta 3.23) */
+.app-logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: none;
+  padding-bottom: 2px;
+  border-bottom: 2px solid transparent;
+}
+.app-logo-active {
+  border-bottom-color: var(--wallapep-primary);
+}
+
+/* ---------- Más contraste ----------
+ * Etiquetas de colores de Ant Design con el texto más oscuro (≥ 4.5:1 sobre su fondo claro). */
+.ant-tag.ant-tag-gold { color: #7c4a00; border-color: #e8c35a; }
+.ant-tag.ant-tag-orange { color: #8a3d00; border-color: #f0b76c; }
+.ant-tag.ant-tag-volcano { color: #9a2a07; border-color: #f2a183; }
+.ant-tag.ant-tag-green { color: #1e6b05; border-color: #95d475; }
+.ant-tag.ant-tag-magenta { color: #9e1068; border-color: #f095c8; }
+.ant-tag.ant-tag-purple { color: #3e1a8c; border-color: #b9a6ee; }
+.ant-tag.ant-tag-blue, .ant-tag.ant-tag-processing { color: #0b3d9c; border-color: #91b9ff; }
+.ant-tag.ant-tag-cyan { color: #00585e; border-color: #7fd3d6; }
+.ant-tag.ant-tag-success { color: #1e6b05; border-color: #95d475; }
+/* Las etiquetas pequeñas de categoría (sin borde) tienen el fondo un poco más marcado */
+.ant-tag-borderless.ant-tag-gold { background: #fff1c2; }
+.ant-tag-borderless.ant-tag-orange { background: #ffe7cc; }
+.ant-tag-borderless.ant-tag-volcano { background: #ffe2d6; }
+.ant-tag-borderless.ant-tag-green { background: #e3f6d5; }
+.ant-tag-borderless.ant-tag-magenta { background: #ffe0f0; }
+.ant-tag-borderless.ant-tag-purple { background: #ece5ff; }
+.ant-tag-borderless.ant-tag-blue { background: #e1ecff; }
+
+/* Cabecera de las tablas y separadores más visibles */
+.ant-table-wrapper .ant-table-thead > tr > th {
+  background: #efedf6 !important;
+  color: var(--wallapep-text) !important;
+  font-weight: 600;
+}
+/* Botones de opción (categorías, tipo de documento) con borde visible */
+.ant-radio-button-wrapper:not(.ant-radio-button-wrapper-checked) {
+  border-color: var(--wallapep-border-strong) !important;
+}
+/* Control segmentado: la pista más oscura para que se distinga la opción elegida */
+.ant-segmented {
+  background: #e4e1ee !important;
+  color: #3f3c52 !important;
+}
+/* Etiquetas sobre las fotos con fondo más opaco */
+.product-card-viewed { background: rgba(34, 31, 51, 0.85); }
+.product-card-top { color: #4a2700; background: #ffc53d; }
+/* Capa de "Preview" al pasar el ratón por la foto: texto blanco legible */
+.ant-image .ant-image-mask { background: rgba(20, 18, 32, 0.62) !important; }
+
+/* ---------- Icono + texto (IconTextComponent) ----------
+ * Centrados en vertical y con un hueco fijo, en vez de depender del espacio de la fuente. */
+.icon-text {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 100%;
+  vertical-align: middle;
+}
+.icon-text-sm {
+  gap: 4px;
+}
+.icon-text > .anticon {
+  flex: none;
+  display: inline-flex;
+  line-height: 0;
+}
+.icon-text-label {
+  min-width: 0;
+}
+
+/* Ayuda y errores de los campos: separados del control, nunca pegados */
+.ant-form-item .ant-form-item-extra,
+.ant-form-item .ant-form-item-explain {
+  margin-top: var(--space-xs);
+  line-height: 1.45;
+}
+
+/* El icono ocupa exactamente una línea de alto: con textos de varias líneas se alinea con la primera */
+.icon-text {
+  align-items: flex-start;
+}
+.icon-text > .anticon {
+  height: 1lh;
+  align-items: center;
+}
+
+/* Contador de caracteres de las áreas de texto: separado del campo y del botón que viene después */
+.form-actions {
+  margin-top: var(--space-md);
+}
+
+/* Barra de formato de la descripción: separada del campo y con la ayuda centrada con los iconos */
+.rich-toolbar {
+  margin-bottom: var(--space-sm);
+  align-items: center !important;
+}
+.rich-hint {
+  line-height: 24px;
+}
+
+/* Precio sugerido: frase e "Use this price" en la misma línea, bien separados */
+.price-suggestion {
+  gap: var(--space-xs) var(--space-sm);
+}
+.inline-link-button.ant-btn {
+  height: auto;
+  padding: 0;
+}
+/* antd pone line-height: 0 a los iconos; para que 1lh sea la línea del texto se hereda la del padre */
+.icon-text > .anticon {
+  line-height: inherit !important;
+}
+/* Contador de caracteres: fuera del campo, 4px por debajo, alineado a la derecha, y con su hueco
+   reservado para que no toque el botón que viene después */
+.ant-input-textarea-show-count {
+  margin-bottom: 24px;
+}
+.ant-input-textarea-show-count .ant-input-data-count {
+  bottom: -24px !important;
+  line-height: 20px;
+}

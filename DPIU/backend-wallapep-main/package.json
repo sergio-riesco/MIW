@@ -1,0 +1,12 @@
+{
+  "dependencies": {
+    "cors": "^2.8.5",
+    "crypto": "^1.0.1",
+    "express": "^4.18.2",
+    "express-fileupload": "^1.4.1",
+    "jsonwebtoken": "^9.0.2",
+    "mysql": "^2.18.1",
+    "sharp": "^0.32.6",
+    "util": "^0.12.5"
+  }
+}
