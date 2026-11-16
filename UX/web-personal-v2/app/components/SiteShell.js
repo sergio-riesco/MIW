@@ -149,7 +149,7 @@ export default function SiteShell({ lang, children }) {
             </p>
           </div>
         </footer>
-        <Clarity />
+        <Clarity lang={lang} />
       </body>
     </html>
   );
