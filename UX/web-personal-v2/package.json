@@ -1,0 +1,22 @@
+{
+  "name": "web-personal",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint ."
+  },
+  "dependencies": {
+    "next": "^16.4.6",
+    "react": "19.2.8",
+    "react-dom": "19.2.8"
+  },
+  "devDependencies": {
+    "@huggingface/transformers": "^4.3.2",
+    "eslint": "^9",
+    "eslint-config-next": "16.3.6",
+    "ffmpeg-static": "^5.3.0"
+  }
+}
