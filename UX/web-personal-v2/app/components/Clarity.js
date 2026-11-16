@@ -4,7 +4,7 @@ import Script from "next/script";
 // pruebas de usabilidad de UX. Pega aquí el identificador del proyecto de
 // clarity.microsoft.com (Settings > Setup, es el texto tras "clarity.ms/tag/").
 // Si se deja vacío, no se carga nada.
-const CLARITY_ID = "";
+const CLARITY_ID = "zemzo0thmt";
 
 export default function Clarity() {
   if (!CLARITY_ID) {
