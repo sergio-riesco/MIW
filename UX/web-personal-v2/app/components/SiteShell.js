@@ -6,6 +6,7 @@ import LanguageSwitch from "./LanguageSwitch";
 import MenuToggle from "./MenuToggle";
 import NavMenu from "./NavMenu";
 import ThemeToggle from "./ThemeToggle";
+import Clarity from "./Clarity";
 import styles from "./SiteShell.module.css";
 import "../globals.css";
 
@@ -148,6 +149,7 @@ export default function SiteShell({ lang, children }) {
             </p>
           </div>
         </footer>
+        <Clarity />
       </body>
     </html>
   );
