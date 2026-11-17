@@ -1,0 +1,291 @@
+/* Estilos comunes a todas las páginas. Lo de cada página va en su .module.css */
+
+/* Temas: data-theme lo pone el script de layout.js antes de pintar, así no
+   hay parpadeo al recargar. */
+
+:root,
+:root[data-theme="light"] {
+  --background: #ffffff;
+  --surface: #f0f1ee;
+  --text: #0f1211;
+  --white: #ffffff;
+  --muted: #3d4341;
+  --accent: #0f4a44;
+  --current: #8e2618;
+  --current-badge: #8e2618;
+  --current-glow: rgb(142 38 24 / 0.16);
+  --favorite: #f2c94c;
+  --on-favorite: #0f1211;
+  --shadow-color: rgb(27 29 28 / 0.12);
+  --border: #858b88;
+  --visited: #6a2c8c;
+  /* v3: color propio de cada sección. Contraste AAA (7:1 o más) sobre el
+     fondo y sobre --surface, en claro y en oscuro; ver leeme.txt */
+  --sec-home: #0f4a44;
+  --sec-education: #1e40af;
+  --sec-music: #8f1446;
+  --sec-videogames: #14532d;
+  --sec-series: #7c2d12;
+  --sec-hobbies: #5b21b6;
+  --sec-contact: #334155;
+}
+
+:root[data-theme="dark"] {
+  --background: #0b0f0e;
+  --surface: #18201e;
+  --text: #f6f8f5;
+  --white: #ffffff;
+  --muted: #ccd5d0;
+  --accent: #a6e6da;
+  --current: #ffa595;
+  --current-badge: #962f20;
+  --current-glow: rgb(255 165 149 / 0.2);
+  --favorite: #f2c94c;
+  --on-favorite: #0f1211;
+  --shadow-color: rgb(0 0 0 / 0.3);
+  --border: #6b7a75;
+  --visited: #d9b8f2;
+  --sec-home: #a6e6da;
+  --sec-education: #9cc3ff;
+  --sec-music: #f9a8d4;
+  --sec-videogames: #8fe0a0;
+  --sec-series: #fdba74;
+  --sec-hobbies: #c9b5ff;
+  --sec-contact: #cbd5e1;
+}
+
+/* Sin data-theme (p. ej. con JS desactivado) manda el sistema */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    --background: #0b0f0e;
+    --surface: #18201e;
+    --text: #f6f8f5;
+    --white: #ffffff;
+    --muted: #ccd5d0;
+    --accent: #a6e6da;
+    --current: #ffa595;
+    --current-badge: #962f20;
+    --current-glow: rgb(255 165 149 / 0.2);
+    --favorite: #f2c94c;
+    --on-favorite: #0f1211;
+    --shadow-color: rgb(0 0 0 / 0.3);
+    --border: #6b7a75;
+    --visited: #d9b8f2;
+    --sec-home: #a6e6da;
+    --sec-education: #9cc3ff;
+    --sec-music: #f9a8d4;
+    --sec-videogames: #8fe0a0;
+    --sec-series: #fdba74;
+    --sec-hobbies: #c9b5ff;
+    --sec-contact: #cbd5e1;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* v3: tamaño de letra. La base sube de 16 a 18 px (112,5 %) y el control
+   A− / A / A+ de la cabecera cambia data-text-size en <html>. Como casi todo
+   el sitio está en rem, todo crece en proporción. Lo pone el script de
+   SiteShell.js antes de pintar, igual que el tema. */
+html {
+  font-size: 112.5%;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+html[data-text-size="s"] {
+  font-size: 100%;
+}
+
+html[data-text-size="l"] {
+  font-size: 125%;
+}
+
+html[data-text-size="xl"] {
+  font-size: 137.5%;
+}
+
+/* v3: cada sección tiene su color. La página marca su sección con
+   data-section en <main>; :has() lo sube a <body> para que también lo usen
+   la cabecera y el menú. Dentro de la sección, --accent pasa a ser el color
+   de la sección, así enlaces, bordes y detalles lo toman solos. */
+body:has(main[data-section="home"]) { --section: var(--sec-home); }
+body:has(main[data-section="education"]) { --section: var(--sec-education); }
+body:has(main[data-section="music"]) { --section: var(--sec-music); }
+body:has(main[data-section="videogames"]) { --section: var(--sec-videogames); }
+body:has(main[data-section="series"]) { --section: var(--sec-series); }
+body:has(main[data-section="hobbies"]) { --section: var(--sec-hobbies); }
+body:has(main[data-section="contact"]) { --section: var(--sec-contact); }
+
+main[data-section] {
+  --accent: var(--section);
+}
+
+main[data-section] .page-header {
+  border-bottom: 0.25rem solid var(--accent);
+}
+
+main[data-section] .page-header h1 {
+  padding-left: 0.85rem;
+  border-left: 0.4rem solid var(--accent);
+}
+
+:root {
+  color-scheme: light;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    color-scheme: dark;
+  }
+}
+
+body {
+  display: flex;
+  min-height: 100vh;
+  min-height: 100dvh;
+  margin: 0;
+  flex-direction: column;
+  background: var(--background);
+  color: var(--text);
+  font-family: system-ui, "Segoe UI", Roboto, sans-serif;
+  line-height: 1.65;
+}
+
+a {
+  color: var(--accent);
+  text-underline-offset: 0.2em;
+}
+
+/* Enlaces ya visitados del contenido en otro color. :where() no suma
+   especificidad, así no pisa los enlaces con estilo propio (tarjetas, menú). */
+:where(main, footer) :where(a:visited) {
+  color: var(--visited);
+}
+
+a:hover {
+  text-decoration-thickness: 2px;
+}
+
+:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 3px;
+}
+
+/* v3 (WCAG 2.2 AAA, 2.5.5): todo enlace que no va dentro de una frase
+   mide al menos 44 px de alto. Los que sí van en una frase quedan fuera
+   por la excepción «en línea» del criterio. */
+:where(main, footer) :where(li, dd, h3) > a:first-child,
+.tap-target {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+}
+
+h1,
+h2,
+p {
+  margin-top: 0;
+}
+
+h1,
+h2 {
+  line-height: 1.2;
+}
+
+h1 {
+  margin-bottom: 1rem;
+  font-size: clamp(2.1rem, 6vw, 3.2rem);
+  letter-spacing: -0.03em;
+}
+
+h2 {
+  margin-bottom: 0.75rem;
+  font-size: 1.4rem;
+}
+
+p {
+  margin-bottom: 1rem;
+}
+
+/* v3 (WCAG AAA 1.4.8): líneas de 80 caracteres como mucho */
+main p {
+  max-width: 75ch;
+}
+
+img {
+  max-width: 100%;
+}
+
+/* Estructura común */
+
+.container {
+  width: min(calc(100% - 2rem), 64rem);
+  margin-inline: auto;
+}
+
+.page {
+  flex: 1;
+  padding-block: 3.5rem 4.5rem;
+}
+
+.page-header {
+  margin-bottom: 3rem;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.lead {
+  max-width: 48rem;
+  margin-bottom: 0;
+  color: var(--muted);
+  font-size: 1.2rem;
+}
+
+section + section {
+  margin-top: 2.5rem;
+}
+
+/* Oculto a la vista pero leído por los lectores de pantalla */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.skip-link {
+  position: fixed;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 10;
+  padding: 0.6rem 0.8rem;
+  background: var(--text);
+  color: var(--background);
+  text-decoration: none;
+  transform: translateY(-200%);
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+
+@media (max-width: 40rem) {
+  .page {
+    padding-block: 2.5rem 3.5rem;
+  }
+}
+
+@media print {
+  .page {
+    padding-block: 0;
+  }
+}

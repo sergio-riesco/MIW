@@ -1,0 +1,22 @@
+/* Botón de tema claro/oscuro */
+
+.themeToggle {
+  display: grid;
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  place-items: center;
+  /* surface y no background: en oscuro el botón se confundiría con la cabecera */
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+  font-size: 1.15rem;
+  line-height: 1;
+}
+
+.themeToggle:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}

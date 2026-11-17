@@ -1,0 +1,47 @@
+/* Migas de pan */
+
+.breadcrumb {
+  margin-bottom: 0.25rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.list {
+  display: flex;
+  margin: 0;
+  padding: 0;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.45rem;
+  list-style: none;
+}
+
+.item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+/* v3: 44 px de alto para pulsar con facilidad (WCAG AAA 2.5.5) */
+.link {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  color: var(--muted);
+  text-decoration: none;
+}
+
+.link:hover {
+  color: var(--accent);
+  text-decoration: underline;
+}
+
+.current {
+  color: var(--accent);
+}
+
+.separator {
+  color: var(--muted);
+}

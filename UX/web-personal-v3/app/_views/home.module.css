@@ -1,0 +1,132 @@
+/* Inicio */
+
+.factList {
+  margin: 0 0 1rem;
+  padding: 0;
+  max-width: 38rem;
+}
+
+.fact {
+  display: grid;
+  padding: 0.35rem 0;
+  grid-template-columns: 8rem 1fr;
+  gap: 1rem;
+}
+
+.fact dt {
+  color: var(--muted);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.fact dd {
+  margin: 0;
+}
+
+/* varios valores para un mismo dato (dos estudios): todos en la columna 2 */
+.fact dd + dd {
+  grid-column: 2;
+}
+
+/* segunda línea de un dato (la universidad) */
+.factDetail {
+  display: block;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+/* texto y foto lado a lado */
+.profile {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 1.5rem 2.5rem;
+  align-items: start;
+}
+
+.profileText > :last-child {
+  margin-bottom: 0;
+}
+
+.photo {
+  width: 22rem;
+  height: auto;
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+}
+
+/* contacto */
+.contact {
+  font-style: normal;
+}
+
+.sectionList {
+  margin: 0;
+  padding: 0;
+  max-width: 44rem;
+  list-style: none;
+}
+
+.sectionList li {
+  border-top: 1px solid var(--border);
+}
+
+.sectionList li:last-child {
+  border-bottom: 1px solid var(--border);
+}
+
+/* v3: cada sección con su color (--item): barra a la izquierda y título */
+.sectionLink {
+  display: grid;
+  padding: 0.85rem 0.25rem 0.85rem 1rem;
+  border-left: 0.4rem solid var(--item, var(--accent));
+  grid-template-columns: 10rem 1fr;
+  gap: 0.2rem 1.5rem;
+  align-items: baseline;
+  text-decoration: none;
+}
+
+.sectionLinkTitle {
+  color: var(--item, var(--accent));
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.sectionLink:hover {
+  background: var(--surface);
+}
+
+.sectionLink:hover .sectionLinkTitle {
+  text-decoration: underline;
+}
+
+.sectionLinkText {
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+@media (max-width: 40rem) {
+  .profile {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .photo {
+    width: 100%;
+    max-width: 22rem;
+  }
+}
+
+@media (max-width: 34rem) {
+  .fact,
+  .sectionLink {
+    grid-template-columns: 1fr;
+    gap: 0.1rem;
+  }
+
+  .fact dd + dd {
+    grid-column: 1;
+    margin-top: 0.4rem;
+  }
+}

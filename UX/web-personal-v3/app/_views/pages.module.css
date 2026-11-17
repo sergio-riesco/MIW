@@ -1,0 +1,247 @@
+/* Formación, contacto, buscador, ayuda y mapa del sitio */
+
+.meta {
+  margin: 0 0 0.5rem;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+/* Línea de tiempo de formación y experiencia */
+.timeline {
+  margin: 0;
+  padding: 0;
+  max-width: 48rem;
+  list-style: none;
+}
+
+.timeline > li {
+  position: relative;
+  padding: 0 0 2rem 1.75rem;
+  border-left: 2px solid var(--border);
+}
+
+.timeline > li:last-child {
+  padding-bottom: 0.5rem;
+}
+
+.timeline > li::before {
+  position: absolute;
+  top: 0.35rem;
+  left: -0.5rem;
+  width: 0.9rem;
+  height: 0.9rem;
+  border: 2px solid var(--background);
+  border-radius: 50%;
+  background: var(--accent);
+  content: "";
+}
+
+.entry h3 {
+  margin: 0 0 0.2rem;
+  font-size: 1.2rem;
+  line-height: 1.3;
+}
+
+.entry h4 {
+  margin: 1.25rem 0 0.4rem;
+  font-size: 1rem;
+}
+
+.entry p:last-child {
+  margin-bottom: 0;
+}
+
+.dates {
+  margin: 0 0 0.25rem;
+  color: var(--accent);
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.bullets {
+  margin: 0;
+  padding-left: 1.25rem;
+}
+
+.bullets li + li {
+  margin-top: 0.4rem;
+}
+
+.tags {
+  display: flex;
+  margin: 0;
+  padding: 0;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  list-style: none;
+}
+
+.tags li {
+  padding: 0.2rem 0.65rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+  font-size: 0.9rem;
+}
+
+/* Tarjetas de contacto y referencias */
+.address {
+  font-style: normal;
+}
+
+.cards {
+  display: grid;
+  margin: 0 0 1.5rem;
+  padding: 0;
+  grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+  gap: 1rem;
+  list-style: none;
+}
+
+.card {
+  padding: 1.1rem 1.25rem;
+  border: 1px solid var(--border);
+  /* v3: franja con el color de la sección */
+  border-top: 0.3rem solid var(--accent);
+  border-radius: 0.6rem;
+  background: var(--surface);
+}
+
+.card h3 {
+  margin: 0 0 0.3rem;
+  font-size: 1.1rem;
+}
+
+.cardTitle {
+  margin: 0 0 0.3rem;
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.card p:last-child {
+  margin-bottom: 0;
+}
+
+.button {
+  display: inline-block;
+  padding: 0.6rem 1.1rem;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--background);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.button:hover {
+  text-decoration: underline;
+}
+
+/* Buscador */
+.searchForm {
+  max-width: 36rem;
+  margin-bottom: 2rem;
+}
+
+.searchForm label {
+  display: block;
+  margin-bottom: 0.4rem;
+  font-weight: 700;
+}
+
+.searchRow {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.searchRow input {
+  min-width: 0;
+  padding: 0.55rem 0.8rem;
+  border: 1px solid var(--border);
+  border-radius: 0.4rem;
+  flex: 1;
+  background: var(--background);
+  color: var(--text);
+  font: inherit;
+}
+
+.searchRow button {
+  padding: 0.55rem 1.1rem;
+  border: 0;
+  border-radius: 0.4rem;
+  background: var(--accent);
+  color: var(--background);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.results {
+  margin: 0;
+  padding: 0;
+  max-width: 48rem;
+  list-style: none;
+}
+
+.results li {
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.results h3 {
+  margin: 0 0 0.25rem;
+  font-size: 1.1rem;
+}
+
+.results p {
+  margin: 0;
+}
+
+.results .meta {
+  margin-bottom: 0.15rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* Ayuda */
+.faq {
+  max-width: 48rem;
+}
+
+.faq h2 {
+  font-size: 1.2rem;
+}
+
+/* v3: el mapa del sitio y la ayuda no son secciones, sus tarjetas no llevan franja */
+main:not([data-section]) .card {
+  border-top-width: 1px;
+  border-top-color: var(--border);
+}
+
+/* Mapa del sitio */
+.tree {
+  margin: 0 0 2.5rem;
+  padding-left: 1.25rem;
+  font-size: 1.05rem;
+}
+
+.tree ul {
+  padding-left: 1.5rem;
+}
+
+.tree li {
+  margin-block: 0.3rem;
+}
+
+/* Página 404: enlaces para seguir navegando */
+.notFoundLinks {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
+  gap: 0.5rem 1.5rem;
+  max-width: 48rem;
+  margin: 0 0 1.5rem;
+  padding-left: 1.25rem;
+}

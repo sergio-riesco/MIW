@@ -1,0 +1,2662 @@
+/*1792490392000*/
+/* Estils dels estudis */
+.playPauseVideo a:before {
+  font-family: "Font Awesome 6 Free";
+  font-weight: 900;
+  content: "\f28b";
+  width: 20px;
+  height: 20px;
+  line-height: 1rem;
+  display: block;
+}
+
+.playPauseVideo a.icon-pause:before {
+  content: "\f28b";
+}
+
+.playPauseVideo a.icon-play:before {
+  content: "\f144";
+}
+
+.playPauseVideo a {
+  padding-left: 2px;
+  width: 20px;
+  height: 20px;
+  top: 17px;
+  position: relative;
+  left: 14px;
+  display: block;
+  overflow: hidden;
+}
+
+/* INFORMACION DEPARTAMENTOS ESTRUCTURA */
+.UIB_dept_apartat H2, .UIB_dept_apartat H3, .UIB_dept_apartat H4 {
+  clear: both;
+  padding: 0px;
+  margin: 0px;
+}
+
+.UIB_dept_apartat H3, .UIB_dept_apartat H4 {
+  margin-bottom: 0.25em;
+}
+
+.UIB_dept_apartat {
+  clear: both;
+  float: left;
+  padding: 0px;
+  margin: 0px;
+  margin-top: 1em;
+  width: 98%;
+}
+
+.UIB_dept_apartat H3 {
+  margin: 0 !important;
+  padding: 0 !important;
+  margin-bottom: 0.5em !important;
+}
+
+.UIB_dept_llistat {
+  display: block;
+  float: left;
+  clear: both;
+  padding: 0 0 0 1em;
+  width: 98%;
+}
+
+.UIB_web_area {
+  padding-bottom: 0.5em;
+  margin-bottom: 0.5em;
+  border-bottom: thin dashed lightgray;
+}
+
+.UIB_membres_amb_foto LI {
+  display: block;
+  height: 70px;
+  vertical-align: top;
+  border-bottom: thin dashed lightgray;
+  margin-bottom: 5px;
+}
+
+.UIB_membres_amb_foto IMG {
+  float: left;
+  display: inline-block;
+}
+
+.UIB_span_foto_profe {
+  float: left !important;
+  width: 60px !important;
+  display: inline-block !important;
+  height: 100% !important;
+}
+
+UL.UIB_llista_per_area {
+  list-style: none;
+}
+
+/* ESTUDIOS */
+UL.lista_todos_estudios {
+  margin: 0 2em 0 1em;
+}
+
+UL.lista_todos_estudios LI {
+  margin-bottom: 1em;
+}
+
+A.enlace_completo {
+  width: 97%;
+  text-align: center;
+  margin: 1em auto 1.5em auto;
+}
+
+div.UIB_leyenda {
+  float: left;
+  margin-top: 2em !important;
+  clear: both;
+}
+
+.llistat.master .llista_estudis li {
+  position: relative;
+  padding-bottom: 1em;
+}
+
+.llistat.master .llista_estudis li > :not(.link_button_preinscripcion) {
+  margin-bottom: 3em;
+}
+
+.llista_estudis li .link_button_preinscripcion {
+  position: absolute;
+  right: 0.5em;
+  bottom: 0.5em;
+  margin-bottom: 0;
+  padding: 5px;
+  font-size: 0.9em;
+}
+
+.llista_estudis li .link_button_preinscripcion .texttitle {
+  margin-top: 1.5em;
+  display: inline-block;
+}
+
+.uib_img_muesca {
+  position: absolute;
+  bottom: 0.25em;
+  left: 1.5em;
+  box-sizing: border-box;
+  margin-bottom: 6px !important;
+}
+
+.uib_img_muesca_cabecera {
+  position: absolute;
+  bottom: 0.5em;
+  right: 1em;
+  box-sizing: border-box;
+  margin-bottom: 6px !important;
+}
+
+.link_button_preinscripcion {
+  text-decoration: none;
+  display: inline-block;
+  padding: 8px 12px;
+  /*background: #006ab7;*/
+  background: rgb(154, 51, 36) !important;
+  color: #FFF;
+  border-radius: 4px;
+  border: 0;
+  /*border: solid 1px #20538D;*/
+  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.4);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 1px 1px rgba(0, 0, 0, 0.2);
+  user-select: none;
+  text-align: center;
+  margin: 0;
+  -moz-transition: all 0.2s ease-in;
+  -o-transition: all 0.2s ease-in;
+  -webkit-transition: all 0.2s ease-in;
+  transition: all 0.2s ease-in;
+  width: auto;
+  height: auto;
+  min-height: auto;
+}
+
+.llista_estudis li .link_button_preinscripcion {
+  text-decoration: none;
+  display: inline-block;
+  padding: 6px 10px;
+  background: rgb(154, 51, 36) !important;
+  color: #FFF;
+  border-radius: 4px;
+  text-shadow: none;
+  border: 0;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 1px 1px rgba(0, 0, 0, 0.2);
+  user-select: none;
+  text-align: center;
+  margin: 0;
+  width: 50%;
+  height: auto;
+  min-height: auto;
+}
+
+.llista_estudis li .link_button_preinscripcion_soon {
+  cursor: not-allowed !important;
+  background: rgb(234, 174, 136);
+}
+
+UL.lista_estudios .link_button_preinscripcion, UL.lista_estudios_qualitat .link_button_preinscripcion {
+  padding: 2px 10px;
+}
+
+ul.llista {
+  margin: 0 0 1em 2em;
+}
+
+span.button_preinscripcion {
+  display: inline-block;
+  width: 10em;
+  text-align: right;
+}
+
+/*
+.llista_estudis .link_button_preinscripcion:hover,.llista_estudis .link_button_preinscripcion:active  {
+    color: #FFF !important;
+    background: #006db5 !important;
+    border: 0;
+    text-decoration: none;
+    cursor:pointer;
+}*/
+.llista_estudis .link_button_preinscripcion:hover, .llista_estudis .link_button_preinscripcion:active,
+.link_button_preinscripcion:hover, .link_button_preinscripcion:active {
+  color: #FFF !important;
+  background: #6f4742;
+  /*background: #004b81; #356094;*/
+  /*border: solid 1px #2A4E77;*/
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.extra_col {
+  display: block;
+  float: right;
+}
+
+.extra_col .normativa {
+  padding: 0 0 0 1em;
+  width: 10em;
+  text-align: center;
+}
+
+UL.lista_estudios, UL.lista_estudios_qualitat {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-bottom: thin solid lightgray;
+}
+
+UL.lista_estudios LI, UL.lista_estudios_qualitat LI {
+  margin: 0;
+  padding: 1em !important;
+  border-top: thin solid lightgray;
+}
+
+UL.lista_estudios LI:hover, UL.lista_estudios_qualitat LI:hover {
+  background: #EEE;
+}
+
+#avis_encurs, #avis_noucurs {
+  font-size: 1.15em;
+  font-weight: bold;
+  padding: 1em;
+}
+
+.any_academic {
+  font-weight: bold;
+  font-size: 1.5em;
+}
+
+TABLE.est_1r {
+  width: 100%;
+}
+
+TABLE.est_1r TR:hover {
+  background: #EEE;
+}
+
+TABLE.est_1r CAPTION {
+  text-align: left;
+  font-size: 1.25em;
+  font-weight: bold;
+  padding-bottom: 1em;
+  margin-top: 1em;
+  border-bottom: thin solid lightgray;
+}
+
+TABLE.est_1r TR {
+  border-bottom: thin solid lightgray;
+}
+
+TABLE.est_1r TD {
+  vertical-align: top;
+  padding: 1.5em 0 0.5em 0;
+}
+
+TABLE.est_1r TD.est_centre UL LI {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+TABLE.est_1r TD.est_centre UL LI UL {
+  margin-bottom: 1.25em !important;
+}
+
+TABLE.est_1r TD.est_centre UL LI UL LI {
+  margin: 0.5em 0 !important;
+}
+
+SPAN.caption_qualitat {
+  font-weight: bold;
+  display: block;
+  margin-bottom: 1em;
+}
+
+TABLE#sumario_master {
+  margin-bottom: 1em;
+}
+
+SPAN#mesinfo {
+  display: block;
+  margin-bottom: 1em;
+}
+
+DIV#pla_estudi {
+  padding-bottom: 1.5em;
+}
+
+TABLE#resum_assignatura {
+  margin-bottom: 1.5em;
+}
+
+P#any_anterior {
+  margin-top: 1.5em;
+}
+
+UL.UIB_ass_grp_list {
+  margin: 0 !important;
+  padding: 0 !important;
+  padding-left: 2em !important;
+  list-style: none;
+}
+
+UL.UIB_ass_grp_list UL {
+  margin: 0 !important;
+  padding: 0 !important;
+  list-style: none;
+}
+
+UL.UIB_ass_grp_list LI UL LI {
+  margin-left: 1em;
+}
+
+UL.UIB_ass_grp_list LI {
+  margin-bottom: 0.1em;
+  padding: 0.15em !important;
+}
+
+UL.UIB_lista_guias {
+  list-style: none;
+  display: inline-block;
+}
+
+UL.UIB_lista_guias LI {
+  display: inline-block;
+  margin: 0 !important;
+  margin-right: 1em !important;
+}
+
+.UIB_lista_grups_horaris {
+  display: inline-block;
+}
+
+UL.UIB_lista_grups_horaris LI {
+  margin: 0 !important;
+}
+
+UL.UIB_ass_grp_list IMG {
+  padding: 0 !important;
+  margin: 0 !important;
+  vertical-align: bottom;
+}
+
+#uib_style_content UL.UIB_llista_prerequisits_assignatura {
+  list-style: disc;
+  margin: 0;
+  padding: 0;
+  margin-left: 0.25em;
+  margin-top: 1em;
+}
+
+#uib_style_content UL.UIB_llista_prerequisits_assignatura .apartat {
+  font-weight: bold;
+  margin: 5px 0px;
+  display: block;
+}
+
+#uib_style_content UL.UIB_llista_prerequisits_assignatura LI {
+  margin-bottom: 5px;
+  margin-left: 2em;
+}
+
+H3.UIB_periode {
+  margin: 0;
+  margin-bottom: 0.5em !important;
+  margin-top: 0.5em !important;
+}
+
+H4.UIB_group_name {
+  margin: 0;
+  margin-bottom: 0.5em;
+  margin-top: 1em;
+  display: block;
+  width: 100%;
+  border-bottom: thin solid #032e58 !important;
+  font-weight: bold;
+  margin-top: 1em !important;
+  color: #032e58;
+}
+
+DIV TABLE.UIB_columns CAPTION {
+  font-size: 1.8em;
+  font-weight: bold;
+  margin: 5px 0px;
+  text-align: left !important;
+  font-family: Georgia, Times New Roman, Serif;
+}
+
+/*----------- Taula ESTUDIS de Primer Segon-----------*/
+table.taulaAssignatures {
+  border-collapse: collapse;
+}
+
+table.taulaAssignatures th {
+  padding: 3px;
+  background-color: #DAE6EF;
+  color: #0C479D;
+  font-weight: bold;
+  border: 1px solid #BED1F1;
+}
+
+table.taulaAssignatures td {
+  padding: 3px;
+  border: 1px solid #ccc;
+  text-align: left;
+}
+
+table.taulaAssignatures td.normal {
+  font-weight: normal;
+}
+
+table.taulaAssignatures td ul {
+  margin-top: 0px;
+  padding-top: 0px;
+}
+
+table.taulaAssignatures td ul li {
+  margin-top: 0px;
+  padding-top: 0px;
+}
+
+/* FITXA PROFESSOR */
+IMG.UIB_foto_profe {
+  float: left;
+  padding-bottom: 0.5em;
+  margin-right: 1.5em;
+}
+
+UL.uib_dadesFitxa {
+  list-style: none;
+  display: table;
+}
+
+UL.uib_dadesFitxa LI {
+  display: table-row;
+}
+
+UL.uib_dadesFitxa LI SPAN {
+  display: table-cell;
+}
+
+SPAN.uib_dadesFitxa_label {
+  font-weight: bold;
+  padding-right: 3em;
+}
+
+UL.UIB_lista_datos {
+  margin: 0;
+  padding: 0;
+  padding-left: 0.5em !important;
+  padding-top: 1.5em !important;
+  list-style: none;
+  float: left;
+}
+
+UL.UIB_lista_estudios_profesor {
+  margin: 0 !important;
+  padding: 0 !important;
+  list-style: none;
+}
+
+UL.UIB_lista_datos SPAN.etiqueta {
+  display: inline-block;
+  width: 16em;
+  font-weight: bold;
+  vertical-align: top;
+  margin-bottom: 0.25em;
+}
+
+SPAN.etiqueta {
+  display: inline-block;
+  width: 16em;
+  font-weight: bold;
+  vertical-align: top;
+  margin-bottom: 0.25em;
+}
+
+UL.UIB_lista_telefons {
+  display: inline-block;
+  list-style: none;
+  margin: 0 !important;
+}
+
+UL.UIB_lista_telefons .telefon_complet {
+  display: inline-block;
+  width: 7em;
+}
+
+UL.UIB_lista_telefons .extension {
+  display: inline-block;
+  text-align: right;
+  width: 5em;
+}
+
+IMG.UIB_foto_profe {
+  float: left;
+  margin-bottom: 0.5em;
+}
+
+#UIB_HorariAtencio TR TD {
+  text-align: center !important;
+}
+
+/* END FITXA PROFESSOR */
+div.uib_LlistaEstudis, div#uib_LlistaEstudis {
+  float: left;
+  margin-top: 1em;
+  width: 100%;
+}
+
+TABLE.horaris_assignatura CAPTION {
+  font-family: Georgia, Times New Roman, Serif;
+  /*color: #333;
+  line-height: initial;
+  font-size: 1.4em;*/
+  margin: 1em 0 0.75em 0;
+  font-size: 1.8em;
+  text-align: left;
+  font-weight: bold;
+}
+
+TABLE#sumario_plan_estudios {
+  margin-top: 0.25em;
+  margin-bottom: 1.5em;
+  float: right;
+  clear: both;
+  border-radius: 8px;
+  width: 60%;
+  margin-left: 3em;
+}
+
+#info_breve {
+  width: 39%;
+}
+
+TABLE#sumario_plan_estudios UL#uib_altra_informacio_general {
+  padding: 0;
+  margin-left: 1.25em;
+  list-style: disc;
+  font-size: 0.85em;
+}
+
+TABLE#sumario_plan_estudios TH {
+  padding-right: 1em;
+  text-align: left;
+}
+
+.ui-accordion {
+  clear: both;
+}
+
+SPAN.estudi_centre {
+  display: inline-block;
+  float: right;
+  margin-right: 2em;
+}
+
+UL.assignaturesnav {
+  list-style: none;
+  padding: 0;
+  margin: 0.5em;
+  margin-left: 0em;
+}
+
+UL.assignaturesnav LI {
+  display: inline-block;
+  min-width: 5em;
+  padding: 0 0.25em 0.25em 0.25em;
+  margin: 0;
+  background: #EEE;
+  text-align: center;
+  border-top: thin solid lightgray;
+  border-left: thin solid lightgray;
+  border-right: thin solid gray;
+  border-bottom: thin solid gray;
+  border-radius: 7px;
+}
+
+UL.assignaturesnav LI.selected {
+  background: white;
+  border-top: thin solid gray;
+  border-left: thin solid gray;
+  border-right: thin solid lightgray;
+  border-bottom: thin solid lightgray;
+}
+
+DIV#uib_LlistaEstudis DIV.listado_tipo {
+  border: 0;
+}
+
+/*UL#permanencia {  padding: 0; margin: 0;  list-style: none;   font-size: 0.85em;}*/
+DIV.impressio {
+  text-align: right;
+}
+
+UL.UIB_ass_grp_list SPAN.etiqueta {
+  display: inline-block;
+  width: 12em;
+  font-weight: bold;
+  vertical-align: top;
+}
+
+UL#UIB_llista_prerequisits .title {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+UL#UIB_llista_prerequisits .apartat {
+  font-weight: bold;
+  margin: 5px 0px;
+  display: block;
+}
+
+UL#UIB_llista_prerequisits LI UL {
+  list-style: circle;
+  margin: 0;
+  padding: 0;
+  padding-left: 1em;
+}
+
+UL#UIB_llista_prerequisits LI UL LI {
+  margin-bottom: 0em;
+}
+
+TABLE.horaris_assignatura TD.GrupHorari, TABLE.horaris_assignatura TH.GrupHorari {
+  width: 60%;
+}
+
+TABLE.horaris_assignatura TD.Cronograma, TABLE.horaris_assignatura TH.Cronograma {
+  width: 20%;
+  text-align: center;
+}
+
+TABLE.horaris_assignatura TD.Examens, TABLE.horaris_assignatura TH.Examens {
+  width: 20%;
+  text-align: center;
+}
+
+TD.ass_nom {
+  width: 55%;
+}
+
+TD.ass_tipus {
+  width: 14%;
+}
+
+TD.ass_credits {
+  width: 7%;
+  text-align: right !important;
+}
+
+TD.ass_places {
+  width: 5%;
+  text-align: right !important;
+}
+
+TD.ass_idioma {
+  width: 8%;
+}
+
+TD.ass_periode {
+  width: 14%;
+}
+
+.nav-tabs {
+  margin-top: 1em;
+}
+
+ul.navegacio {
+  margin-bottom: 1em;
+}
+
+DIV.UIB_nota_peu {
+  margin: 0px;
+  padding: 0px;
+  margin-top: 1em;
+}
+
+DIV.UIB_nota_peu DIV {
+  margin: 0px;
+  padding: 0px;
+  padding: 0.25em;
+}
+
+DIV.UIB_nota_peu .titol_peu {
+  font-weight: bold;
+}
+
+@media (max-width: 400px) {
+  TABLE#sumario_plan_estudios, #info_breve {
+    width: 100%;
+  }
+}
+/* Estils ui2016*/
+/* Taules amb bootstrap */
+.table-striped th:first-child {
+  text-align: center;
+}
+
+.table-striped th[scope=row]:first-child {
+  text-align: left;
+}
+
+.table-striped td ul {
+  margin: 0px 0px 1em 1em;
+  padding: 0;
+}
+
+#tableResumCredits tr th, #tableResumCredits tr td {
+  text-align: left !important;
+}
+
+.table-striped CAPTION {
+  font-size: 1.3em;
+  font-weight: bold;
+  text-align: left !important;
+  font-family: Georgia, Times New Roman, serif;
+  margin: 5px 0px;
+}
+
+.cercador_estudis {
+  padding-top: 2em;
+  padding-bottom: 2em;
+  padding-left: 1em;
+  margin-bottom: 2em;
+  background-color: #bed8ef;
+}
+
+.cercador_estudis span {
+  margin-bottom: 1em;
+}
+
+.llista_estudis {
+  position: relative;
+  width: 100%;
+  clear: both;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  list-style: none;
+  font-size: 1.18em;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  -webkit-box-align: stretch !important;
+  -ms-flex-align: stretch !important;
+  align-items: stretch !important;
+}
+
+.llista_estudis li {
+  border: 0;
+  min-height: 8em;
+  margin: 0 0 1.85em 0;
+  text-align: center;
+  padding: 0px 15px !important;
+  position: relative;
+  -webkit-box-align: stretch !important;
+  -ms-flex-align: stretch !important;
+  align-items: stretch !important;
+  width: 33%;
+  flex: 0 0 32.95%;
+  list-style: none outside none;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+.llista_estudis li a {
+  color: white;
+  padding: 0;
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  display: block;
+  padding: 1em 0;
+  min-height: 7em;
+  box-sizing: border-box;
+}
+
+.llista_estudis li a .texttitle {
+  font-weight: bold;
+  position: relative;
+  /*top: 50%;
+  transform: translateY(-50%);*/
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 1em 1em 1em 0.75em;
+  box-sizing: border-box;
+}
+
+.llista_estudis li a:hover {
+  background-color: var(--uib-color) !important;
+  color: white !important;
+  text-decoration: none !important;
+}
+
+/*barras*/
+/*
+.llista_estudis li a .texttitle:before,
+.llista_estudis li a .texttitle:after {
+ content: "";
+position: absolute;
+top: 0em;
+border-top: 3px solid white;
+width: 70px;
+transform: rotate(-9deg);
+left: 0.5em;
+}
+
+.llista_estudis li a .texttitle:after {
+    top: auto;
+    bottom: -0.5em;
+}*/
+#avis_biblioteca {
+  padding-bottom: 1em;
+}
+
+#llista_llibres_recomanats .autors:before {
+  content: " - ";
+}
+
+#llista_llibres_recomanats .publicacio:before {
+  content: " / ";
+}
+
+.capsaInfoEstudi {
+  padding: 2em;
+  margin-top: 1em;
+}
+
+.capsaInfoEstudi a {
+  color: #005d9b;
+}
+
+.sizeMedium {
+  font-size: medium;
+}
+
+.sizeLarge {
+  font-size: large;
+}
+
+.uib_style_estudi div {
+  margin: 0 0 1.35em;
+}
+
+.uib_style_estudi .formularicapestudis div {
+  margin: 0;
+}
+
+.est2Col, .est2col {
+  overflow: hidden;
+}
+
+.estColLeft {
+  padding-right: 2em;
+  padding-bottom: 300px;
+  margin-bottom: -300px;
+}
+
+.estColRight {
+  padding-left: 1em;
+}
+
+.imatge-segell img {
+  height: 90px;
+  position: relative;
+  margin-top: -45px;
+  top: 25px;
+}
+
+.imatge-informacio img {
+  padding-bottom: 1em;
+  width: 100%;
+}
+
+/*.imatge-informacio {margin-bottom:1em;}*/
+/*
+.download-pdf {
+    padding-left: 55px;
+    height: 38px;
+    display: inline-block;
+    padding-top: 12px;
+    background: url(img/icon-pdf-large.png) no-repeat scroll 0px 0px
+        transparent;
+}*/
+.url-alternativa {
+  padding-left: 55px;
+  height: 38px;
+  display: block;
+  padding-top: 12px;
+  /* background: url(img/web.png) no-repeat scroll 0px 0px transparent; */
+}
+
+/** SIGMA **/
+/* Branca: Arts i Humanitats*/
+.llista_estudis.cbH li a, .llista_estudis li.cbH a, .backgroundEstH {
+  background-color: #C28100;
+}
+
+.estColLeft2 {
+  border-right: 1px solid #C28100;
+}
+
+/* Branca: Ciencies Socials i Juridiques*/
+.llista_estudis.cbJ li a, .llista_estudis li.cbJ a, .backgroundEstJ {
+  background-color: #BA4A1D;
+}
+
+.estColLeft5 {
+  border-right: 1px solid #BA4A1D;
+}
+
+/* Branca: Ciencies */
+.llista_estudis.cbX li a, .llista_estudis li.cbX a, .backgroundEstX {
+  background-color: #999600; /*#A2A000;*/
+}
+
+.estColLeft3 {
+  border-right: 1px solid #999600;
+}
+
+/* Branca: Enginyeria i Arquitectura */
+.llista_estudis.cbT li a, .llista_estudis li.cbT a, .backgroundEstT {
+  background-color: #1D486B;
+}
+
+.estColLeft6 {
+  border-right: 1px solid #1D486B;
+}
+
+/* Branca: Ciencies de la Salut */
+.llista_estudis.cbS li a, .llista_estudis li.cbS a, .backgroundEstS {
+  background-color: #74163F;
+}
+
+.estColLeft4 {
+  border-right: 1px solid #74163F;
+}
+
+/** AGORA **/
+/* Branca: Arts i Humanitats*/
+.llista_estudis.cbAIH li a, .llista_estudis li.cbAIH a, .backgroundEstAIH {
+  background-color: #E49900;
+}
+
+.estColLeftAIH {
+  border-right: 1px solid #E49900;
+}
+
+/* Branca: Ciencies Socials i Juridiques*/
+.llista_estudis.cbCSJ li a, .llista_estudis li.cbCSJ a, .backgroundEstCSJ {
+  background-color: #BA4A1D;
+}
+
+.estColLeftCSJ {
+  border-right: 1px solid #BA4A1D;
+}
+
+/* Branca: Ciencies */
+.llista_estudis.cbCIE li a, .llista_estudis li.cbCIE a, .backgroundEstCIE {
+  background-color: #A2A000;
+}
+
+.estColLeftCIE {
+  border-right: 1px solid #A2A000;
+}
+
+/* Branca: Enginyeria i Arquitectura */
+.llista_estudis.cbEIA li a, .llista_estudis li.cbEIA a, .backgroundEstEIA {
+  background-color: #1D486B;
+}
+
+.estColLeftEIA {
+  border-right: 1px solid #1D486B;
+}
+
+/* Branca: Ciencies de la Salut */
+.llista_estudis.cbCSA li a, .llista_estudis li.cbCSA a, .backgroundEstCSA {
+  background-color: #74163F;
+}
+
+.backgroundEstH, .backgroundEstJ, .backgroundEstX, .backgroundEstT, .backgroundEstS,
+.backgroundEstAIH, .backgroundEstCSJ, .backgroundEstCIE, .backgroundEstEIA, .backgroundEstCSA {
+  color: white;
+}
+.backgroundEstH.capsaInfoEstudi a, .backgroundEstJ.capsaInfoEstudi a, .backgroundEstX.capsaInfoEstudi a, .backgroundEstT.capsaInfoEstudi a, .backgroundEstS.capsaInfoEstudi a,
+.backgroundEstAIH.capsaInfoEstudi a, .backgroundEstCSJ.capsaInfoEstudi a, .backgroundEstCIE.capsaInfoEstudi a, .backgroundEstEIA.capsaInfoEstudi a, .backgroundEstCSA.capsaInfoEstudi a {
+  color: white;
+  text-decoration: underline;
+}
+.backgroundEstH.capsaInfoEstudi a:hover, .backgroundEstJ.capsaInfoEstudi a:hover, .backgroundEstX.capsaInfoEstudi a:hover, .backgroundEstT.capsaInfoEstudi a:hover, .backgroundEstS.capsaInfoEstudi a:hover,
+.backgroundEstAIH.capsaInfoEstudi a:hover, .backgroundEstCSJ.capsaInfoEstudi a:hover, .backgroundEstCIE.capsaInfoEstudi a:hover, .backgroundEstEIA.capsaInfoEstudi a:hover, .backgroundEstCSA.capsaInfoEstudi a:hover {
+  color: #AADFFF !important;
+}
+
+.estColLeftCSA {
+  border-right: 1px solid #74163F;
+}
+
+/* Formulari contacte cap estudi landing page */
+.formularicapestudis .imgPerson {
+  margin-bottom: 1em;
+}
+
+.formularicapestudis .contactPerson {
+  font-weight: bold;
+  display: block;
+}
+
+.formularicapestudis .g-recaptcha {
+  transform: scale(0.9);
+  transform-origin: 0;
+  -webkit-transform: scale(0.9);
+  transform: scale(0.9);
+  -webkit-transform-origin: 0 0;
+  transform-origin: 0 0;
+}
+
+.nav-pills > li > a:hover {
+  text-decoration: underline;
+}
+
+.nav-pills > .active > a:hover {
+  color: white !important;
+  text-decoration: underline;
+}
+
+#N_list.llistat {
+  float: left;
+  width: 100%;
+}
+
+.row-fluid.cercador_estudis {
+  padding: 0;
+  margin-bottom: 2em;
+  background-color: #bed8ef;
+}
+
+.row-fluid.cercador_estudis .video-filter {
+  position: relative;
+  height: 300px;
+  margin-top: -300px;
+  background-color: rgba(190, 216, 239, 0.65);
+}
+
+.row-fluid.cercador_estudis h2 {
+  position: relative;
+  margin-top: -100px;
+  margin-left: 1em;
+  text-shadow: 1px 1px #EEE;
+}
+
+.row-fluid.cercador_estudis .easy-autocomplete {
+  margin-left: 1em;
+  position: absolute;
+}
+
+.row-fluid.cercador_estudis .easy-autocomplete input {
+  max-width: calc(100% - 2em);
+}
+
+.fullscreen-bg {
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  overflow: hidden;
+  z-index: -5;
+  height: 300px;
+}
+
+.fullscreen-bg__video {
+  position: relative;
+  top: 50%;
+  left: 50%;
+  width: auto;
+  height: auto;
+  min-width: 100%;
+  min-height: 100%;
+  -webkit-transform: translate(-50%, -50%);
+  -moz-transform: translate(-50%, -50%);
+  -ms-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+  display: block;
+}
+
+.row-fluid.cercador_estudis .playPauseVideo {
+  background-color: rgba(255, 255, 255, 0.67);
+  position: relative;
+  margin-top: -40px;
+  width: 40px;
+  height: 40px;
+  z-index: 1;
+  float: right;
+  border-radius: 100% 0 0 0;
+}
+
+.playPauseVideo a {
+  padding-left: 12px;
+  width: 0px;
+  top: 15px;
+  position: relative;
+  left: 18px;
+  display: block;
+  overflow: hidden;
+}
+
+.estudis .popup, #estudis .popup {
+  left: 0;
+  position: absolute;
+  top: 175;
+  width: 100%;
+  z-index: 1001;
+}
+
+.estudis .content-popup, #estudis .content-popup {
+  margin: 0px auto;
+  position: relative;
+  padding: 5px;
+  width: 300px;
+  min-height: 100px;
+  border-radius: 4px;
+  background-color: #FFFFFF;
+  box-shadow: 0 2px 5px #666666;
+}
+
+.estudis .content-popup h3, #estudis .content-popup h3 {
+  color: #48484B;
+  border-bottom: 1px solid #48484B;
+  margin-top: 0;
+  padding-bottom: 4px;
+}
+
+.estudis .popup-overlay, #estudis .popup-overlay {
+  left: 0;
+  width: 100%;
+  z-index: 999;
+  display: none;
+  background-color: #777777;
+  cursor: pointer;
+  opacity: 0.7;
+}
+
+.estudis .close, #estudis .close {
+  position: absolute;
+  right: 15px;
+}
+
+.any_aca_docencia_antiga {
+  padding-left: 0.25em;
+}
+
+.tall_nom {
+  width: 45%;
+}
+
+.tall_nota {
+  width: 10%;
+  text-align: right !important;
+}
+
+.tall_grup {
+  width: 5%;
+  text-align: right !important;
+}
+
+.tall_espera {
+  width: 10%;
+  text-align: right !important;
+}
+
+.tall_anyaca {
+  width: 10%;
+  text-align: right !important;
+}
+
+.tall_anteriors {
+  width: 20%;
+  text-align: center !important;
+}
+
+.portlet-content #txtFiltre {
+  padding: 0.25em;
+  margin: 0 0 0.5em 0;
+}
+
+[id^=Indicadors_] {
+  font-size: 0.9rem !important; /*Hi ha un style que els fa massa petits*/
+}
+
+/*divisor indicadors*/
+div.pan18 {
+  flex: 1 1 24em;
+}
+
+@media (max-width: 979px) {
+  .wrap-estudis {
+    display: flex;
+    display: -webkit-box;
+    flex-wrap: wrap;
+    -webkit-flex-wrap: wrap;
+    -ms-flex-wrap: wrap;
+  }
+}
+@media (max-width: 767px) {
+  .fullscreen-bg {
+    background: url("http://canal.uib.cat/digitalAssets/320/320117_vlcsnap-2015-03-23-13h18m41s87.jpg") center center/cover no-repeat;
+  }
+  .fullscreen-bg__video, .row-fluid.cercador_estudis .playPauseVideo {
+    display: none;
+  }
+  .est2Col {
+    overflow: visible;
+  }
+  .estColLeft {
+    padding-right: 0em;
+    padding-bottom: 0px;
+    margin-bottom: 0px;
+    border: 0;
+  }
+  .estColRight {
+    padding-left: 0em;
+  }
+}
+@media (max-width: 499px) {
+  .llista_estudis li {
+    width: 90%;
+    flex: 0 0 100%;
+    padding: 2%;
+    margin-right: 5%;
+    margin-bottom: 2em;
+  }
+  .llista_estudis li:nth-child(3n+0) {
+    margin-right: 5%;
+  }
+  .llista_estudis li:nth-child(2n+0) {
+    margin-right: 0;
+  }
+  .llistat.master .llista_estudis li {
+    padding-bottom: 1em;
+  }
+  .llista_estudis li .link_button_preinscripcion {
+    width: 92%;
+    text-align: center;
+    box-sizing: border-box;
+  }
+  .llistat.master .llista_estudis li > :not(.link_button_preinscripcion) {
+    margin-bottom: 3em;
+  }
+}
+@media (min-width: 1200px) {
+  .wrap-estudis #resultats_list, #tabsInsercioLaboral {
+    font-size: 1rem;
+  }
+  .wrap-estudis #resultats_list ul li a, #tabsInsercioLaboral ul li a {
+    border-radius: 0;
+  }
+  .wrap-estudis #resultats_list ul li a:hover, #tabsInsercioLaboral ul li a:hover {
+    background-color: var(--uib-color-lightgray);
+    color: var(--foreground);
+  }
+}
+#fichapersonal ul {
+  padding: 0;
+}
+
+#fichapersonal .listado_tipo ul.navegacio li,
+#fichapersonal .lista_estudios li, #fichapersonal ul:not([class]) li:not([class]), #fichapersonal ol:not([class]) li:not([class]) {
+  padding-bottom: 0.5em;
+}
+
+#fichapersonal label {
+  font-size: 1rem;
+  font-weight: normal;
+}
+
+#fichapersonal .menuleft {
+  padding: 0 4em 0 3em !important;
+}
+
+#fichapersonal .hasTitleContent.menuleft {
+  margin-top: 4.25em;
+}
+
+#fichapersonal .img-top-left,
+#fichapersonal .img-left {
+  float: left;
+  margin: 0;
+  padding: 0px;
+  border: 0px;
+  padding-right: 1.5em;
+  padding-bottom: 1.5em;
+  box-sizing: border-box;
+}
+
+/*! Estils dels components */
+#fichapersonal {
+  width: 100%;
+}
+
+#tocify.menuficha #menuleft-nav label.item {
+  position: unset;
+  display: inline;
+}
+
+#tocify.menuficha #uib_style_content #menuleft-nav ol {
+  padding: 0;
+  display: inline;
+}
+
+#tocify.menuficha #menuleft-nav .menuleft_list .menuleft_list li label {
+  color: #006EBD;
+}
+
+#tocify.menuficha #menuleft-nav .menuleft_list li label:hover {
+  text-decoration: underline;
+}
+
+#tocify.menuficha #menuleft-nav .menuleft_list .menuleft_list li label::before {
+  content: "- ";
+  position: absolute;
+  left: -0.7em;
+}
+
+.radio_toggle {
+  display: none;
+}
+
+.radio_toggle:checked + div.info_panel, .radio_toggle:checked + div.global_panel .info_panel {
+  max-height: 5000px;
+  display: block;
+}
+
+.radio_toggle + div.global_panel h2.section_title {
+  display: none;
+}
+
+.radio_toggle:checked + div.global_panel h2.section_title {
+  display: block;
+}
+
+.info_panel, .global_panel .info_panel {
+  max-height: 0;
+  display: none;
+  overflow: hidden;
+  margin-bottom: 1px;
+}
+
+.hidden {
+  display: none;
+  visibility: hidden;
+}
+
+.visible-phone {
+  display: none !important;
+}
+
+.visible-tablet {
+  display: none !important;
+}
+
+.hidden-desktop {
+  display: none !important;
+}
+
+.visible-desktop {
+  display: inherit !important;
+}
+
+@media screen and (min-width: 768px) and (max-width: 979px) {
+  .hidden-desktop {
+    display: inherit !important;
+  }
+  .visible-desktop {
+    display: none !important;
+  }
+  .visible-tablet {
+    display: inherit !important;
+  }
+  .hidden-tablet {
+    display: none !important;
+  }
+}
+@media screen and (max-width: 767px) {
+  .hidden-desktop {
+    display: inherit !important;
+  }
+  .visible-desktop {
+    display: none !important;
+  }
+  .visible-phone {
+    display: inherit !important;
+  }
+  .hidden-phone {
+    display: none !important;
+  }
+}
+.visible-print {
+  display: none !important;
+}
+
+@media print {
+  .visible-print {
+    display: inherit !important;
+  }
+  .hidden-print {
+    display: none !important;
+  }
+}
+.ui-widget-content a.btn {
+  color: var(--btn-primary-color, #fff);
+}
+
+.simulaTaula_Taula {
+  width: 100%;
+  /*float: left;*/
+  display: table;
+  position: relative;
+  border-top: 1px solid #D4D4D4;
+  border-bottom: 1px solid #D4D4D4;
+  margin-bottom: 1.5rem;
+}
+
+.simulaTaula_Fila {
+  display: table-row;
+}
+
+.simulaTaula_Cella1 {
+  display: table-cell;
+  width: 43%;
+  font-weight: bold;
+  padding: 0.3em 0.5em;
+  background-color: #EEE;
+}
+
+.simulaTaula_Cella2 {
+  display: table-cell;
+  width: 57%;
+  font-weight: normal;
+  color: #000;
+  padding: 0.3em 0.5em;
+}
+
+.simulaTaula_Taula + .simulaTaula_Taula {
+  margin-top: calc(-1.5rem - 1px);
+}
+
+.row-fluid.simulaTaula_Taula {
+  background-color: #eee;
+  display: flex;
+}
+
+.row-fluid.simulaTaula_Taula div:nth-child(1) {
+  background-color: #EEE;
+  font-weight: bold;
+  padding: 0.3em 0.5em;
+}
+
+.row-fluid.simulaTaula_Taula div:nth-child(2) {
+  background-color: #FFF;
+  font-weight: normal;
+  padding: 0.3em 0.5em;
+}
+
+@media screen and (max-width: 767px) {
+  .row.simulaTaula_Taula [class*=span],
+  .row-fluid.simulaTaula_Taula [class*=span] {
+    float: none;
+    display: block;
+    width: 100% !important;
+    margin-left: 0;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+  }
+  .row.simulaTaula_Taula, .row-fluid.simulaTaula_Taula {
+    display: block !important;
+  }
+}
+/* OLD BOOTSTRAP */
+[class*=span] {
+  float: left;
+  min-height: 1px;
+  margin-left: 20px;
+}
+
+.span20 {
+  width: 980px;
+}
+
+.span19 {
+  width: 930px;
+}
+
+.span18 {
+  width: 880px;
+}
+
+.span17 {
+  width: 830px;
+}
+
+.span16 {
+  width: 780px;
+}
+
+.span15 {
+  width: 730px;
+}
+
+.span14 {
+  width: 680px;
+}
+
+.span13 {
+  width: 630px;
+}
+
+.span12 {
+  width: 580px;
+}
+
+.span11 {
+  width: 530px;
+}
+
+.span10 {
+  width: 480px;
+}
+
+.span9 {
+  width: 430px;
+}
+
+.span8 {
+  width: 380px;
+}
+
+.span7 {
+  width: 330px;
+}
+
+.span6 {
+  width: 280px;
+}
+
+.span5 {
+  width: 230px;
+}
+
+.span4 {
+  width: 180px;
+}
+
+.span3 {
+  width: 130px;
+}
+
+.span2 {
+  width: 80px;
+}
+
+.span1 {
+  width: 30px;
+}
+
+.offset20 {
+  margin-left: 1020px;
+}
+
+.offset19 {
+  margin-left: 970px;
+}
+
+.offset18 {
+  margin-left: 920px;
+}
+
+.offset17 {
+  margin-left: 870px;
+}
+
+.offset16 {
+  margin-left: 820px;
+}
+
+.offset15 {
+  margin-left: 770px;
+}
+
+.offset14 {
+  margin-left: 720px;
+}
+
+.offset13 {
+  margin-left: 670px;
+}
+
+.offset12 {
+  margin-left: 620px;
+}
+
+.offset11 {
+  margin-left: 570px;
+}
+
+.offset10 {
+  margin-left: 520px;
+}
+
+.offset9 {
+  margin-left: 470px;
+}
+
+.offset8 {
+  margin-left: 420px;
+}
+
+.offset7 {
+  margin-left: 370px;
+}
+
+.offset6 {
+  margin-left: 320px;
+}
+
+.offset5 {
+  margin-left: 270px;
+}
+
+.offset4 {
+  margin-left: 220px;
+}
+
+.offset3 {
+  margin-left: 170px;
+}
+
+.offset2 {
+  margin-left: 120px;
+}
+
+.offset1 {
+  margin-left: 70px;
+}
+
+.row-fluid {
+  width: 100%;
+  *zoom: 1;
+  clear: both;
+  display: inline-block;
+}
+
+.row-fluid:before,
+.row-fluid:after {
+  display: table;
+  content: "";
+  content: normal; /*safari*/
+  line-height: 0;
+  width: 0;
+}
+
+.row-fluid:after {
+  clear: both;
+}
+
+.row-fluid [class*=span] {
+  display: block;
+  width: 100%;
+  min-height: 22px;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  float: left;
+  margin-left: 2.0408163265%;
+  *margin-left: 1.9897959184%;
+}
+
+.row-fluid [class*=span]:first-child {
+  margin-left: 0;
+}
+
+.row-fluid .controls-row [class*=span] + [class*=span] {
+  margin-left: 2.0408163265%;
+}
+
+.row-fluid .span20 {
+  width: 100%;
+  *width: 99.9489795918%;
+}
+
+.row-fluid .span19 {
+  width: 94.8979591837%;
+  *width: 94.8469387755%;
+}
+
+.row-fluid .span18 {
+  width: 89.7959183673%;
+  *width: 89.7448979592%;
+}
+
+.row-fluid .span17 {
+  width: 84.693877551%;
+  *width: 84.6428571429%;
+}
+
+.row-fluid .span16 {
+  width: 79.5918367347%;
+  *width: 79.5408163265%;
+}
+
+.row-fluid .span15 {
+  width: 74.4897959184%;
+  *width: 74.4387755102%;
+}
+
+.row-fluid .span14 {
+  width: 69.387755102%;
+  *width: 69.3367346939%;
+}
+
+.row-fluid .span13 {
+  width: 64.2857142857%;
+  *width: 64.2346938776%;
+}
+
+.row-fluid .span12 {
+  width: 59.1836734694%;
+  *width: 59.1326530612%;
+}
+
+.row-fluid .span11 {
+  width: 54.0816326531%;
+  *width: 54.0306122449%;
+}
+
+.row-fluid .span10 {
+  width: 48.9795918367%;
+  *width: 48.9285714286%;
+}
+
+.row-fluid .span9 {
+  width: 43.8775510204%;
+  *width: 43.8265306122%;
+}
+
+.row-fluid .span8 {
+  width: 38.7755102041%;
+  *width: 38.7244897959%;
+}
+
+.row-fluid .span7 {
+  width: 33.6734693878%;
+  *width: 33.6224489796%;
+}
+
+.row-fluid .span6 {
+  width: 28.5714285714%;
+  *width: 28.5204081633%;
+}
+
+.row-fluid .span5 {
+  width: 23.4693877551%;
+  *width: 23.4183673469%;
+}
+
+.row-fluid .span4 {
+  width: 18.3673469388%;
+  *width: 18.3163265306%;
+}
+
+.row-fluid .span3 {
+  width: 13.2653061224%;
+  *width: 13.2142857143%;
+}
+
+.row-fluid .span2 {
+  width: 8.1632653061%;
+  *width: 8.112244898%;
+}
+
+.row-fluid .span1 {
+  width: 3.0612244898%;
+  *width: 3.0102040816%;
+}
+
+.row-fluid .offset20 {
+  margin-left: 104.0816326531%;
+  *margin-left: 103.9795918367%;
+}
+
+.row-fluid .offset20:first-child {
+  margin-left: 102.0408163265%;
+  *margin-left: 101.9387755102%;
+}
+
+.row-fluid .offset19 {
+  margin-left: 98.9795918367%;
+  *margin-left: 98.8775510204%;
+}
+
+.row-fluid .offset19:first-child {
+  margin-left: 96.9387755102%;
+  *margin-left: 96.8367346939%;
+}
+
+.row-fluid .offset18 {
+  margin-left: 93.8775510204%;
+  *margin-left: 93.7755102041%;
+}
+
+.row-fluid .offset18:first-child {
+  margin-left: 91.8367346939%;
+  *margin-left: 91.7346938776%;
+}
+
+.row-fluid .offset17 {
+  margin-left: 88.7755102041%;
+  *margin-left: 88.6734693878%;
+}
+
+.row-fluid .offset17:first-child {
+  margin-left: 86.7346938776%;
+  *margin-left: 86.6326530612%;
+}
+
+.row-fluid .offset16 {
+  margin-left: 83.6734693878%;
+  *margin-left: 83.5714285714%;
+}
+
+.row-fluid .offset16:first-child {
+  margin-left: 81.6326530612%;
+  *margin-left: 81.5306122449%;
+}
+
+.row-fluid .offset15 {
+  margin-left: 78.5714285714%;
+  *margin-left: 78.4693877551%;
+}
+
+.row-fluid .offset15:first-child {
+  margin-left: 76.5306122449%;
+  *margin-left: 76.4285714286%;
+}
+
+.row-fluid .offset14 {
+  margin-left: 73.4693877551%;
+  *margin-left: 73.3673469388%;
+}
+
+.row-fluid .offset14:first-child {
+  margin-left: 71.4285714286%;
+  *margin-left: 71.3265306122%;
+}
+
+.row-fluid .offset13 {
+  margin-left: 68.3673469388%;
+  *margin-left: 68.2653061224%;
+}
+
+.row-fluid .offset13:first-child {
+  margin-left: 66.3265306122%;
+  *margin-left: 66.2244897959%;
+}
+
+.row-fluid .offset12 {
+  margin-left: 63.2653061224%;
+  *margin-left: 63.1632653061%;
+}
+
+.row-fluid .offset12:first-child {
+  margin-left: 61.2244897959%;
+  *margin-left: 61.1224489796%;
+}
+
+.row-fluid .offset11 {
+  margin-left: 58.1632653061%;
+  *margin-left: 58.0612244898%;
+}
+
+.row-fluid .offset11:first-child {
+  margin-left: 56.1224489796%;
+  *margin-left: 56.0204081633%;
+}
+
+.row-fluid .offset10 {
+  margin-left: 53.0612244898%;
+  *margin-left: 52.9591836735%;
+}
+
+.row-fluid .offset10:first-child {
+  margin-left: 51.0204081633%;
+  *margin-left: 50.9183673469%;
+}
+
+.row-fluid .offset9 {
+  margin-left: 47.9591836735%;
+  *margin-left: 47.8571428571%;
+}
+
+.row-fluid .offset9:first-child {
+  margin-left: 45.9183673469%;
+  *margin-left: 45.8163265306%;
+}
+
+.row-fluid .offset8 {
+  margin-left: 42.8571428571%;
+  *margin-left: 42.7551020408%;
+}
+
+.row-fluid .offset8:first-child {
+  margin-left: 40.8163265306%;
+  *margin-left: 40.7142857143%;
+}
+
+.row-fluid .offset7 {
+  margin-left: 37.7551020408%;
+  *margin-left: 37.6530612245%;
+}
+
+.row-fluid .offset7:first-child {
+  margin-left: 35.7142857143%;
+  *margin-left: 35.612244898%;
+}
+
+.row-fluid .offset6 {
+  margin-left: 32.6530612245%;
+  *margin-left: 32.5510204082%;
+}
+
+.row-fluid .offset6:first-child {
+  margin-left: 30.612244898%;
+  *margin-left: 30.5102040816%;
+}
+
+.row-fluid .offset5 {
+  margin-left: 27.5510204082%;
+  *margin-left: 27.4489795918%;
+}
+
+.row-fluid .offset5:first-child {
+  margin-left: 25.5102040816%;
+  *margin-left: 25.4081632653%;
+}
+
+.row-fluid .offset4 {
+  margin-left: 22.4489795918%;
+  *margin-left: 22.3469387755%;
+}
+
+.row-fluid .offset4:first-child {
+  margin-left: 20.4081632653%;
+  *margin-left: 20.306122449%;
+}
+
+.row-fluid .offset3 {
+  margin-left: 17.3469387755%;
+  *margin-left: 17.2448979592%;
+}
+
+.row-fluid .offset3:first-child {
+  margin-left: 15.306122449%;
+  *margin-left: 15.2040816327%;
+}
+
+.row-fluid .offset2 {
+  margin-left: 12.2448979592%;
+  *margin-left: 12.1428571429%;
+}
+
+.row-fluid .offset2:first-child {
+  margin-left: 10.2040816327%;
+  *margin-left: 10.1020408163%;
+}
+
+.row-fluid .offset1 {
+  margin-left: 7.1428571429%;
+  *margin-left: 7.0408163265%;
+}
+
+.row-fluid .offset1:first-child {
+  margin-left: 5.1020408163%;
+  *margin-left: 5%;
+}
+
+[class*=span].hide,
+.row-fluid [class*=span].hide {
+  display: none;
+}
+
+[class*=span].pull-right,
+.row-fluid [class*=span].pull-right {
+  float: right;
+}
+
+@media screen and (max-width: 767px) {
+  .row-fluid {
+    width: 100%;
+  }
+  [class*=span],
+  .uneditable-input[class*=span],
+  .row-fluid [class*=span] {
+    float: none;
+    display: block;
+    width: 100%;
+    margin-left: 0;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+  }
+  .span12,
+  .row-fluid .span12 {
+    width: 100%;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+  }
+  .row-fluid [class*=offset]:first-child {
+    margin-left: 0;
+  }
+  .input-large,
+  .input-xlarge,
+  .input-xxlarge,
+  input[class*=span],
+  select[class*=span],
+  textarea[class*=span],
+  .uneditable-input {
+    display: block;
+    width: 100%;
+    min-height: 22px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+  }
+  .input-prepend input,
+  .input-append input,
+  .input-prepend input[class*=span],
+  .input-append input[class*=span] {
+    display: inline-block;
+    width: auto;
+  }
+}
+/*-----------------------------------------*/
+#content-zone-estudis .menuleft {
+  padding: 0 4em 0 3em !important;
+}
+
+#tocify {
+  z-index: 1;
+}
+
+#menuleft-nav {
+  /*.menuleft_list .menuleft_list li a { padding-left:1.5em;}*/
+  /*
+  .menuleft_box *:focus {
+      outline: none; per accessibilitat ha d'estar posat
+  }*/
+}
+#menuleft-nav .menuleft_titol {
+  color: var(--uib-color-gray);
+  display: block;
+  width: 100%;
+  font-size: 1.15em;
+  font-weight: bold;
+  border-bottom: 2px solid var(--uib-color-gray);
+}
+#menuleft-nav .menuleft_titol a {
+  color: #444;
+}
+#menuleft-nav .menuleft_list {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+#menuleft-nav .menuleft_list li {
+  position: relative;
+  margin: 0.75em 0;
+}
+#menuleft-nav .menuleft_list li a {
+  color: #005fa3;
+  padding-left: 0;
+  line-height: 1.3em;
+}
+#menuleft-nav .menuleft_list .menuleft_list {
+  margin: 0;
+  margin-left: 1.5em;
+}
+#menuleft-nav .menuleft_list .menuleft_list li a:before {
+  content: "- ";
+  position: absolute;
+  left: -0.7em;
+}
+#menuleft-nav a.menuleft_selected {
+  display: block;
+}
+#menuleft-nav li.menuleft_selected {
+  background-color: transparent;
+  display: block;
+}
+#menuleft-nav li a.link-selected.current-page,
+#menuleft-nav li.link-selected > a,
+#menuleft-nav li.uib_style_option_selected > a {
+  font-weight: bold;
+}
+#menuleft-nav a.extern:after {
+  content: "\f0c1";
+  font-family: "Font Awesome 5 Free";
+  font-weight: 900;
+  font-size: 0.65em;
+  line-height: 1em;
+  position: relative;
+  padding: 0.5em 1em;
+}
+#menuleft-nav .menuleft_box {
+  margin-top: 1.25em;
+  position: relative;
+}
+#menuleft-nav .menuleft_box:first-child {
+  margin-top: 0em;
+}
+#menuleft-nav label {
+  width: 0;
+  padding-left: 0;
+  overflow: hidden;
+  height: 0;
+  position: absolute;
+  right: -9999px;
+}
+#menuleft-nav .openclose {
+  width: 0;
+  border: 0;
+  margin: 0;
+  background-color: transparent;
+  position: absolute;
+  left: -9999px;
+}
+
+@media (max-width: 767px) {
+  #menuleft-nav {
+    padding: 0 0.5em;
+    overflow-y: auto;
+    max-height: calc(100vh - 8em);
+    box-sizing: border-box;
+    min-height: 2.35em;
+    width: 100%;
+    z-index: 8;
+    position: fixed;
+    top: calc(var(--height-xs-top-header) + 2.35rem);
+    left: 0;
+    margin: 0;
+    background-color: var(--uib-color-gray);
+    opacity: 0.95;
+    /*menubox*/
+  }
+  #menuleft-nav * {
+    box-sizing: border-box;
+  }
+  #menuleft-nav .menuleft_list {
+    margin: 0 0 0 1.5em;
+    display: none;
+  }
+  #menuleft-nav .menuleft_box > .menuleft_box {
+    display: none;
+  }
+  #menuleft-nav .menuleft_box:first-child {
+    padding: 0.35em 0 0.5em 0;
+  }
+  #menuleft-nav .menuleft_titol {
+    display: inline-block;
+    width: auto;
+    font-size: 1em;
+    font-weight: normal;
+    border-bottom: 0;
+    margin: 0 2em 0 0;
+    color: var(--background);
+  }
+  #menuleft-nav .menuleft_list > li { /*SUBMENUS*/ }
+  #menuleft-nav .menuleft_list > li > label, #menuleft-nav .menuleft_list > li label {
+    display: none;
+  }
+  #menuleft-nav .menuleft_list > li > li:not(:hover) > .openclose:not(:checked) + label + .sub-menu, #menuleft-nav .menuleft_list > li > .sub-menu {
+    display: block;
+    max-height: none;
+  }
+  #menuleft-nav .menuleft_list > li a:hover,
+  #menuleft-nav .menuleft_list > li a,
+  #menuleft-nav .menuleft_list > li span,
+  #menuleft-nav .menuleft_list > li label,
+  #menuleft-nav .menuleft_list > li label:before,
+  #menuleft-nav .menuleft_list > li .openclose:not(:checked) + label:before {
+    color: white !important;
+    background-color: transparent;
+  }
+  #menuleft-nav .menuleft_list > li > a:hover {
+    text-decoration: underline;
+  }
+  #menuleft-nav .menuleft_titol a,
+  #menuleft-nav .menuleft_list li a,
+  #menuleft-nav .menuleft_list li span {
+    padding: 4px;
+  }
+  #menuleft-nav a.link-selected.current-page,
+  #menuleft-nav span.link-selected.current-page {
+    border-left: 10px solid var(--uib-celeste-color);
+  }
+  #menuleft-nav > ol .sub-menu .sub-menu {
+    background-color: transparent;
+  }
+  #menuleft-nav .menuleft_box a.extern:after {
+    content: "\f0c1";
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    font-size: 0.65em;
+    line-height: 1em;
+    position: relative;
+    padding: 0.5em 1em;
+    transition: 0.2s;
+  }
+  #menuleft-nav .menuleft_box > ol > li:focus, #menuleft-nav .menuleft_box > ol > li:focus-within, #menuleft-nav .menuleft_box > ol > li:hover {
+    z-index: 100;
+  }
+  #menuleft-nav .menuleft_box > ol li:focus:after, #menuleft-nav .menuleft_box > ol li:focus-within:after, #menuleft-nav .menuleft_box > ol li:hover:after {
+    background-color: var(--uib-celeste-color);
+  }
+  #menuleft-nav .menuleft_box > ol > li:first-child {
+    padding-left: 0;
+  }
+  #menuleft-nav .menuleft_box > ol > li:focus .sub-menu, #menuleft-nav .menuleft_box > ol > li:focus-within .sub-menu {
+    max-height: 1500px;
+  }
+  #menuleft-nav .menuleft_box > ol > li:after {
+    background: var(--uib-celeste-color);
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    transition: 0.3s;
+    max-width: 0;
+    overflow: hidden;
+  }
+  #menuleft-nav .menuleft_box > ol > li > .sub-menu {
+    box-sizing: border-box;
+    padding: 0.5em;
+    list-style: none;
+    overflow: hidden;
+    padding-bottom: 2em;
+    position: absolute;
+    left: 0%;
+    transition: 0.3s;
+    min-width: 20em;
+    width: max-content;
+    max-width: 10em;
+  }
+  #menuleft-nav .menuleft_box > ol > li:not(:hover) > .openclose:not(:checked) + label + .sub-menu {
+    display: none;
+    max-height: 0;
+  }
+  #menuleft-nav .menuleft_box > ol .sub-menu {
+    border-left: 0;
+    padding-left: 0;
+    display: none;
+    max-height: 0;
+  }
+  #menuleft-nav .menuleft_box > ol .sub-menu > li {
+    font-size: 0.95em;
+    text-align: left;
+    display: block;
+    min-width: 100%;
+    padding: 5px 0.5em;
+    width: 100%;
+  }
+  #menuleft-nav .menuleft_box > ol .sub-menu > li a,
+  #menuleft-nav .menuleft_box > ol .sub-menu > li span {
+    padding: 4px;
+  }
+  #menuleft-nav .menuleft_box > ol .sub-menu > li li a:after {
+    bottom: 2px;
+    height: 1px;
+  }
+  #menuleft-nav .menuleft_box > ol .sub-menu > li a:hover:after,
+  #menuleft-nav .menuleft_box > ol .sub-menu > li a:focus:after {
+    width: 15px;
+  }
+  #menuleft-nav .menuleft_box > ol .sub-menu:before:focus .sub-menu, #menuleft-nav .menuleft_box > ol .sub-menu:before:hover .sub-menu {
+    display: block;
+  }
+  #menuleft-nav .menuleft_box > ol .sub-menu .sub-menu {
+    display: block;
+    position: relative;
+    background-color: var(--subsubback-color);
+    margin: 0 0 0 1em;
+    width: calc(100% - 1em);
+    max-height: none;
+  }
+  #menuleft-nav .menuleft_box > ol .sub-menu .sub-menu li {
+    width: 100%;
+    border-left: 2px solid var(--uib-celeste-color);
+  }
+  #menuleft-nav .menuleft_box .openclose:not(:checked) + label:before, #menuleft-nav .menuleft_box label:before {
+    content: "\f067";
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    font-size: 1em;
+    line-height: 1em;
+    position: absolute;
+    margin: auto;
+    transition: 0.2s;
+    right: 0;
+    bottom: 0.6em;
+    color: white;
+  }
+  #menuleft-nav .menuleft_box .sub-menu .openclose:not(:checked) + label:before,
+  #menuleft-nav .menuleft_box .sub-menu label:before {
+    content: "\f055";
+  }
+  #menuleft-nav .menuleft_box .sub-menu label:focus:before,
+  #menuleft-nav .menuleft_box .sub-menu label:hover:before {
+    content: "\f067" !important;
+  }
+  #menuleft-nav .menuleft_box > ol > li.dropdown:hover > label:before, #menuleft-nav .menuleft_box > ol > li.dropdown:focus > label:before, #menuleft-nav .menuleft_box .openclose:checked ~ label:before {
+    content: "\f068";
+  }
+  #menuleft-nav .menuleft_box label {
+    width: 0;
+    padding-left: 2em;
+    overflow: hidden;
+    height: 2em;
+    position: absolute;
+    right: 0;
+  }
+  #menuleft-nav .menuleft_box .openclose {
+    width: 0;
+    border: 0;
+    margin: 0;
+    background-color: transparent;
+    position: absolute;
+    left: -9999px;
+  }
+  #menuleft-nav .menuleft_box > ol > li:hover > .sub-menu, #menuleft-nav .menuleft_box > ol > li:hover + .sub-menu, #menuleft-nav .menuleft_box > ol > li:hover + .sub-menu ~ .menuleft_box, #menuleft-nav .menuleft_box > ol > li:focus > .sub-menu, #menuleft-nav .menuleft_box > ol > li:focus + .sub-menu, #menuleft-nav .menuleft_box > ol > li:focus + .sub-menu ~ .menuleft_box, #menuleft-nav .menuleft_box > ol > li:focus-within > .sub-menu, #menuleft-nav .menuleft_box > ol > li:focus-within + .sub-menu, #menuleft-nav .menuleft_box > ol > li:focus-within + .sub-menu ~ .menuleft_box, #menuleft-nav .menuleft_box .openclose:checked + label > .sub-menu, #menuleft-nav .menuleft_box .openclose:checked + label + .sub-menu, #menuleft-nav .menuleft_box .openclose:checked + label + .sub-menu ~ .menuleft_box {
+    max-height: 1850px;
+    max-height: none;
+    display: block;
+    position: relative;
+    padding: 0;
+  }
+  /*menuvertical*/
+  #menuleft-nav .menuleft > ol > li {
+    font-weight: normal;
+    margin-right: 0;
+  }
+  #menuleft-nav .menuleft > ol > li > a,
+  #menuleft-nav .menuleft > ol > li > span {
+    border: 0;
+  }
+  #menuleft-nav, #menuleft-nav * {
+    box-sizing: border-box;
+  }
+  #menuleft-expand {
+    border-radius: 0;
+    background-color: transparent;
+    display: inline-block;
+    float: none;
+    left: 0em;
+    top: 0em;
+    margin: 0;
+    width: 2em;
+    min-height: 2.5em;
+    height: auto;
+    cursor: pointer;
+    border: 0;
+    padding: 0;
+  }
+  #menuleft-expand i {
+    color: white;
+    margin-top: 1em;
+  }
+  .menuleft_titol {
+    display: inline-block;
+    border: 0;
+    font-weight: normal;
+  }
+  .menuleft_titol a, .menuleft_list li a,
+  .menuleft_titol a:hover {
+    color: white !important;
+  }
+  #menuleft-nav a:hover,
+  #menuleft-nav a:focus,
+  #menuleft-nav a:focus-within {
+    text-decoration: underline !important;
+  }
+  ul li a.link-selected.current-page,
+  li.menuleft_selected ul {
+    background-color: transparent;
+  }
+  ul li a.link-selected.current-page {
+    text-decoration: underline;
+  }
+}
+.uib-visualizer-portlet {
+  /*.alert, .alert h4 {
+      color: #8A5700;
+  }*/
+}
+.uib-visualizer-portlet .alert-block, .uib-visualizer-portlet .alert-block h4 {
+  color: #333;
+  color: var(--foreground);
+}
+.uib-visualizer-portlet .alert-block {
+  padding-top: 14px;
+  padding-bottom: 14px;
+}
+.uib-visualizer-portlet .alert {
+  padding: 8px 35px 8px 14px;
+  margin-bottom: 12px;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+  /*background-color: #fcf8e3;
+  border: 1px solid #fbeed5;*/
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  border-radius: 4px;
+}
+.uib-visualizer-portlet .nav {
+  margin-left: 0;
+  margin-bottom: 1rem;
+  list-style: none;
+  border: 0;
+}
+.uib-visualizer-portlet .nav > li > a {
+  display: block;
+}
+.uib-visualizer-portlet .nav > li > a:hover, .uib-visualizer-portlet .nav > li > a:focus {
+  text-decoration: none;
+  background-color: #005db5;
+  color: white;
+}
+.uib-visualizer-portlet .nav > li > a > img {
+  max-width: none;
+}
+.uib-visualizer-portlet .nav > .pull-right {
+  float: right;
+}
+.uib-visualizer-portlet .nav-header {
+  display: block;
+  padding: 3px 15px;
+  font-size: 11px;
+  font-weight: bold;
+  line-height: 12px;
+  color: #999999;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+  text-transform: uppercase;
+}
+.uib-visualizer-portlet .nav li + .nav-header {
+  margin-top: 9px;
+}
+.uib-visualizer-portlet .nav-list {
+  padding-left: 15px;
+  padding-right: 15px;
+  margin-bottom: 0;
+}
+.uib-visualizer-portlet .nav-list > li > a, .uib-visualizer-portlet .nav-list .nav-header {
+  margin-left: -15px;
+  margin-right: -15px;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+.uib-visualizer-portlet .nav-list > li > a {
+  padding: 3px 15px;
+}
+.uib-visualizer-portlet .nav-list > .active > a, .uib-visualizer-portlet .nav-list > .active > a:hover, .uib-visualizer-portlet .nav-list > .active > a:focus {
+  color: #ffffff;
+  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.2);
+  background-color: #005db5;
+}
+.uib-visualizer-portlet .nav-list [class^=icon-], .uib-visualizer-portlet .nav-list [class*=" icon-"] {
+  margin-right: 2px;
+}
+.uib-visualizer-portlet .nav-list .divider {
+  *width: 100%;
+  height: 1px;
+  margin: 5px 1px;
+  *margin: -5px 0 5px;
+  overflow: hidden;
+  background-color: #e5e5e5;
+  border-bottom: 1px solid #ffffff;
+}
+.uib-visualizer-portlet .nav-tabs {
+  font-size: 1rem;
+}
+.uib-visualizer-portlet .nav-tabs,
+.uib-visualizer-portlet .nav-pills {
+  *zoom: 1;
+}
+.uib-visualizer-portlet .nav-tabs:before, .uib-visualizer-portlet .nav-pills:before, .uib-visualizer-portlet .nav-tabs:after, .uib-visualizer-portlet .nav-pills:after {
+  display: table;
+  content: "";
+  line-height: 0;
+}
+.uib-visualizer-portlet .nav-tabs:after, .uib-visualizer-portlet .nav-pills:after {
+  clear: both;
+}
+.uib-visualizer-portlet .nav-tabs > li, .uib-visualizer-portlet .nav-pills > li {
+  float: left;
+}
+.uib-visualizer-portlet .nav-tabs > li > a, .uib-visualizer-portlet .nav-pills > li > a {
+  padding-right: 12px;
+  padding-left: 12px;
+  margin-right: 2px;
+  line-height: 14px;
+}
+.uib-visualizer-portlet .nav-tabs > li > a, .uib-visualizer-portlet .nav-pills > li > a {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  margin-top: 2px;
+  margin-bottom: 2px;
+  border-radius: 0;
+}
+.uib-visualizer-portlet .nav-pills > .active > a, .uib-visualizer-portlet .nav-pills > .active > a:hover, .uib-visualizer-portlet .nav-pills > .active > a:focus, .uib-visualizer-portlet .nav-pills > li > a:hover, .uib-visualizer-portlet .nav-pills > li > a:focus, .uib-visualizer-portlet .nav-tabs > .active > a, .uib-visualizer-portlet .nav-tabs > .active > a:hover, .uib-visualizer-portlet .nav-tabs > .active > a:focus, .uib-visualizer-portlet .nav-tabs > li > a:hover, .uib-visualizer-portlet .nav-tabs > li > a:focus {
+  color: #ffffff !important;
+  background-color: #005db5;
+  text-decoration: none;
+}
+.uib-visualizer-portlet .nav-pills > li > a, .uib-visualizer-portlet .nav-tabs > li > a {
+  padding-right: 4px;
+  padding-left: 4px;
+  margin-right: 1em;
+}
+.uib-visualizer-portlet .nav-pills > li:last-child > a, .uib-visualizer-portlet .nav-tabs > li:last-child > a {
+  margin-right: 0;
+}
+.uib-visualizer-portlet .nav-stacked > li {
+  float: none;
+}
+.uib-visualizer-portlet .nav-stacked > li > a {
+  margin-right: 0;
+}
+.uib-visualizer-portlet .nav-tabs.nav-stacked {
+  border-bottom: 0;
+}
+.uib-visualizer-portlet .nav-tabs.nav-stacked > li > a {
+  border: 1px solid #ddd;
+  -webkit-border-radius: 0;
+  -moz-border-radius: 0;
+  border-radius: 0;
+}
+.uib-visualizer-portlet .nav-tabs.nav-stacked > li:first-child > a {
+  -webkit-border-top-right-radius: 4px;
+  -moz-border-radius-topright: 4px;
+  border-top-right-radius: 4px;
+  -webkit-border-top-left-radius: 4px;
+  -moz-border-radius-topleft: 4px;
+  border-top-left-radius: 4px;
+}
+.uib-visualizer-portlet .nav-tabs.nav-stacked > li:last-child > a {
+  -webkit-border-bottom-right-radius: 4px;
+  -moz-border-radius-bottomright: 4px;
+  border-bottom-right-radius: 4px;
+  -webkit-border-bottom-left-radius: 4px;
+  -moz-border-radius-bottomleft: 4px;
+  border-bottom-left-radius: 4px;
+}
+.uib-visualizer-portlet .nav-tabs.nav-stacked > li > a:hover, .uib-visualizer-portlet .nav-tabs.nav-stacked > li > a:focus {
+  border-color: #ddd;
+  z-index: 2;
+}
+.uib-visualizer-portlet .nav-pills.nav-stacked > li > a {
+  margin-bottom: 3px;
+}
+.uib-visualizer-portlet .nav-pills.nav-stacked > li:last-child > a {
+  margin-bottom: 1px;
+}
+.uib-visualizer-portlet .nav-tabs .dropdown-menu {
+  -webkit-border-radius: 0 0 6px 6px;
+  -moz-border-radius: 0 0 6px 6px;
+  border-radius: 0 0 6px 6px;
+}
+.uib-visualizer-portlet .nav-pills .dropdown-menu {
+  -webkit-border-radius: 6px;
+  -moz-border-radius: 6px;
+  border-radius: 6px;
+}
+.uib-visualizer-portlet .nav .dropdown-toggle .caret {
+  border-top-color: #005db5;
+  border-bottom-color: #005db5;
+  margin-top: 6px;
+}
+.uib-visualizer-portlet .nav .dropdown-toggle:hover .caret, .uib-visualizer-portlet .nav .dropdown-toggle:focus .caret {
+  border-top-color: #003f69;
+  border-bottom-color: #003f69;
+}
+.uib-visualizer-portlet .nav-tabs .dropdown-toggle .caret {
+  margin-top: 8px;
+}
+.uib-visualizer-portlet .nav .active .dropdown-toggle .caret {
+  border-top-color: #fff;
+  border-bottom-color: #fff;
+}
+.uib-visualizer-portlet .nav-tabs .active .dropdown-toggle .caret {
+  border-top-color: #555555;
+  border-bottom-color: #555555;
+}
+.uib-visualizer-portlet .nav > .dropdown.active > a:hover, .uib-visualizer-portlet .nav > .dropdown.active > a:focus {
+  cursor: pointer;
+}
+.uib-visualizer-portlet .nav-tabs .open .dropdown-toggle, .uib-visualizer-portlet .nav-pills .open .dropdown-toggle, .uib-visualizer-portlet .nav > li.dropdown.open.active > a:hover, .uib-visualizer-portlet .nav > li.dropdown.open.active > a:focus {
+  color: #ffffff;
+  background-color: #999999;
+  border-color: #999999;
+}
+.uib-visualizer-portlet .nav li.dropdown.open .caret, .uib-visualizer-portlet .nav li.dropdown.open.active .caret, .uib-visualizer-portlet .nav li.dropdown.open a:hover .caret, .uib-visualizer-portlet .nav li.dropdown.open a:focus .caret {
+  border-top-color: #ffffff;
+  border-bottom-color: #ffffff;
+  opacity: 1;
+  filter: alpha(opacity=100);
+}
