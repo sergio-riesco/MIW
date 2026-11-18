@@ -214,9 +214,19 @@ p {
   margin-bottom: 1rem;
 }
 
-/* v3 (WCAG AAA 1.4.8): líneas de 80 caracteres como mucho */
-main p {
-  max-width: 75ch;
+/* v3 (WCAG AAA 1.4.8): bloques de texto de 80 caracteres como mucho.
+   75ch dejaba líneas de hasta 99 caracteres; 60ch da unas 75. */
+main p,
+main li,
+main dd {
+  max-width: 60ch;
+}
+
+/* v3 (WCAG AAA 3.1.4): las siglas con su forma completa (components/Abbr.js) */
+abbr[title] {
+  text-decoration: underline dotted;
+  text-underline-offset: 0.15em;
+  cursor: help;
 }
 
 img {
@@ -242,7 +252,7 @@ img {
 }
 
 .lead {
-  max-width: 48rem;
+  max-width: 60ch;
   margin-bottom: 0;
   color: var(--muted);
   font-size: 1.2rem;

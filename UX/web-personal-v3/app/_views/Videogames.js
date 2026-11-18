@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Breadcrumb from "../components/Breadcrumb";
+import { withAbbr } from "../components/Abbr";
 import TrailerDialog from "../components/TrailerDialog";
 import { subtitleTracks } from "../data/subtitles";
 import { videogames } from "../data/videogames";
@@ -125,7 +126,7 @@ export default function Videogames({ lang }) {
                   )}
                 </div>
 
-                <p className={styles.genre}>{pick(game.genre, lang)}</p>
+                <p className={styles.genre}>{withAbbr(pick(game.genre, lang), lang)}</p>
                 <h3>{game.title}</h3>
                 <p className={styles.description}>{pick(game.description, lang)}</p>
               </article>

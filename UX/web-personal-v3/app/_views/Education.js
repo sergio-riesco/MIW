@@ -1,4 +1,5 @@
 import Breadcrumb from "../components/Breadcrumb";
+import { withAbbr } from "../components/Abbr";
 import { education, experience } from "../data/profile";
 import { dictionaries } from "../i18n/dictionaries";
 import { formatDate, href, pageMetadata, pick } from "../i18n/config";
@@ -94,12 +95,12 @@ export default function Education({ lang }) {
                 </p>
                 <h3>{pick(job.role, lang)}</h3>
                 <p className={styles.meta}>{job.company}</p>
-                <p>{pick(job.summary, lang)}</p>
+                <p>{withAbbr(pick(job.summary, lang), lang)}</p>
 
                 <h4>{t.whatIDid}</h4>
                 <ul className={styles.bullets}>
                   {job.tasks.map((task, index) => (
-                    <li key={index}>{pick(task, lang)}</li>
+                    <li key={index}>{withAbbr(pick(task, lang), lang)}</li>
                   ))}
                 </ul>
 
@@ -107,7 +108,7 @@ export default function Education({ lang }) {
                 <ul className={styles.tags}>
                   {job.skills.map((skill) => {
                     const label = pick(skill, lang);
-                    return <li key={label}>{label}</li>;
+                    return <li key={label}>{withAbbr(label, lang)}</li>;
                   })}
                 </ul>
               </article>

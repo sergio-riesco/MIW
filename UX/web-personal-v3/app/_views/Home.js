@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import Breadcrumb from "../components/Breadcrumb";
+import { withAbbr } from "../components/Abbr";
 import { contact, education, experience } from "../data/profile";
 import { dictionaries } from "../i18n/dictionaries";
 import { href, pageMetadata, pick } from "../i18n/config";
@@ -137,7 +138,7 @@ export default function Home({ lang }) {
             <dt>{t.experience}</dt>
             <dd>
               {pick(job.role, lang)}, {job.company}
-              <span className={styles.factDetail}>{pick(job.summary, lang)}</span>
+              <span className={styles.factDetail}>{withAbbr(pick(job.summary, lang), lang)}</span>
             </dd>
           </div>
         </dl>

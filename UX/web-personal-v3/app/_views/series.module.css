@@ -172,7 +172,7 @@
 }
 
 .favoriteNote {
-  max-width: 44rem;
+  max-width: 60ch; /* v3: 80 caracteres como mucho (WCAG 1.4.8) */
   margin: 0;
   color: var(--muted);
 }

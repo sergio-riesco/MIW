@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { dictionaries, EMAIL } from "../i18n/dictionaries";
 import { formatDate, href, LAST_UPDATED, SITE_URL } from "../i18n/config";
+import { withAbbr } from "./Abbr";
 import InlineScript from "./InlineScript";
 import LanguageSwitch from "./LanguageSwitch";
 import MenuToggle from "./MenuToggle";
@@ -152,7 +153,7 @@ export default function SiteShell({ lang, children }) {
             </p>
 
             <p>
-              © 2026 Sergio Riesco Collar · {t.footer.place}
+              © 2026 Sergio Riesco Collar · {withAbbr(t.footer.place, lang)}
             </p>
           </div>
         </footer>
