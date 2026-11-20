@@ -9,6 +9,8 @@ import { series } from "./series";
 import { videogames } from "./videogames";
 import { href, musicCategoryHref, pick } from "../i18n/config";
 
+// Nombre de cada sección en los dos idiomas. Sale encima del título de cada
+// resultado y también se busca en él.
 const sectionNames = {
   es: {
     home: "Sobre mí",
@@ -34,6 +36,8 @@ const sectionNames = {
   },
 };
 
+// Descripción de las páginas que no tienen una lista de datos detrás
+// (inicio, contacto, ayuda y mapa), para que también se puedan encontrar.
 const pageTexts = {
   es: {
     home: "Presentación, dónde vivo, estudios y contacto de Sergio Riesco Collar.",
@@ -49,10 +53,18 @@ const pageTexts = {
   },
 };
 
+// Construye el índice de un idioma ("es" o "en"). Cada entrada es un objeto:
+//   section  sección donde está (sale encima del título)
+//   title    título del resultado, que es el enlace
+//   text     descripción corta que sale debajo del título
+//   extra    texto que se busca pero no se muestra (opcional)
+//   href     página a la que lleva el resultado, en el idioma pedido
+// pick() elige el texto del idioma cuando un dato es un objeto { es, en }.
 export function buildIndex(lang) {
   const names = sectionNames[lang];
   const entries = [];
 
+  // Páginas generales
   for (const key of ["home", "contact", "help", "sitemap"]) {
     entries.push({
       section: names[key],
@@ -62,6 +74,7 @@ export function buildIndex(lang) {
     });
   }
 
+  // Grado y máster: centro, año de inicio y estado
   for (const item of education) {
     entries.push({
       section: names.education,
@@ -71,6 +84,8 @@ export function buildIndex(lang) {
     });
   }
 
+  // Prácticas. Las tareas y tecnologías van en extra: así "ROS2" encuentra
+  // las prácticas aunque no salga en el resultado.
   for (const job of experience) {
     entries.push({
       section: names.education,
@@ -82,6 +97,7 @@ export function buildIndex(lang) {
     });
   }
 
+  // Personas que me avalan (página de contacto)
   for (const person of references) {
     entries.push({
       section: names.contact,
@@ -91,6 +107,9 @@ export function buildIndex(lang) {
     });
   }
 
+  // Música: una entrada por género (con la lista de sus grupos como texto) y
+  // otra por grupo (con el álbum y la canción del fragmento). Los dos llevan
+  // a la página del género.
   for (const category of categories) {
     const name = pick(category.name, lang);
     entries.push({
@@ -110,6 +129,7 @@ export function buildIndex(lang) {
     }
   }
 
+  // Videojuegos: género y descripción
   for (const game of videogames) {
     entries.push({
       section: names.videogames,
@@ -119,6 +139,7 @@ export function buildIndex(lang) {
     });
   }
 
+  // Series: género, temporada y descripción
   for (const show of series) {
     entries.push({
       section: names.series,
@@ -128,6 +149,7 @@ export function buildIndex(lang) {
     });
   }
 
+  // Aficiones. Los detalles (etiqueta y valor) van en extra.
   for (const hobby of hobbies) {
     entries.push({
       section: names.hobbies,
@@ -144,6 +166,8 @@ export function buildIndex(lang) {
 }
 
 // Minúsculas y sin tildes: "música" encuentra "Musica" y al revés.
+// normalize("NFD") separa cada letra de su acento ("é" pasa a "e" + acento) y
+// la expresión regular borra los acentos (rango Unicode U+0300 a U+036F).
 export function normalize(value) {
   return value
     .normalize("NFD")
@@ -154,6 +178,8 @@ export function normalize(value) {
 // Devuelve las entradas que contienen todas las palabras buscadas,
 // primero las que coinciden en el título.
 export function search(query, lang) {
+  // Separa la búsqueda en palabras; filter(Boolean) quita las vacías que
+  // quedan si hay varios espacios seguidos.
   const words = normalize(query).split(/\s+/).filter(Boolean);
 
   if (words.length === 0) {
@@ -163,15 +189,21 @@ export function search(query, lang) {
   return buildIndex(lang)
     .map((entry) => {
       const title = normalize(entry.title);
+      // Todo el texto de la entrada junto, para buscar en cualquier campo
       const all = normalize(`${entry.title} ${entry.section} ${entry.text} ${entry.extra ?? ""}`);
 
+      // Tienen que estar todas las palabras. includes() acepta trozos de
+      // palabra: "zeld" encuentra "Zelda".
       if (!words.every((word) => all.includes(word))) {
         return null;
       }
 
+      // Un punto por cada palabra que está en el título
       const score = words.filter((word) => title.includes(word)).length;
       return { ...entry, score };
     })
     .filter(Boolean)
+    // De más a menos puntos. sort() es estable: los empates se quedan en el
+    // orden del índice.
     .sort((a, b) => b.score - a.score);
 }

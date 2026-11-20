@@ -1,0 +1,9 @@
+https://www.uib.es/o/frontend-js-loader-modules-extender/loader.js.map mapping for column out of bounds: 1:29
+file:///C:/Users/UO294343/AppData/Local/Temp/claude/64394c9402cb517b/4e7bf994-cfed-421f-9ce9-c420e3924e14/scratchpad/lh-one.mjs:24
+  await Promise.race([chrome.kill().catch(() => {}), new Promise(r => setTimeout(r, 5000))]);
+                                   ^
+
+TypeError: Cannot read properties of undefined (reading 'catch')
+    at file:///C:/Users/UO294343/AppData/Local/Temp/claude/64394c9402cb517b/4e7bf994-cfed-421f-9ce9-c420e3924e14/scratchpad/lh-one.mjs:24:36
+
+Node.js v24.21.0

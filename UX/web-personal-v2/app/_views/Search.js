@@ -5,6 +5,13 @@ import { dictionaries } from "../i18n/dictionaries";
 import { href, pageMetadata } from "../i18n/config";
 import styles from "./pages.module.css";
 
+// Página de búsqueda (/buscar y /en/search). Se genera en el servidor en cada
+// petición: el formulario envía la búsqueda por GET en el parámetro "q" y la
+// página llega con los resultados ya pintados, así funciona sin JavaScript.
+// La búsqueda en sí está en app/data/searchIndex.js.
+
+// Textos de la página en los dos idiomas. results y none son funciones porque
+// llevan dentro el número de resultados y lo que se ha buscado.
 const text = {
   es: {
     title: "Buscar",
@@ -37,6 +44,7 @@ const text = {
   },
 };
 
+// Título, descripción y URLs de la página para cada idioma.
 export function metadata(lang) {
   const t = text[lang];
   return {
@@ -46,11 +54,17 @@ export function metadata(lang) {
   };
 }
 
+// lang: "es" o "en". searchParams: parámetros de la URL (en Next.js 16 es una
+// promesa, por eso el await).
 export default async function Search({ lang, searchParams }) {
   const t = text[lang];
   const params = await searchParams;
+  // Si la URL trae ?q= repetido, Next.js da un array; se usa el primero.
   const raw = Array.isArray(params?.q) ? params.q[0] : params?.q;
+  // Sin espacios alrededor y como mucho 100 caracteres (igual que el maxLength
+  // del campo), por si alguien escribe la URL a mano.
   const query = (raw ?? "").trim().slice(0, 100);
+  // Solo se busca si hay algo escrito; si no, se muestran los ejemplos.
   const results = query ? search(query, lang) : [];
   const searchHref = href("search", lang);
 
@@ -65,6 +79,9 @@ export default async function Search({ lang, searchParams }) {
         <p className="lead">{t.lead}</p>
       </header>
 
+      {/* Formulario GET normal: el navegador va a searchHref?q=... sin
+          necesitar JavaScript. defaultValue deja escrita la última búsqueda
+          para poder corregirla. */}
       <form className={styles.searchForm} role="search" action={searchHref} method="get">
         <label htmlFor="buscar-pagina">{t.label}</label>
         <div className={styles.searchRow}>
@@ -80,6 +97,7 @@ export default async function Search({ lang, searchParams }) {
         </div>
       </form>
 
+      {/* Sin búsqueda: enlaces de ejemplo que ya llevan la búsqueda hecha */}
       {!query && (
         <p>
           {t.examples}{" "}
@@ -93,6 +111,10 @@ export default async function Search({ lang, searchParams }) {
         </p>
       )}
 
+      {/* Con búsqueda: encabezado con el número de resultados y la lista, o
+          el mensaje de que no hay nada con un enlace al mapa del sitio.
+          React escapa el texto de la búsqueda, así que si se busca código
+          HTML se muestra como texto y no se ejecuta. */}
       {query && (
         <section aria-labelledby="resultados">
           <h2 id="resultados">
@@ -105,6 +127,9 @@ export default async function Search({ lang, searchParams }) {
             </p>
           ) : (
             <ol className={styles.results}>
+              {/* Cada resultado: sección, título con enlace y descripción.
+                  La key lleva el índice porque varios resultados pueden
+                  compartir href (todos los juegos van a /videojuegos). */}
               {results.map((result, index) => (
                 <li key={`${result.href}-${result.title}-${index}`}>
                   <p className={styles.meta}>{result.section}</p>

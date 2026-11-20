@@ -1,0 +1,156 @@
+[
+ {
+  "id": "1-portada",
+  "name": "Portada",
+  "desktop": {
+   "performance": 64,
+   "accessibility": 89,
+   "best-practices": 100,
+   "seo": 85
+  },
+  "mobile": {
+   "performance": 37,
+   "accessibility": 87,
+   "best-practices": 100,
+   "seo": 85
+  },
+  "mobileMetrics": {
+   "fcp": "5.0 s",
+   "lcp": "8.0 s",
+   "tbt": "860 ms",
+   "cls": "0",
+   "si": "12.2 s",
+   "weight": "Total size was 118,874 KiB"
+  },
+  "mobileA11yFails": [
+   "aria-hidden-focus",
+   "image-alt",
+   "target-size"
+  ],
+  "viewport": 1,
+  "finalUrl": "https://www.uib.es/inici"
+ },
+ {
+  "id": "2-listado-grados",
+  "name": "Listado de grados",
+  "desktop": {
+   "performance": 83,
+   "accessibility": 83,
+   "best-practices": 100,
+   "seo": 92
+  },
+  "mobile": {
+   "performance": 41,
+   "accessibility": 91,
+   "best-practices": 54,
+   "seo": 92
+  },
+  "mobileMetrics": {
+   "fcp": "6.9 s",
+   "lcp": "7.6 s",
+   "tbt": "640 ms",
+   "cls": "0",
+   "si": "11.1 s",
+   "weight": "Total size was 3,571 KiB"
+  },
+  "mobileA11yFails": [
+   "color-contrast",
+   "heading-order",
+   "target-size"
+  ],
+  "viewport": 1,
+  "finalUrl": "https://estudis.uib.es/estudis-de-grau/grau/"
+ },
+ {
+  "id": "3-plan-estudios",
+  "name": "Plan de estudios",
+  "desktop": {
+   "performance": 90,
+   "accessibility": 85,
+   "best-practices": 96,
+   "seo": 92
+  },
+  "mobile": {
+   "performance": 44,
+   "accessibility": 90,
+   "best-practices": 93,
+   "seo": 92
+  },
+  "mobileMetrics": {
+   "fcp": "6.1 s",
+   "lcp": "10.9 s",
+   "tbt": "650 ms",
+   "cls": "0",
+   "si": "6.1 s",
+   "weight": "Total size was 2,407 KiB"
+  },
+  "mobileA11yFails": [
+   "color-contrast",
+   "heading-order",
+   "link-in-text-block",
+   "target-size"
+  ],
+  "viewport": 1,
+  "finalUrl": "https://estudis.uib.es/estudis-de-grau/grau/informatica/GIN3-P/plaEstudis.html"
+ },
+ {
+  "id": "4-ficha-21724",
+  "name": "Ficha de la asignatura 21724",
+  "desktop": {
+   "performance": 83,
+   "accessibility": 82,
+   "best-practices": 96,
+   "seo": 92
+  },
+  "mobile": {
+   "performance": 45,
+   "accessibility": 91,
+   "best-practices": 93,
+   "seo": 92
+  },
+  "mobileMetrics": {
+   "fcp": "6.4 s",
+   "lcp": "11.5 s",
+   "tbt": "580 ms",
+   "cls": "0",
+   "si": "6.4 s",
+   "weight": "Total size was 2,468 KiB"
+  },
+  "mobileA11yFails": [
+   "color-contrast",
+   "listitem",
+   "target-size"
+  ],
+  "viewport": 1,
+  "finalUrl": "https://estudis.uib.es/estudis-de-grau/grau/informatica/GIN3-P/21724/index.html"
+ },
+ {
+  "id": "5-transparencia",
+  "name": "Portal de transparencia",
+  "desktop": {
+   "performance": 77,
+   "accessibility": 91,
+   "best-practices": 100,
+   "seo": 92
+  },
+  "mobile": {
+   "performance": 40,
+   "accessibility": 96,
+   "best-practices": 100,
+   "seo": 92
+  },
+  "mobileMetrics": {
+   "fcp": "4.7 s",
+   "lcp": "15.0 s",
+   "tbt": "640 ms",
+   "cls": "0",
+   "si": "23.7 s",
+   "weight": "Total size was 4,847 KiB"
+  },
+  "mobileA11yFails": [
+   "color-contrast"
+  ],
+  "viewport": 1,
+  "finalUrl": "https://transparencia.uib.es/"
+ }
+]
